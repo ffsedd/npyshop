@@ -1,0 +1,11 @@
+#!/usr/bin/env xdg-open
+[Desktop Entry]
+Name=pie
+Comment=
+Exec=x-terminal-emulator -e python3 -i /home/m/Dropbox/alma_scripts/pyalma/numpyshop/numpyshop.py  
+Icon=
+Terminal=false
+Type=Application
+Hidden=false
+
+

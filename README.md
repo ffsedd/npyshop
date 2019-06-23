@@ -1,2 +1,2 @@
 # numpyshop
-Image Editor base od Numpy arrays
+Image Editor based on Numpy arrays
