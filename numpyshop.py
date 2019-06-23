@@ -299,8 +299,7 @@ if __name__ == '__main__':
         Fp = Path(sys.argv[1])
         assert Fp.is_file(), f"not a file {Fp}"
     else:
-        Fp = Path('/home/m/Dropbox/alma_scripts/pyalma/numpyshop/hory.jpg')
-    
+        Fp = Path(__file__).parent / 'sample.jpg'    
     root = tk.Tk()
     root.title("Numpyshop")
     root.withdraw()  # root win is hidden
