@@ -1,4 +1,7 @@
 #!/usr/bin/env python3
+import time
+time0 = time.time()
+print("started")
 import sys
 from pathlib import Path
 import numpy as np
@@ -10,7 +13,7 @@ from matplotlib.backends.backend_tkagg import (
     FigureCanvasTkAgg, NavigationToolbar2Tk)
 
 from collections import deque
-
+print("imports done")
 
 '''
 RESOURCES:
@@ -30,6 +33,9 @@ AttributeError: 'FigureCanvasTkAgg' object has no attribute 'manager'
 
 sometimes incorrect crop region
 
+large images:
+matplotlib imshow very slow
+running out of memory
 '''
 
 
@@ -96,12 +102,21 @@ def buttons_dict():
 #  ------------------------------------------
 #  FUNCTIONS
 #  ------------------------------------------
+def timeit(method):
+
+    def timed(*args, **kw):
+        ts = time.time()
+        result = method(*args, **kw)
+        te = time.time()
+        print('%r  %2.2f ms' % (method.__qualname__, (te - ts) * 1000))
+        return result
+    return timed
 
 
 def load():
     print("open")
     img.load()
-    img.info()
+#    img.info()
     mainwin.update()
     histwin.update()
 
@@ -399,6 +414,7 @@ class mainWin(tk.Toplevel):
 
         self.draw()
 
+    @timeit
     def draw(self):
         ''' draw new image '''
         self.fig = plt.figure(figsize=(5, 5))
@@ -417,13 +433,14 @@ class mainWin(tk.Toplevel):
 
         history.add()
 
+    @timeit
     def update(self, add_to_history=True):
         ''' update image '''
         if len(img.arr.ravel()) == 0:
             print("array is empty")
             return
 
-        img.info()
+#        img.info()
         print(f"update w:{img.width}, h:{img.height}")
 
         self.im.set_data(img.arr)
@@ -471,6 +488,7 @@ class histWin(tk.Toplevel):
 
         self.draw()
 
+    @timeit
     def draw(self):
         self.fig = plt.figure(figsize=(2, 4))
         self.axes = self.fig.add_subplot(111)
@@ -497,6 +515,7 @@ class histWin(tk.Toplevel):
         self.canvas.draw()
         self.canvas.get_tk_widget().pack(side=tk.TOP, fill=tk.BOTH, expand=1)
 
+    @timeit
     def update(self):
 
         if self.hidden:
@@ -541,6 +560,7 @@ class statsWin(tk.Toplevel):
         self.frame = tk.Frame(self)
         self._draw_table()
 
+    @timeit
     def update(self):
 
         if self.hidden:
@@ -548,6 +568,7 @@ class statsWin(tk.Toplevel):
         self.frame.grid_forget()
         self._draw_table()
 
+    @timeit
     def _draw_table(self):
 
         for r, k in enumerate(img.stats):  # loop stats dictionary
@@ -565,9 +586,11 @@ class statsWin(tk.Toplevel):
         self.frame.pack(side=tk.LEFT)
 
 
+
 #  ------------------------------------------
 #  MAIN
 #  ------------------------------------------
+
 
 if __name__ == '__main__':
 
@@ -583,7 +606,7 @@ if __name__ == '__main__':
 
     # load image into numpy array
     img = npImage(Fp)
-
+    print("image loaded")
     history = History()
 
     histwin = histWin(root)
@@ -591,7 +614,8 @@ if __name__ == '__main__':
     statswin = statsWin(root)
 
     toolbar = Toolbar(root)
-
+    print("show mainwin")
     mainwin = mainWin(root)
+    print(f"mainloop in {time.time()-time0}")
 
     root.mainloop()

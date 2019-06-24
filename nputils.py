@@ -11,35 +11,51 @@ from pathlib import Path
 
 from imageio import imread, imwrite
 
+from skimage import img_as_float, img_as_ubyte, img_as_uint
 
+
+
+def timeit(method):
+
+    import time
+
+    def timed(*args, **kw):
+        ts = time.time()
+        result = method(*args, **kw)
+        te = time.time()
+        if 'log_time' in kw:
+            name = kw.get('log_name', method.__name__.upper())
+            kw['log_time'][name] = int((te - ts) * 1000)
+        else:
+            print('%r  %2.2f ms' %
+                  (method.__name__, (te - ts) * 1000))
+        return result
+    return timed
+
+
+@timeit
 def int_to_float(arr):
-
-    if arr.dtype == np.uint8:
-        y = arr / 255
-    elif arr.dtype == np.uint16:
-        y = arr / 65535
-    return y.astype(np.float32)
+    ''' twice as fast then (arr / 255).astype(np.float) '''
+    return img_as_float(arr)
 
 
-def float_to_int(float_arr, bitdepth):
-
+@timeit
+def float_to_int(arr, bitdepth):
+    ''' '''
     if bitdepth == 8:
-        arr = 255 * float_arr
-        return arr.astype(np.uint8)
-    elif bitdepth == 16:  # 16bit PNG - default output
-        arr = 65535 * float_arr
-        return arr.astype(np.uint16)
+        return img_as_ubyte(arr)
     else:
-        raise(f"Not implemented bitdepth {bitdepth}")
+        return img_as_uint(arr)
 
 
+@timeit
 def load_image(fp):
     ''' load image from fp and return numpy uint8 or uint16 '''
     return imread(fp)
 
 
 def get_bitdepth(arr):
-
+    ''' read bitdepth before conversion to float '''
     if arr.dtype == np.uint8:
         return 8
     elif arr.dtype == np.uint16:
@@ -58,6 +74,7 @@ def normalize(y, inrange=None, outrange=(0, 1)):
                    a_min=omin, a_max=omax)
 
 
+@timeit
 def save_image(float_arr, fp_out, bitdepth=8):
     ''' '''
 
@@ -69,7 +86,7 @@ def save_image(float_arr, fp_out, bitdepth=8):
 
     float_arr = np.clip(float_arr, a_min=0, a_max=1)
 
-    arr = float_to_int(float_arr, bitdepth=bitdepth)
+    arr = float_to_int(float_arr, bitdepth)
 
     imwrite(Fp, arr)
 
@@ -85,5 +102,6 @@ def plti(im, name="", plot_axis=False, vmin=0, vmax=1, **kwargs):
     if not plot_axis:
         plt.axis('off')  # turn off axis
     plt.show()
-    
+
+
 

@@ -19,6 +19,25 @@ FILETYPES = ['jpeg', 'bmp', 'png', 'tiff']
 HISTOGRAM_BINS = 256
 
 
+
+def timeit(method):
+
+    import time
+
+    def timed(*args, **kw):
+        ts = time.time()
+        result = method(*args, **kw)
+        te = time.time()
+        if 'log_time' in kw:
+            name = kw.get('log_name', method.__name__.upper())
+            kw['log_time'][name] = int((te - ts) * 1000)
+        else:
+            print('%r  %2.2f ms' %
+                  (method.__name__, (te - ts) * 1000))
+        return result
+    return timed
+
+
 class npImage():
 
     def __init__(self, fpath=None):
@@ -31,19 +50,23 @@ class npImage():
         if fpath:
             self.load(fpath)
 
+    @timeit
+    def get_mode(self):
+        self.mode = imghdr.what(self.fpath)
+        assert self.mode in FILETYPES, f"Error, not supported {self.fpath}"
+
+    @timeit
     def load(self, fpath=None):
 
         fpath = fpath or filedialog.askopenfilename()
         print(f"open file {fpath}")
 
         # make sure it's an image file
-        self.mode = imghdr.what(fpath)
+        #
         self.name = Path(fpath).stem
         self.filesize = Path(fpath).stat().st_size
-
-        assert self.mode in FILETYPES, f"Error, not supported {fpath}"
-
         self.fpath = fpath
+        self.get_mode()
 
         self.arr = nputils.load_image(fpath)
 
@@ -54,7 +77,7 @@ class npImage():
         self.original = self.arr.copy()
 
         print(f"bitdepth {self.bitdepth}")
-        self.info()
+#        self.info()
 
     def reset(self):
         self.arr = self.original.copy()
@@ -76,7 +99,7 @@ class npImage():
         fpath = fpath or self.fpath
         Fp = Path(fpath)
         print(f"save to {Fp} bitdepth:{self.bitdepth} mode:{self.mode}")
-        print(f"{self.info()}")
+#        print(f"{self.info()}")
 
         if Fp.is_file():
             send2trash(str(Fp))
@@ -153,10 +176,11 @@ class npImage():
         y0 = int(max(y0, 0))
         print(f"apply crop: {x0} {x1} {y0} {y1}")
         self.arr = self.arr[y0:y1, x0:x1, ...]
-        self.info()
+#        self.info() # slow
 
     def info(self):
-        ''' print info about numpy array'''
+        ''' print info about numpy array
+        very slow with large images '''
         y = self.arr
         if len(y.ravel()) == 0:
             print("array is empty")
@@ -169,7 +193,9 @@ class npImage():
 
     @property
     def stats(self):
-        ''' return stats dict '''
+        ''' return stats dict
+        statistics very slow with large images - disabled
+        '''
         return {
             "name": self.name,
             "mode": self.mode,
@@ -179,12 +205,13 @@ class npImage():
             "height": self.height,
             "width": self.width,
             "ratio": round(self.ratio, 2),
-            "min": round(self.arr.min(), 2),
-            "max": round(self.arr.max(), 2),
-            "mean": round(self.arr.mean(), 2),
-            "std_dev": round(self.arr.std(), 2),
+#            "min": round(self.arr.min(), 2),
+#            "max": round(self.arr.max(), 2),
+#            "mean": round(self.arr.mean(), 2),
+#            "std_dev": round(self.arr.std(), 2),
         }
 
+    @timeit
     def histogram_data(self):
         ''' return dict of histogram values (1D)
         result looks like: (0,10,20...), {"red":(15, 7, 3...) ...}
