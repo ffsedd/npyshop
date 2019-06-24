@@ -13,14 +13,13 @@ from matplotlib.backends.backend_tkagg import (
 from collections import deque
 
 
-''' 
+'''
 RESOURCES:
-image operations tutorial: https://homepages.inf.ed.ac.uk/rbf/HIPR2/wksheets.htm 
+image operations tutorial:
+    https://homepages.inf.ed.ac.uk/rbf/HIPR2/wksheets.htm
 
 
 '''
-
-
 
 '''
 BUGS:
@@ -37,29 +36,171 @@ SETTINGS = {
 }
 
 
+def commands(self):
+    ''' can not be set as a global, contains undefined functions '''
+    return {
+            "File":
+            [
+                ("Open", "o", load),
+                ("Save", "S", save),
+                ("Save as", "s", save_as),
+                ("Reset", "R", reset),
+            ],
+            "Edit":
+            [
+                ("Undo", "z", undo),
+                ("Redo", "y", redo),
+                ("Crop", "C", crop),
+                ("Rotate", "r", rotate),
+            ],
+            "View":
+            [
+                ("Histogram", "h", hist_toggle),
+                ("Stats", "t", stats_toggle),
+                ("Toolbar", "b", toolbar_toggle),
+            ],
+            "Filter":
+            [
+                ("Gamma", "g", gamma),
+                ("Normalize", "n", normalize),
+                ("Multiply", "m", multiply),
+                ("Add", "a", add),
+                ("Contrast", "c", contrast),
+                ("Invert", "i", invert),
+            ],
+            }
+
+
+#  ------------------------------------------
+#  FUNCTIONS
+#  ------------------------------------------
+
+
+def load():
+    print("open")
+    img.load()
+    img.info()
+    mainwin.update()
+    histwin.update()
+
+
+def save():
+    print("save")
+    img.save()
+
+
+def save_as():
+    print("save as")
+    img.save_as()
+
+
+def reset():
+    print("reset")
+    img.reset()
+    mainwin.update()
+
+
+def undo():
+    print("undo")
+    history.undo()
+    mainwin.update(add_to_history=False)
+
+
+def redo():
+    print("redo")
+    history.redo()
+    mainwin.update(add_to_history=False)
+
+
+def rotate():
+    print("rotate")
+    img.rotate()
+    mainwin.update()
+
+
+def invert():
+    print("invert")
+    img.invert()
+    mainwin.update()
+
+
+def mirror():
+    print("mirror")
+    img.mirror()
+    mainwin.update()
+
+
+def flip():
+    print("flip")
+    img.flip()
+    mainwin.update()
+
+
+def contrast():
+    print("contrast")
+    f = tk.simpledialog.askfloat("Contrast", "Enter float value")
+    img.contrast(f)
+    mainwin.update()
+
+
+def multiply():
+    print("multiply")
+    f = tk.simpledialog.askfloat("Multiply", "Enter float value")
+    img.multiply(f)
+    mainwin.update()
+
+
+def add():
+    print("add")
+    f = tk.simpledialog.askfloat("Add", "Enter float value")
+    img.add(f)
+    mainwin.update()
+
+
+def normalize():
+    print("normalize")
+    img.normalize()
+    mainwin.update()
+
+
+def gamma():
+    print("gamma")
+    g = tk.simpledialog.askfloat("Set Gamma", "Enter float value")
+    img.gamma(g)
+    mainwin.update()
+
+
+def crop():
+    x0, x1 = sorted(mainwin.xlim)
+    y0, y1 = sorted(mainwin.ylim)
+    print(f"call crop: {x0} {x1} {y0} {y1}")
+    img.crop(x0, x1, y0, y1)
+    mainwin.update()
+
+
+def hist_toggle():
+    toggle_win(histwin)
+
+
+def stats_toggle():
+    toggle_win(statswin)
+
+
+def toolbar_toggle():
+    toggle_win(toolbar)
+
+#  ------------------------------------------
+#  GUI FUNCTIONS
+#  ------------------------------------------
+
+
 def keyPressed(event):
     ''' hotkeys '''
-    commands = [
-            ("z", toolbar.undo),
-            ("y", toolbar.redo),
-            ("h", histwin.toggle),
-            ("t", statswin.toggle),
-            ("r", toolbar.rotate),
-            ("o", toolbar.load),
-            ("S", toolbar.save),
-            ("s", toolbar.save_as),
-            ("g", toolbar.gamma),
-            ("C", toolbar.crop),
-            ("n", toolbar.normalize),
-            ("m", toolbar.multiply),
-            ("a", toolbar.add),
-            ("c", toolbar.contrast),
-            ("b", toolbar.toggle),
 
-            ]
-    for c in commands:
-        if event.keysym == c[0]:
-            c[1]()
+    for menu, items in commands(toolbar).items():
+        for name, key, command in items:
+            if event.keysym == key:
+                command()
 
 
 def toggle_win(win):
@@ -78,47 +219,15 @@ def toggle_win(win):
     mainwin.focus_force()
 
 
-class History():
+def quit_app():
 
-    def __init__(self):
-        self.undo_queue = deque([], 10)
-        self.redo_queue = deque([], 10)
+    print("quit app")
+    root.destroy()
 
-    def add(self):
-        self.undo_queue.append(img.arr.copy())
-        self.redo_queue.clear()  # discard redo (new version)
-        print(f"added to history, len:{len(self.undo_queue)}")
 
-    # use deques to make Undo and Redo more efficient
-    # after each change, append the new version to the Undo queue
-    def undo(self):
-        if len(self.undo_queue) > 1:
-            print("pop")
-            # move last image to redo queue
-            lastImage = self.undo_queue.pop()
-            self.redo_queue.append(lastImage)
-
-            # get the previous version of the image
-            img.arr = self.undo_queue[-1]
-
-        print(f"undo queue len: {len(self.undo_queue)}")
-
-    def redo(self):
-        if len(self.redo_queue) > 0:
-            img.arr = self.redo_queue.pop()
-            self.undo_queue.append(img.arr.copy())
-            # we remove this version from the Redo Deque beacuase it
-            # has become our current image
-            # lastImage=self.redo_queue.pop()
-            # self.undo_queue.append(lastImage)
-
-        print(f"redo queue len: {len(self.redo_queue)}")
-
-        mainwin.update(add_to_history=False)
-
-    def reset(self):
-        img.arr = img.original.copy()
-        mainwin.update()
+#  ------------------------------------------
+#  TOOLBAR
+#  ------------------------------------------
 
 
 class Toolbar(tk.Toplevel):
@@ -127,7 +236,7 @@ class Toolbar(tk.Toplevel):
         super().__init__(master)
         self.title("Numpyshop-toolbar")
         self.master = master
-        self.protocol("WM_DELETE_WINDOW", self.toggle)
+        self.protocol("WM_DELETE_WINDOW", toolbar_toggle)
         self.geometry("600x30")
         self.bind("<Key>", lambda event: keyPressed(event))
         self.ButtonsInit()
@@ -146,8 +255,8 @@ class Toolbar(tk.Toplevel):
         toolKitFrame = tk.Frame(self)
 
         buttons_cfg = [
-                        ("Crop", self.crop),
-                        ("Rotate", self.rotate),
+                        ("Crop", crop),
+                        ("Rotate", rotate),
                 ]
 
         for i, b in enumerate(buttons_cfg):
@@ -161,136 +270,55 @@ class Toolbar(tk.Toplevel):
     def menuInit(self):
 
         menubar = tk.Menu(self)
+        tkmenu = {}
+        for submenu, items in commands(self).items():
+            tkmenu[submenu] = tk.Menu(menubar, tearoff=0)
+            for name, key, command in items:
+                tkmenu[submenu].add_command(label=f"{name}   {key}",
+                                                  command=command)
+            menubar.add_cascade(label=submenu, menu=tkmenu[submenu])
+            self.config(menu=menubar)
 
-        # FILE pull down menu
-        filemenu = tk.Menu(menubar, tearoff=0)
-        filemenu.add_command(label="Open    o", command=self.load)
-        filemenu.add_command(label="Save    s", command=self.save)
-        filemenu.add_command(label="Save as   S", command=self.save_as)
-        filemenu.add_command(label="Reset    ", command=self.reset)
-        menubar.add_cascade(label="File", menu=filemenu)
-        self.config(menu=menubar)
+#  ------------------------------------------
+#  HISTORY
+#  ------------------------------------------
 
-        # Edit pull down menu
-        editmenu = tk.Menu(menubar, tearoff=0)
-        editmenu.add_command(label="Undo   z", command=self.undo)
-        editmenu.add_command(label="Redo   y", command=self.redo)
-        editmenu.add_command(label="Normalize   n", command=self.normalize)
-        editmenu.add_command(label="Crop   c", command=self.crop)
-        editmenu.add_command(label="Rotate   r", command=self.rotate)
-        editmenu.add_command(label="Mirror   ", command=self.mirror)
-        editmenu.add_command(label="Flip   ", command=self.flip)
-        menubar.add_cascade(label="Edit", menu=editmenu)
-        self.config(menu=menubar)
 
-        # View pull down menu
-        viewmenu = tk.Menu(menubar, tearoff=0)
-        viewmenu.add_command(label="Histogram   h", command=histwin.toggle)
-        viewmenu.add_command(label="Stats   t", command=statswin.toggle)
-        menubar.add_cascade(label="View", menu=viewmenu)
-        self.config(menu=menubar)
+class History():
 
-        # Filter pull-down tk.Menu
-        filtermenu = tk.Menu(menubar, tearoff=0)
-        filtermenu.add_command(label="Invert", command=self.invert)
-        filtermenu.add_command(label="Gamma    g", command=self.gamma)
-        filtermenu.add_command(label="Multiply    m", command=self.multiply)
-        filtermenu.add_command(label="Add    a", command=self.add)
-        filtermenu.add_command(label="Contrast    c", command=self.add)
-        menubar.add_cascade(label="Filter", menu=filtermenu)
-        self.config(menu=menubar)
-
-    # TOOLBAR FUNCTIONS ------------------------------------------
-
-    def toggle(self):
-        toggle_win(self)
-
-    def load(self):
-        print("open")
-        img.load()
-        img.info()
-        mainwin.update()
-        histwin.update()
-
-    def save(self):
-        print("save")
-        img.save()
-
-    def save_as(self):
-        print("save as")
-        img.save_as()
-
-    def reset(self):
-        print("reset")
-        img.reset()
-        mainwin.update()
-
-    def undo(self):
-        print("undo")
-        history.undo()
-        mainwin.update(add_to_history=False)
-
-    def redo(self):
-        print("redo")
-        history.redo()
-        mainwin.update(add_to_history=False)
-
-    def rotate(self):
-        print("rotate")
-        img.rotate()
-        mainwin.update()
-
-    def invert(self):
-        print("invert")
-        img.invert()
-        mainwin.update()
-
-    def mirror(self):
-        print("mirror")
-        img.mirror()
-        mainwin.update()
-
-    def flip(self):
-        print("flip")
-        img.flip()
-        mainwin.update()
-
-    def contrast(self):
-        print("contrast")
-        f = tk.simpledialog.askfloat("Contrast", "Enter float value")
-        img.contrast(f)
-        mainwin.update()
-
-    def multiply(self):
-        print("multiply")
-        f = tk.simpledialog.askfloat("Multiply", "Enter float value")
-        img.multiply(f)
-        mainwin.update()
+    def __init__(self):
+        self.undo_queue = deque([], 10)
+        self.redo_queue = deque([], 10)
 
     def add(self):
-        print("add")
-        f = tk.simpledialog.askfloat("Add", "Enter float value")
-        img.add(f)
+        self.undo_queue.append(img.arr.copy())
+        self.redo_queue.clear()  # discard redo (new version)
+        print(f"added to history, len:{len(self.undo_queue)}")
+
+    def undo(self):
+        if len(self.undo_queue) > 1:
+            lastImage = self.undo_queue.pop()
+            self.redo_queue.append(lastImage)
+            img.arr = self.undo_queue[-1]
+
+        print(f"undo queue len: {len(self.undo_queue)}")
+
+    def redo(self):
+        if len(self.redo_queue) > 0:
+            img.arr = self.redo_queue.pop()
+            self.undo_queue.append(img.arr.copy())
+
+        print(f"redo queue len: {len(self.redo_queue)}")
+
+        mainwin.update(add_to_history=False)
+
+    def reset(self):
+        img.arr = img.original.copy()
         mainwin.update()
 
-    def normalize(self):
-        print("normalize")
-        img.normalize()
-        mainwin.update()
-
-    def gamma(self):
-        print("gamma")
-        g = tk.simpledialog.askfloat("Set Gamma", "Enter float value")
-        img.gamma(g)
-        mainwin.update()
-
-    def crop(self):
-        x0, x1 = sorted(mainwin.xlim)
-        y0, y1 = sorted(mainwin.ylim)
-        print(f"call crop: {x0} {x1} {y0} {y1}")
-        img.crop(x0, x1, y0, y1)
-        mainwin.update()
-    # ---------------------------------------------------------------
+#  ------------------------------------------
+#  MAIN WINDOW
+#  ------------------------------------------
 
 
 class mainWin(tk.Toplevel):
@@ -355,6 +383,10 @@ class mainWin(tk.Toplevel):
         self.ylim = self.ax.get_ylim()
         # print(self.xlim,self.ylim)
 
+#  ------------------------------------------
+#  HISTOGRAM
+#  ------------------------------------------
+
 
 class histWin(tk.Toplevel):
 
@@ -362,7 +394,7 @@ class histWin(tk.Toplevel):
         super().__init__(master)
         self.title("Numpyshop-histogram")
         self.master = master
-        self.protocol("WM_DELETE_WINDOW", self.toggle)
+        self.protocol("WM_DELETE_WINDOW", hist_toggle)
         self.geometry("300x300")
         self.bind("<Key>", lambda event: keyPressed(event))
 
@@ -434,6 +466,10 @@ class histWin(tk.Toplevel):
                 lines.append(self.plot_hist(y, color=color))
         return lines
 
+#  ------------------------------------------
+#  STATISTICS
+#  ------------------------------------------
+
 
 class statsWin(tk.Toplevel):
 
@@ -441,7 +477,7 @@ class statsWin(tk.Toplevel):
         super().__init__(master)
         self.title("Numpyshop-stats")
         self.master = master
-        self.protocol("WM_DELETE_WINDOW", self.toggle)
+        self.protocol("WM_DELETE_WINDOW", stats_toggle)
         self.geometry("150x230")
         self.bind("<Key>", lambda event: keyPressed(event))
 
@@ -478,7 +514,7 @@ class statsWin(tk.Toplevel):
     def _draw_chart(self):
 
         for r, k in enumerate(img.stats):  # loop stats dictionary
-            bg = "#ffffff" if r % 2 else "#ddffee" # alternating row colors
+            bg = "#ffffff" if r % 2 else "#ddffee"  # alternating row colors
             # keys
             b1 = tk.Label(self.frame, text=k, font=(None, 9),
                           background=bg, width=9)
@@ -492,11 +528,9 @@ class statsWin(tk.Toplevel):
         self.frame.pack(side=tk.LEFT)
 
 
-def quit_app():
-
-    print("quit app")
-    root.destroy()
-
+#  ------------------------------------------
+#  MAIN
+#  ------------------------------------------
 
 if __name__ == '__main__':
 
