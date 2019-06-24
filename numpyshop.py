@@ -12,6 +12,10 @@ from matplotlib import pyplot as plt
 from matplotlib.backends.backend_tkagg import (
     FigureCanvasTkAgg, NavigationToolbar2Tk)
 
+from skimage import img_as_float, img_as_ubyte, img_as_uint
+    
+from PIL import Image, ImageTk
+
 from collections import deque
 print("imports done")
 
@@ -411,6 +415,7 @@ class mainWin(tk.Toplevel):
         self.geometry("800x800")
         self.bind("<Key>", lambda event: keyPressed(event))
         self.fig = None
+        self.zoom = 8
 
         self.draw()
 
@@ -419,7 +424,8 @@ class mainWin(tk.Toplevel):
         ''' draw new image '''
         self.fig = plt.figure(figsize=(5, 5))
         self.cmap = "gray" if img.channels == 1 else "jet"
-        self.im = plt.imshow(img.arr, cmap=self.cmap, interpolation=None)
+        self.view = img.arr[::self.zoom,::self.zoom,...]
+        self.im = plt.imshow(self.view, cmap=self.cmap, interpolation=None)
         self.ax = self.fig.add_subplot(111)
 
         self.canvas = FigureCanvasTkAgg(self.fig, master=self)
@@ -432,6 +438,18 @@ class mainWin(tk.Toplevel):
         self.canvas.mpl_connect('draw_event', self.on_draw)
 
         history.add()
+        
+    # @timeit
+    # def draw(self):
+        # ''' draw using pillow '''
+        # self.zoom = 8 
+        # self.imgtk =  ImageTk.PhotoImage(image=Image.fromarray(img_as_ubyte(img.arr[::self.zoom,::self.zoom,...])))
+
+        # self.canvas = tk.Canvas(self,width=800,height=800)
+        # self.canvas.pack()
+        # self.canvas.create_image(0,0, anchor="nw", image=self.imgtk)
+        
+        # history.add()
 
     @timeit
     def update(self, add_to_history=True):
@@ -443,7 +461,7 @@ class mainWin(tk.Toplevel):
 #        img.info()
         print(f"update w:{img.width}, h:{img.height}")
 
-        self.im.set_data(img.arr)
+        self.im.set_data(img.view)
 
         # resize graph after crop, rotate
         self.im.set_extent((0, img.width, 0, img.height))
