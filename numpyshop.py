@@ -448,7 +448,7 @@ class histWin(tk.Toplevel):
 #        self.axes = plt.axes()
         self.ax = plt.gca()
 
-        self.canvas = FigureCanvasTkAgg(self.fig, master=self)
+        self.canvas = FigureCanvasTkAgg(self.fig, master=self, bg="#ffffcc")
         self.canvas.draw()
         self.canvas.get_tk_widget().pack(side=tk.TOP, fill=tk.BOTH, expand=1)
 
