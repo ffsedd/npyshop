@@ -18,15 +18,24 @@ from matplotlib import pyplot as plt
 from collections import deque
 
 
+SETTINGS = {
+    "hide_toolbar": True,
+    "hide_histogram": True,
+    "hide_stats": True,
+}
+
+
 def toggle_win(win):
-    
+    ''' shared method for floating windows, 
+    I tried to make new class and subclass it, but keybindings did not work then '''
     if win.hidden:
         win.deiconify() 
-        win.update()
+        win.hidden = False
+        win.update() # works only when not hidden
     else:
         win.withdraw()
-    win.hidden = not win.hidden
-    
+        win.hidden = True
+        
     mainwin.focus_force()
 
 def keyPressed(event):
@@ -49,6 +58,8 @@ def keyPressed(event):
     for c in commands:
         if event.keysym == c[0]:
             c[1]()
+
+
 
 class History():
     
@@ -109,7 +120,7 @@ class Toolbar(tk.Toplevel):
         self.ButtonsInit()
         self.menuInit()
         
-        self.hidden = False
+        self.hidden = SETTINGS["hide_toolbar"]
         
         if self.hidden:
             self.withdraw()
@@ -171,7 +182,7 @@ class Toolbar(tk.Toplevel):
         ## View pull down menu
         viewmenu = tk.Menu(menubar, tearoff=0)
         viewmenu.add_command(label="Histogram   H", command=histwin.toggle)
-        viewmenu.add_command(label="Stats   T", command=histwin.toggle)
+        viewmenu.add_command(label="Stats   T", command=statswin.toggle)
         menubar.add_cascade(label="View", menu=viewmenu)
         self.config(menu=menubar)
         
@@ -250,8 +261,7 @@ class Toolbar(tk.Toplevel):
                 
     def gamma(self):
         print("gamma")
-        g = tk.simpledialog.askstring("Set Gamma", "Value?",
-                                parent=self)
+        g = tk.simpledialog.askfloat("Set Gamma", "Value?")
         img.gamma(float(g))
         mainwin.update()     
         
@@ -275,8 +285,6 @@ class mainWin(tk.Toplevel):
         self.geometry("800x800")
         self.bind("<Key>", lambda event:keyPressed(event))
         self.fig = None
-        
-
         
         self.draw()
 
@@ -343,9 +351,10 @@ class histWin(tk.Toplevel):
         self.protocol("WM_DELETE_WINDOW", self.toggle)
         self.geometry("300x300")
         self.bind("<Key>", lambda event:keyPressed(event))
-        self.hidden = False
+
         self.bins = 30
         
+        self.hidden = SETTINGS["hide_histogram"]
         if self.hidden:
             self.withdraw()
             
@@ -423,8 +432,8 @@ class statsWin(tk.Toplevel):
         self.protocol("WM_DELETE_WINDOW", self.toggle)
         self.geometry("150x200")
         self.bind("<Key>", lambda event:keyPressed(event))
-        self.hidden = False
         
+        self.hidden = SETTINGS["hide_stats"]        
         if self.hidden:
             self.withdraw()
             
@@ -474,8 +483,8 @@ class statsWin(tk.Toplevel):
         self.stats = {
 
             "name":img.name,
-            "size [MB]":round(img.filesize/1024/1024,2),
             "mode":img.mode,
+            "size":f"{img.filesize/1024/1024:.2f} MB",
             "height":img.height,
             "width":img.width,
             "ratio":round(img.ratio,2),
