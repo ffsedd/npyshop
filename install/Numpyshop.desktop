@@ -1,0 +1,10 @@
+#!/usr/bin/env xdg-open
+[Desktop Entry]
+Name=Numpyshop
+GenericName=Numpyshop
+Type=Application
+Categories=Graphics;Science;ImageProcessing;
+Exec=x-terminal-emulator -e python3 -i SCRIPTPATH  %f
+Terminal=false
+StartupNotify=true
+Icon=
