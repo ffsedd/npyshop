@@ -47,7 +47,7 @@ SETTINGS = {
     "hide_toolbar": True,
     "hide_histogram": False,
     "hide_stats": True,
-    "history_steps": 5,
+    "history_steps": 4,
 }
 
 
@@ -415,16 +415,19 @@ class mainWin(tk.Toplevel):
         self.geometry("800x800")
         self.bind("<Key>", lambda event: keyPressed(event))
         self.fig = None
-        self.zoom = 8
+        self.zoom = max(1, img.width * img.height // 2**22)
+        print(self.zoom)
 
         self.draw()
 
     @timeit
     def draw(self):
         ''' draw new image '''
+        self.view = img.arr[::self.zoom,::self.zoom,...] # downsize for speed
+        
         self.fig = plt.figure(figsize=(5, 5))
         self.cmap = "gray" if img.channels == 1 else "jet"
-        self.view = img.arr[::self.zoom,::self.zoom,...]
+        
         self.im = plt.imshow(self.view, cmap=self.cmap, interpolation=None)
         self.ax = self.fig.add_subplot(111)
 
@@ -460,8 +463,8 @@ class mainWin(tk.Toplevel):
 
 #        img.info()
         print(f"update w:{img.width}, h:{img.height}")
-
-        self.im.set_data(img.view)
+        self.view = img.arr[::self.zoom,::self.zoom,...] # downsize for speed
+        self.im.set_data(self.view)
 
         # resize graph after crop, rotate
         self.im.set_extent((0, img.width, 0, img.height))
