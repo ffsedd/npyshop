@@ -21,9 +21,9 @@ Code may be inefficient or unnecessary complicated.
 
 ## Filetypes:
 * JPG
-* PNG 
+* PNG (16bit)
 * TIF
-* 16bit PNG  (numpngw library)
+
 
 
 ## View:
@@ -65,5 +65,4 @@ Code may be inefficient or unnecessary complicated.
 * python3
 * numpy
 * matplotlib
-* numpngw
 * send2trash
