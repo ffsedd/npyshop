@@ -66,3 +66,4 @@ Code may be inefficient or unnecessary complicated.
 * numpy
 * matplotlib
 * numpngw
+* send2trash

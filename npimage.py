@@ -30,6 +30,8 @@ from imageio import imread
 
 from numpngw import write_png
 
+from send2trash import send2trash
+
 
 FILETYPES = ['jpeg', 'bmp', 'png', 'tiff']
 
@@ -199,7 +201,12 @@ class npImage():
     def save(self, fpath=None):
         
         fpath = fpath or self.fpath
-        print(f"save to {fpath} bitdepth:{self.bitdepth} mode:{self.mode}")
+        Fp = Path(fpath)
+        print(f"save to {Fp} bitdepth:{self.bitdepth} mode:{self.mode}")
+        
+        if Fp.is_file():
+            send2trash(str(Fp))
+        
         save_image(self.arr, fpath, bitdepth=self.bitdepth)
 
 
