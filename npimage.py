@@ -106,28 +106,21 @@ def plti(im, name="", plot_axis=False, vmin=0, vmax=1, **kwargs):
     plt.show()
 
 def numpy_to_png(im, fp_out,  bitdepth=8):
+    
     assert isinstance(im, (np.ndarray, np.generic))
-    # ensure extenion
-    if not Path(fp_out).suffix == ".png":
-        fp_out += ".png"
-
+    Fp = Path(fp_out)
     logging.info(f"saving array to png..{fp_out} bitdepth {bitdepth}")
-    #Image.fromarray(img_as_ubyte(im)).save(fp_out)
-    write_png(fp_out, im, bitdepth=bitdepth)
+    write_png(Fp.with_suffix(".png"), im, bitdepth=bitdepth)
     logging.info("...saved")
 
 
 def numpy_to_jpg(im, fp_out):
 
+    assert isinstance(im, (np.ndarray, np.generic))
     Fp = Path(fp_out)
-
     logging.info(f"saving array to jpg...{fp_out}")
-    
-    #Image.fromarray(img_as_ubyte(im)).save(fp_out)  # use PIL
     cmap = "gray" if im.ndim == 2 else "jet"
-
     plt.imsave(Fp.with_suffix(".jpg"), im, cmap=cmap, vmin=0, vmax=1)  # use matplotlib
-    
     logging.info(f"...saved")
 
 def normalize(y, inrange=None, outrange=(0, 1)):
