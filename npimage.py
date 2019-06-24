@@ -146,3 +146,21 @@ class npImage():
             bitdepth:{self.bitdepth} "
             print(out)
         return out
+
+    @property
+    def stats(self):
+        ''' return stats dict '''
+        return {
+            "name": self.name,
+            "mode": self.mode,
+            "bitdepth": self.bitdepth,
+            "channels": self.channels,
+            "size": f"{self.filesize/1024/1024: .3f} MB",
+            "height": self.height,
+            "width": self.width,
+            "ratio": round(self.ratio, 2),
+            "min": round(self.arr.min(), 2),
+            "max": round(self.arr.max(), 2),
+            "mean": round(self.arr.mean(), 2),
+            "std_dev": round(self.arr.std(), 2),
+        }

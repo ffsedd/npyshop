@@ -292,7 +292,7 @@ class mainWin(tk.Toplevel):
 
     def __init__(self, master=None):
         super().__init__(master)
-        self.title("numpyshop-Canvas")
+        self.title("Numpyshop")
         self.master = master
         self.protocol("WM_DELETE_WINDOW", quit_app)
         self.geometry("800x800")
@@ -437,7 +437,7 @@ class statsWin(tk.Toplevel):
         self.title("Numpyshop-stats")
         self.master = master
         self.protocol("WM_DELETE_WINDOW", self.toggle)
-        self.geometry("150x200")
+        self.geometry("150x230")
         self.bind("<Key>", lambda event: keyPressed(event))
 
         self.hidden = SETTINGS["hide_stats"]
@@ -472,34 +472,19 @@ class statsWin(tk.Toplevel):
 
     def _draw_chart(self):
 
-        self._get_stats()
-        for r, k in enumerate(self.stats):  # Rows
-
-            b1 = tk.Label(self.frame, text=k, font=(None, 8),
-                          background='white', width=8)
+        for r, k in enumerate(img.stats):  # loop stats dictionary
+            bg = "#ffffff" if r % 2 else "#ddffee" # alternating row colors
+            # keys
+            b1 = tk.Label(self.frame, text=k, font=(None, 9),
+                          background=bg, width=9)
             b1.grid(row=r, column=1)
-            b2 = tk.Label(self.frame, text=self.stats[k], font=(None, 8),
-                          background='white', width=8)
+
+            # values
+            b2 = tk.Label(self.frame, text=img.stats[k], font=(None, 9),
+                          background=bg, width=9)
             b2.grid(row=r, column=2)
 
         self.frame.pack(side=tk.LEFT)
-
-    def _get_stats(self):
-
-        self.stats = {
-            "name": img.name,
-            "mode": img.mode,
-            "bitdepth": img.bitdepth,
-            "channels": img.channels,
-            "size": f"{img.filesize/1024/1024: .2f} MB",
-            "height": img.height,
-            "width": img.width,
-            "ratio": round(img.ratio, 2),
-            "min": round(img.arr.min(), 2),
-            "max": round(img.arr.max(), 2),
-            "mean": round(img.arr.mean(), 2),
-            "std_dev": round(img.arr.std(), 2),
-        }
 
 
 def quit_app():
