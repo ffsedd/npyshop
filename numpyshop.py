@@ -13,6 +13,8 @@ from matplotlib.backends.backend_tkagg import (
 from collections import deque
 
 
+''' image operations tutorial: https://homepages.inf.ed.ac.uk/rbf/HIPR2/wksheets.htm '''
+
 SETTINGS = {
     "hide_toolbar": True,
     "hide_histogram": True,
@@ -46,10 +48,12 @@ def keyPressed(event):
             ("r", toolbar.rotate),
             ("o", toolbar.load),
             ("s", toolbar.save),
-            ("a", toolbar.save_as),
+            ("S", toolbar.save_as),
             ("g", toolbar.gamma),
             ("c", toolbar.crop),
             ("n", toolbar.normalize),
+            ("m", toolbar.multiply),
+            ("a", toolbar.add),
             ("b", toolbar.toggle),
 
             ]
@@ -144,20 +148,20 @@ class Toolbar(tk.Toplevel):
 
         # FILE pull down menu
         filemenu = tk.Menu(menubar, tearoff=0)
-        filemenu.add_command(label="Open    O", command=self.load)
-        filemenu.add_command(label="Save    S", command=self.save)
-        filemenu.add_command(label="Save as   A", command=self.save_as)
+        filemenu.add_command(label="Open    o", command=self.load)
+        filemenu.add_command(label="Save    s", command=self.save)
+        filemenu.add_command(label="Save as   S", command=self.save_as)
         filemenu.add_command(label="Reset    ", command=self.reset)
         menubar.add_cascade(label="File", menu=filemenu)
         self.config(menu=menubar)
 
         # Edit pull down menu
         editmenu = tk.Menu(menubar, tearoff=0)
-        editmenu.add_command(label="Undo   Z", command=self.undo)
-        editmenu.add_command(label="Redo   Y", command=self.redo)
-        editmenu.add_command(label="Normalize   N", command=self.normalize)
-        editmenu.add_command(label="Crop   C", command=self.crop)
-        editmenu.add_command(label="Rotate   R", command=self.rotate)
+        editmenu.add_command(label="Undo   z", command=self.undo)
+        editmenu.add_command(label="Redo   y", command=self.redo)
+        editmenu.add_command(label="Normalize   n", command=self.normalize)
+        editmenu.add_command(label="Crop   c", command=self.crop)
+        editmenu.add_command(label="Rotate   r", command=self.rotate)
         editmenu.add_command(label="Mirror   ", command=self.mirror)
         editmenu.add_command(label="Flip   ", command=self.flip)
         menubar.add_cascade(label="Edit", menu=editmenu)
@@ -165,15 +169,17 @@ class Toolbar(tk.Toplevel):
 
         # View pull down menu
         viewmenu = tk.Menu(menubar, tearoff=0)
-        viewmenu.add_command(label="Histogram   H", command=histwin.toggle)
-        viewmenu.add_command(label="Stats   T", command=statswin.toggle)
+        viewmenu.add_command(label="Histogram   h", command=histwin.toggle)
+        viewmenu.add_command(label="Stats   t", command=statswin.toggle)
         menubar.add_cascade(label="View", menu=viewmenu)
         self.config(menu=menubar)
 
         # Filter pull-down tk.Menu
         filtermenu = tk.Menu(menubar, tearoff=0)
         filtermenu.add_command(label="Invert", command=self.invert)
-        filtermenu.add_command(label="Gamma    G", command=self.gamma)
+        filtermenu.add_command(label="Gamma    g", command=self.gamma)
+        filtermenu.add_command(label="Multiply    m", command=self.multiply)
+        filtermenu.add_command(label="Multiply    a", command=self.add)
         menubar.add_cascade(label="Filter", menu=filtermenu)
         self.config(menu=menubar)
 
@@ -232,6 +238,18 @@ class Toolbar(tk.Toplevel):
         img.flip()
         mainwin.update()
 
+    def multiply(self):
+        print("multiply")
+        f = tk.simpledialog.askfloat("Multiply", "Enter float value")
+        img.multiply(f)
+        mainwin.update()
+
+    def add(self):
+        print("add")
+        f = tk.simpledialog.askfloat("Add", "Enter float value")
+        img.add(f)
+        mainwin.update()
+
     def normalize(self):
         print("normalize")
         img.normalize()
@@ -239,8 +257,8 @@ class Toolbar(tk.Toplevel):
 
     def gamma(self):
         print("gamma")
-        g = tk.simpledialog.askfloat("Set Gamma", "Value?")
-        img.gamma(float(g))
+        g = tk.simpledialog.askfloat("Set Gamma", "Enter float value")
+        img.gamma(g)
         mainwin.update()
 
     def crop(self):
@@ -478,7 +496,7 @@ if __name__ == '__main__':
         Fp = Path(sys.argv[1])
         assert Fp.is_file(), f"not a file {Fp}"
     else:
-        Fp = Path(__file__).parent / 'sample.jpg'
+        Fp = Path(__file__).parent / 'sample.tif'
 
     root = tk.Tk()
     root.title("Numpyshop")

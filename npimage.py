@@ -112,6 +112,14 @@ class npImage():
         gamma < 1. : image will brighten"""
         self.arr = self.arr ** g
 
+    def multiply(self, f):
+        """ change brightness """
+        self.arr = np.clip(f * self.arr, 0, 1)
+
+    def add(self, f):
+        """ change brightness """
+        self.arr = np.clip(f + self.arr, 0, 1)
+
     def crop(self, x0, x1, y0, y1):
 
         # ensure crop area in image
