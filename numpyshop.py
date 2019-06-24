@@ -36,7 +36,7 @@ SETTINGS = {
 }
 
 
-def commands(self):
+def commands_dict():
     ''' can not be set as a global, contains undefined functions '''
     return {
             "File":
@@ -69,6 +69,13 @@ def commands(self):
                 ("Invert", "i", invert),
             ],
             }
+
+
+def buttons_dict():
+    return [
+            ("Crop", crop),
+            ("Rotate", rotate),
+            ]
 
 
 #  ------------------------------------------
@@ -178,6 +185,11 @@ def crop():
     mainwin.update()
 
 
+#  ------------------------------------------
+#  GUI FUNCTIONS
+#  ------------------------------------------
+
+
 def hist_toggle():
     toggle_win(histwin)
 
@@ -189,15 +201,11 @@ def stats_toggle():
 def toolbar_toggle():
     toggle_win(toolbar)
 
-#  ------------------------------------------
-#  GUI FUNCTIONS
-#  ------------------------------------------
-
 
 def keyPressed(event):
     ''' hotkeys '''
 
-    for menu, items in commands(toolbar).items():
+    for menu, items in commands_dict().items():
         for name, key, command in items:
             if event.keysym == key:
                 command()
@@ -254,12 +262,7 @@ class Toolbar(tk.Toplevel):
         buttonHeight = 1
         toolKitFrame = tk.Frame(self)
 
-        buttons_cfg = [
-                        ("Crop", crop),
-                        ("Rotate", rotate),
-                ]
-
-        for i, b in enumerate(buttons_cfg):
+        for i, b in enumerate(buttons_dict()):
             button = tk.Button(toolKitFrame, text=b[0],
                                background=backgroundColour, width=buttonWidth,
                                height=buttonHeight, command=b[1])
@@ -271,7 +274,7 @@ class Toolbar(tk.Toplevel):
 
         menubar = tk.Menu(self)
         tkmenu = {}
-        for submenu, items in commands(self).items():
+        for submenu, items in commands_dict().items():
             tkmenu[submenu] = tk.Menu(menubar, tearoff=0)
             for name, key, command in items:
                 tkmenu[submenu].add_command(label=f"{name}   {key}",
@@ -550,6 +553,7 @@ if __name__ == '__main__':
     history = History()
 
     histwin = histWin(root)
+
     statswin = statsWin(root)
 
     toolbar = Toolbar(root)
