@@ -18,13 +18,10 @@ Code may be inefficient or unnecessary complicated.
 -----------------------------
 # FEATURES
 
-
 ## Filetypes:
 * JPG
 * PNG (16bit)
 * TIF
-
-
 
 ## View:
 * zoom
@@ -42,11 +39,12 @@ Code may be inefficient or unnecessary complicated.
 * set gamma
 * normalize
 * invert
+* add
+* multiply
+* contrast
 
 
 ## TODO
-* brightness
-* contrast
 * levels (white point, black point)
 * RGB > grayscale
 * unsharp mask

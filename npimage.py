@@ -120,6 +120,10 @@ class npImage():
         """ change brightness """
         self.arr = np.clip(f + self.arr, 0, 1)
 
+    def contrast(self, f):
+        """ change contrast """
+        self.arr = np.clip(.5 + f * (self.arr - .5), 0, 1)
+
     def crop(self, x0, x1, y0, y1):
 
         # ensure crop area in image

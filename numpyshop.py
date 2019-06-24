@@ -15,6 +15,16 @@ from collections import deque
 
 ''' image operations tutorial: https://homepages.inf.ed.ac.uk/rbf/HIPR2/wksheets.htm '''
 
+
+
+'''
+BUGS:
+error in histogram scaling
+
+
+'''
+
+
 SETTINGS = {
     "hide_toolbar": True,
     "hide_histogram": True,
@@ -47,13 +57,14 @@ def keyPressed(event):
             ("t", statswin.toggle),
             ("r", toolbar.rotate),
             ("o", toolbar.load),
-            ("s", toolbar.save),
-            ("S", toolbar.save_as),
+            ("S", toolbar.save),
+            ("s", toolbar.save_as),
             ("g", toolbar.gamma),
-            ("c", toolbar.crop),
+            ("C", toolbar.crop),
             ("n", toolbar.normalize),
             ("m", toolbar.multiply),
             ("a", toolbar.add),
+            ("c", toolbar.contrast),
             ("b", toolbar.toggle),
 
             ]
@@ -179,7 +190,8 @@ class Toolbar(tk.Toplevel):
         filtermenu.add_command(label="Invert", command=self.invert)
         filtermenu.add_command(label="Gamma    g", command=self.gamma)
         filtermenu.add_command(label="Multiply    m", command=self.multiply)
-        filtermenu.add_command(label="Multiply    a", command=self.add)
+        filtermenu.add_command(label="Add    a", command=self.add)
+        filtermenu.add_command(label="Contrast    c", command=self.add)
         menubar.add_cascade(label="Filter", menu=filtermenu)
         self.config(menu=menubar)
 
@@ -236,6 +248,12 @@ class Toolbar(tk.Toplevel):
     def flip(self):
         print("flip")
         img.flip()
+        mainwin.update()
+
+    def contrast(self):
+        print("contrast")
+        f = tk.simpledialog.askfloat("Contrast", "Enter float value")
+        img.contrast(f)
         mainwin.update()
 
     def multiply(self):
