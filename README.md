@@ -1,6 +1,4 @@
-# Numpyshop
-
-Image Editor based on Numpy arrays, Matplotlib and Tkinter
+# Numpyshop - Image Editor based on Numpy arrays, Matplotlib and Tkinter
 --------------------------------------------------------
 
 Adapted from https://github.com/riyasavla/Image-Editor
@@ -18,35 +16,35 @@ I do not have much experience with tkinter and matplotlib :-(
 Code may be inefficient or unnecessary complicated.
 
 -----------------------------
-## FEATURES
+# FEATURES
 
 
-###FILETYPES:
+##FILETYPES:
 * JPG
 * PNG 
 * TIF
 * 16bit PNG  (numpngw library)
 
 
-###VIEW:
+##VIEW:
 * zoom
 * histogram
 * statistics
 
-###EDIT:
+##EDIT:
 * rotate
 * crop
 * mirror
 * flip
 * invert
 
-###FILTERS
+##FILTERS
 * set gamma
 * normalize
 * invert
 
 
-### TODO
+## TODO
 * brightness
 * contrast
 * levels (white point, black point)
@@ -54,15 +52,15 @@ Code may be inefficient or unnecessary complicated.
 * unsharp mask
 * white balance
 
-## Hotkeys
-B - show toolbar
-H - show histogram
-T - show stats
+# Hotkeys
+* B - show toolbar
+* H - show histogram
+* T - show stats
 
 ...and more, see menu
 
 -----------------------------
-##Requirements
+# Requirements
 
 * python3
 * numpy
