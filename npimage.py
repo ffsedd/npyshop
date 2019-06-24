@@ -1,18 +1,10 @@
 #!/usr/bin/env python3
-# -*- coding: utf-8 -*-
-
-# import logging
-
+import time
 import imghdr
-
 import numpy as np
-
 from pathlib import Path
-
 from send2trash import send2trash
-
 from tkinter import filedialog
-
 import nputils
 
 FILETYPES = ['jpeg', 'bmp', 'png', 'tiff']
