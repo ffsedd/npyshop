@@ -8,8 +8,6 @@ Project incomplete, not fully functional
 Very slow with large images
 
 contributions are welcome
------------------------------
-
 
 
 -----------------------------
