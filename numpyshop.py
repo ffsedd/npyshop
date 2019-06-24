@@ -13,7 +13,12 @@ from matplotlib.backends.backend_tkagg import (
 from collections import deque
 
 
-''' image operations tutorial: https://homepages.inf.ed.ac.uk/rbf/HIPR2/wksheets.htm '''
+''' 
+RESOURCES:
+image operations tutorial: https://homepages.inf.ed.ac.uk/rbf/HIPR2/wksheets.htm 
+
+
+'''
 
 
 
@@ -32,24 +37,8 @@ SETTINGS = {
 }
 
 
-def toggle_win(win):
-    ''' shared method for floating windows,
-    I tried to make new class and subclass it,
-    but keybindings did not work then '''
-
-    if win.hidden:
-        win.deiconify()
-        win.hidden = False
-        win.update()  # works only when not hidden
-    else:
-        win.withdraw()
-        win.hidden = True
-
-    mainwin.focus_force()
-
-
 def keyPressed(event):
-
+    ''' hotkeys '''
     commands = [
             ("z", toolbar.undo),
             ("y", toolbar.redo),
@@ -71,6 +60,22 @@ def keyPressed(event):
     for c in commands:
         if event.keysym == c[0]:
             c[1]()
+
+
+def toggle_win(win):
+    ''' shared method for floating windows,
+    I tried to make new class and subclass it,
+    but keybindings did not work then '''
+
+    if win.hidden:
+        win.deiconify()
+        win.hidden = False
+        win.update()  # works only when not hidden
+    else:
+        win.withdraw()
+        win.hidden = True
+
+    mainwin.focus_force()
 
 
 class History():
