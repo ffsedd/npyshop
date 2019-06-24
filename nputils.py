@@ -85,3 +85,5 @@ def plti(im, name="", plot_axis=False, vmin=0, vmax=1, **kwargs):
     if not plot_axis:
         plt.axis('off')  # turn off axis
     plt.show()
+    
+

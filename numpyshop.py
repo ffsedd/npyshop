@@ -3,7 +3,6 @@ import sys
 from pathlib import Path
 
 import tkinter as tk
-import numpy as np
 from npimage import npImage
 
 from matplotlib import pyplot as plt
@@ -135,10 +134,12 @@ def rotate():
     img.rotate()
     mainwin.update()
 
+
 def rotate_270():
     print("rotate left")
     img.rotate(3)
     mainwin.update()
+
 
 def rotate_180():
     print("rotate 180")
@@ -362,7 +363,7 @@ class mainWin(tk.Toplevel):
         ''' draw new image '''
         self.fig = plt.figure(figsize=(5, 5))
         self.cmap = "gray" if img.channels == 1 else "jet"
-        self.im = plt.imshow(img.arr, cmap=self.cmap)
+        self.im = plt.imshow(img.arr, cmap=self.cmap, interpolation=None)
         self.ax = self.fig.add_subplot(111)
 
         self.canvas = FigureCanvasTkAgg(self.fig, master=self)
@@ -414,14 +415,14 @@ class mainWin(tk.Toplevel):
 
 class histWin(tk.Toplevel):
 
-    def __init__(self, master=None):
+    def __init__(self, master=None, linewidth=1.0):
         super().__init__(master)
         self.title("Numpyshop-histogram")
         self.master = master
         self.protocol("WM_DELETE_WINDOW", hist_toggle)
         self.geometry("300x300")
         self.bind("<Key>", lambda event: keyPressed(event))
-
+        self.linewidth = linewidth
         self.bins = 30
 
         self.hidden = SETTINGS["hide_histogram"]
@@ -430,25 +431,24 @@ class histWin(tk.Toplevel):
 
         self.draw()
 
-    @property
-    def x(self):
-        ''' histogram x axis (range depends on bitdepth) '''
-        return np.linspace(0, 2**img.bitdepth-1, self.bins)
-
-
     def draw(self):
 
         self.fig = plt.figure(figsize=(2, 4))
         self.axes = self.fig.add_subplot(111)
         self.ims = []
 
-        for line in self.hist_lines():
-            self.ims.append(plt.plot(self.x, line[0], color=line[1])[0])
-#        print("self.ims",self.ims)
-#        self.axes = plt.axes()
-        self.ax = plt.gca()
+        x, hist_data = img.histogram_data()
+        for color, y in hist_data.items():
+            self.ims.append(plt.plot(x, y, color=color,
+                                     linewidth=self.linewidth)[0])
 
-        self.canvas = FigureCanvasTkAgg(self.fig, master=self, bg="#ffffcc")
+        self.ax = plt.gca()
+        self.ax.spines['right'].set_visible(False)
+        self.ax.spines['top'].set_visible(False)
+        self.ax.spines['left'].set_visible(False)
+        self.ax.tick_params(left=False)
+
+        self.canvas = FigureCanvasTkAgg(self.fig, master=self)
         self.canvas.draw()
         self.canvas.get_tk_widget().pack(side=tk.TOP, fill=tk.BOTH, expand=1)
 
@@ -457,34 +457,20 @@ class histWin(tk.Toplevel):
         if self.hidden:
             return
 
+        x, hist_data = img.histogram_data()
         # calculate max of all lines (autoscale did not work, scale manually)
         hist_max = 0
-
         # loop and update all lines
-        for im, line in zip(self.ims, self.hist_lines()):
-            im.set_data(self.x, line[0])
-            hist_max = max(hist_max, line[0].max())
+        for im, color in zip(self.ims, hist_data):
+            y = hist_data[color]
+            im.set_data(x, y)
+            hist_max = max(hist_max, y.max())
 
-        self.axes.set_xlim(0, 2 ** img.bitdepth - 1)
+        self.axes.set_xlim(-1, 2 ** img.bitdepth)
         self.axes.set_ylim(0, hist_max)
 
         self.canvas.draw()
 
-    def plot_hist(self, y, color="black"):
-        h = np.histogram(y, bins=self.bins, range=(0,1), density=True)[0]  # normalized
-        return h, color
-
-    def hist_lines(self):
-        ''' return list of histogram y values (1D) '''
-        lines = []
-        if img.channels == 1:  # gray
-            y = img.arr
-            lines.append(self.plot_hist(y, color="black"))
-        else:    # RGB image
-            for i, color in enumerate(('red', 'green', 'blue')):
-                y = img.arr[:, :, i]
-                lines.append(self.plot_hist(y, color=color))
-        return lines
 
 #  ------------------------------------------
 #  STATISTICS
@@ -506,7 +492,6 @@ class statsWin(tk.Toplevel):
             self.withdraw()
 
         self.draw()
-
 
     def draw(self):
         self.frame = tk.Frame(self)

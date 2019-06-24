@@ -16,6 +16,7 @@ from tkinter import filedialog
 import nputils
 
 FILETYPES = ['jpeg', 'bmp', 'png', 'tiff']
+HISTOGRAM_BINS = 256
 
 
 class npImage():
@@ -132,7 +133,7 @@ class npImage():
         y1 = int(min(y1, self.arr.shape[0]))
         y0 = int(max(y0, 0))
         print(f"apply crop: {x0} {x1} {y0} {y1}")
-        self.arr = self.arr[y0:y1, x0:x1,...]
+        self.arr = self.arr[y0:y1, x0:x1, ...]
         self.info()
 
     def info(self):
@@ -164,3 +165,27 @@ class npImage():
             "mean": round(self.arr.mean(), 2),
             "std_dev": round(self.arr.std(), 2),
         }
+
+    def histogram_data(self):
+        ''' return dict of histogram values (1D)
+        result looks like: (0,10,20...), {"red":(15, 7, 3...) ...}
+
+        '''
+
+        if self.channels < 3:
+            colors = ('black',)
+        else:
+            colors = ('red', 'green', 'blue')
+
+        x = np.linspace(0, 2 ** self.bitdepth - 1, HISTOGRAM_BINS)
+        hist_data = {}
+
+        for i, color in enumerate(colors):
+
+            channel = self.arr[i] if self.arr.ndim > 2 else self.arr
+
+            h = np.histogram(channel, bins=HISTOGRAM_BINS, range=(0, 1),
+                             density=True)[0]
+            hist_data[color] = h
+
+        return x, hist_data
