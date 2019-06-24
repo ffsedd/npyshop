@@ -18,7 +18,16 @@ from matplotlib import pyplot as plt
 from collections import deque
 
 
-
+def toggle_win(win):
+    
+    if win.hidden:
+        win.deiconify() 
+        win.update()
+    else:
+        win.withdraw()
+    win.hidden = not win.hidden
+    
+    mainwin.focus_force()
 
 def keyPressed(event):
     
@@ -34,6 +43,7 @@ def keyPressed(event):
             ("g",toolbar.gamma),
             ("c",toolbar.crop),
             ("n",toolbar.normalize),
+            ("b",toolbar.toggle),
             
             ]
     for c in commands:
@@ -93,13 +103,16 @@ class Toolbar(tk.Toplevel):
         super().__init__(master)
         self.title("Numpyshop-toolbar")
         self.master = master
-        self.protocol("WM_DELETE_WINDOW", quit_app)
+        self.protocol("WM_DELETE_WINDOW", self.toggle)
         self.geometry("600x30")
         self.bind("<Key>", lambda event:keyPressed(event))
         self.ButtonsInit()
         self.menuInit()
         
-
+        self.hidden = False
+        
+        if self.hidden:
+            self.withdraw()
             
     def ButtonsInit(self):
 
@@ -172,6 +185,10 @@ class Toolbar(tk.Toplevel):
         self.config(menu=menubar)
         
     # TOOLBAR FUNCTIONS ------------------------------------------    
+
+
+    def toggle(self):
+        toggle_win(self)  
         
     def load(self):
         print("open")
@@ -258,9 +275,12 @@ class mainWin(tk.Toplevel):
         self.geometry("800x800")
         self.bind("<Key>", lambda event:keyPressed(event))
         self.fig = None
-        self.draw()
+        
 
         
+        self.draw()
+
+                
     def draw(self):
         ''' draw new image '''
         self.fig = plt.figure(figsize=(5,5))
@@ -280,7 +300,8 @@ class mainWin(tk.Toplevel):
         self.canvas.mpl_connect('draw_event', self.on_draw)
 
         history.add()
-        
+
+      
         
     def update(self, add_to_history=True):
         ''' update image '''
@@ -337,14 +358,7 @@ class histWin(tk.Toplevel):
         self.withdraw()  # hide only
         
     def toggle(self):
-        if self.hidden:
-            self.deiconify() 
-            self.update()
-
-        else:
-            self.withdraw()
-        self.hidden = not self.hidden
-        mainwin.focus_force()
+        toggle_win(self) 
         
     def draw(self):
         
@@ -426,14 +440,7 @@ class statsWin(tk.Toplevel):
         self.withdraw()  # hide only
         
     def toggle(self):
-        if self.hidden:
-            self.deiconify() 
-            self.update()
-
-        else:
-            self.withdraw()
-        self.hidden = not self.hidden
-        mainwin.focus_force()
+        toggle_win(self) 
         
     def draw(self):
         
