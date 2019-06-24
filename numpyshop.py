@@ -24,8 +24,6 @@ image operations tutorial:
 '''
 BUGS:
 
-error in histogram scaling
-
 self.set_cursor(cursors.SELECT_REGION)
   File "/home/m/.local/lib/python3.6/site-packages/matplotlib/backends/_backend_tk.py", line 613, in set_cursor
     window = self.canvas.manager.window
@@ -51,14 +49,16 @@ def commands_dict():
                 ("Open", "o", load),
                 ("Save", "S", save),
                 ("Save as", "s", save_as),
-                ("Reset", "R", reset),
+                ("Reset", "Q", reset),
             ],
             "Edit":
             [
                 ("Undo", "z", undo),
                 ("Redo", "y", redo),
                 ("Crop", "C", crop),
-                ("Rotate", "r", rotate),
+                ("Rotate_90", "r", rotate),
+                ("Rotate_270", "R", rotate_270),
+                ("Rotate_180", "u", rotate_180),
             ],
             "Filter":
             [
@@ -133,6 +133,16 @@ def redo():
 def rotate():
     print("rotate")
     img.rotate()
+    mainwin.update()
+
+def rotate_270():
+    print("rotate left")
+    img.rotate(3)
+    mainwin.update()
+
+def rotate_180():
+    print("rotate 180")
+    img.rotate(2)
     mainwin.update()
 
 
@@ -420,14 +430,11 @@ class histWin(tk.Toplevel):
 
         self.draw()
 
+    @property
     def x(self):
-        return np.linspace(0, 2 ** img.bitdepth, self.bins)
+        ''' histogram x axis (range depends on bitdepth) '''
+        return np.linspace(0, 2**img.bitdepth-1, self.bins)
 
-    def on_closing(self):
-        self.withdraw()  # hide only
-
-    def toggle(self):
-        toggle_win(self)
 
     def draw(self):
 
@@ -436,7 +443,7 @@ class histWin(tk.Toplevel):
         self.ims = []
 
         for line in self.hist_lines():
-            self.ims.append(plt.plot(self.x(), line[0], color=line[1])[0])
+            self.ims.append(plt.plot(self.x, line[0], color=line[1])[0])
 #        print("self.ims",self.ims)
 #        self.axes = plt.axes()
         self.ax = plt.gca()
@@ -455,17 +462,16 @@ class histWin(tk.Toplevel):
 
         # loop and update all lines
         for im, line in zip(self.ims, self.hist_lines()):
-            im.set_data(self.x(), line[0])
+            im.set_data(self.x, line[0])
             hist_max = max(hist_max, line[0].max())
 
-        self.axes.set_xlim(0, 2 ** img.bitdepth)
+        self.axes.set_xlim(0, 2 ** img.bitdepth - 1)
         self.axes.set_ylim(0, hist_max)
 
         self.canvas.draw()
 
     def plot_hist(self, y, color="black"):
-
-        h = np.histogram(y, bins=self.bins, density=True)[0]  # normalized
+        h = np.histogram(y, bins=self.bins, range=(0,1), density=True)[0]  # normalized
         return h, color
 
     def hist_lines(self):
@@ -501,31 +507,19 @@ class statsWin(tk.Toplevel):
 
         self.draw()
 
-    def min(self):
-        return img.arr.min()
-
-    def max(self):
-        return img.arr.min()
-
-    def on_closing(self):
-        self.withdraw()  # hide only
-
-    def toggle(self):
-        toggle_win(self)
 
     def draw(self):
-
         self.frame = tk.Frame(self)
-        self._draw_chart()
+        self._draw_table()
 
     def update(self):
 
         if self.hidden:
             return
         self.frame.grid_forget()
-        self._draw_chart()
+        self._draw_table()
 
-    def _draw_chart(self):
+    def _draw_table(self):
 
         for r, k in enumerate(img.stats):  # loop stats dictionary
             bg = "#ffffff" if r % 2 else "#ddffee"  # alternating row colors

@@ -91,7 +91,7 @@ class npImage():
         k = number of rotations
         '''
         # self.arr = ndimage.rotate(self.arr, angle=-90, reshape=True)
-        self.arr = np.rot90(self.arr, k, axes=(0, 1))
+        self.arr = np.rot90(self.arr, -k, axes=(0, 1))
 
     def invert(self):
         self.arr = 1 - self.arr
