@@ -111,19 +111,38 @@ class npImage():
         gamma = 1. : no effect
         gamma > 1. : image will darken
         gamma < 1. : image will brighten"""
-        self.arr = self.arr ** g
+        y = self.arr ** g
+        self.arr = np.clip(y, 0, 1)
 
     def multiply(self, f):
-        """ change brightness """
-        self.arr = np.clip(f * self.arr, 0, 1)
+        """ change contrast """
+        y = .5 + f * (self.arr - .5)
+        self.arr = np.clip(y, 0, 1)
 
     def add(self, f):
         """ change brightness """
         self.arr = np.clip(f + self.arr, 0, 1)
 
-    def contrast(self, f):
-        """ change contrast """
-        self.arr = np.clip(.5 + f * (self.arr - .5), 0, 1)
+    def tres_high(self, f):
+        """  """
+        self.arr[(self.arr > f)] = 1
+
+    def tres_low(self, f):
+        """  """
+        self.arr[(self.arr < f)] = 0
+
+    def clip_high(self, f):
+        """  """
+        self.arr[(self.arr > f)] = f
+
+    def clip_low(self, f):
+        """  """
+        self.arr[(self.arr < f)] = f
+
+    def sigma(self, sigma=2):
+        """ s shaped curve """
+        y = np.tanh((self.arr - .5) * sigma) / 2 + .5
+        self.arr = np.clip(y, 0, 1)
 
     def crop(self, x0, x1, y0, y1):
 
@@ -177,7 +196,8 @@ class npImage():
         else:
             colors = ('red', 'green', 'blue')
 
-        x = np.linspace(0, 2 ** self.bitdepth - 1, HISTOGRAM_BINS)
+#        x = np.linspace(0, 2 ** self.bitdepth - 1, HISTOGRAM_BINS)
+        x = np.linspace(0, 1, HISTOGRAM_BINS)
         hist_data = {}
 
         for i, color in enumerate(colors):

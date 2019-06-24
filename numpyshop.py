@@ -1,7 +1,7 @@
 #!/usr/bin/env python3
 import sys
 from pathlib import Path
-
+import numpy as np
 import tkinter as tk
 from npimage import npImage
 
@@ -14,9 +14,9 @@ from collections import deque
 
 '''
 RESOURCES:
-image operations tutorial:
+image operations:
     https://homepages.inf.ed.ac.uk/rbf/HIPR2/wksheets.htm
-
+    https://web.cs.wpi.edu/~emmanuel/courses/cs545/S14/slides/lecture02.pdf
 
 '''
 
@@ -35,8 +35,9 @@ sometimes incorrect crop region
 
 SETTINGS = {
     "hide_toolbar": True,
-    "hide_histogram": True,
+    "hide_histogram": False,
     "hide_stats": True,
+    "history_steps": 5,
 }
 
 
@@ -65,8 +66,12 @@ def commands_dict():
                 ("Normalize", "n", normalize),
                 ("Multiply", "m", multiply),
                 ("Add", "a", add),
-                ("Contrast", "c", contrast),
                 ("Invert", "i", invert),
+                ("Sigma", "G", sigma),
+                ("Clip light", "l", clip_high),
+                ("Clip dark", "d", clip_low),
+                ("Tres light", "L", tres_high),
+                ("Tres dark", "D", tres_low),
             ],
             "View":
             [
@@ -165,23 +170,17 @@ def flip():
     mainwin.update()
 
 
-def contrast():
-    print("contrast")
-    f = tk.simpledialog.askfloat("Contrast", "Enter float value")
-    img.contrast(f)
-    mainwin.update()
-
-
 def multiply():
     print("multiply")
-    f = tk.simpledialog.askfloat("Multiply", "Enter float value")
+    f = tk.simpledialog.askfloat("Multiply", "Value to multiply with (float)",
+                                 initialvalue=1.3)
     img.multiply(f)
     mainwin.update()
 
 
 def add():
     print("add")
-    f = tk.simpledialog.askfloat("Add", "Enter float value")
+    f = tk.simpledialog.askfloat("Add", "Enter value to add (float)")
     img.add(f)
     mainwin.update()
 
@@ -192,10 +191,51 @@ def normalize():
     mainwin.update()
 
 
+def sigma():
+    print("sigma")
+    g = tk.simpledialog.askfloat("Set Sigma", "Enter sigma (float)",
+                                 initialvalue=2)
+    img.sigma(g)
+    mainwin.update()
+
+
 def gamma():
     print("gamma")
-    g = tk.simpledialog.askfloat("Set Gamma", "Enter float value")
+    g = tk.simpledialog.askfloat("Set Gamma", "Enter gamma (float)",
+                                 initialvalue=.8)
     img.gamma(g)
+    mainwin.update()
+
+
+def clip_high():
+    print("clip_high")
+    f = tk.simpledialog.askfloat("Cut high", "Enter high treshold (float)",
+                                 initialvalue=.9)
+    img.clip_high(f)
+    mainwin.update()
+
+
+def clip_low():
+    print("clip_low")
+    f = tk.simpledialog.askfloat("Cut low", "Enter low treshold (float)",
+                                 initialvalue=.1)
+    img.clip_low(f)
+    mainwin.update()
+
+
+def tres_high():
+    print("tres_high")
+    f = tk.simpledialog.askfloat("tres high", "Enter high treshold (float)",
+                                 initialvalue=.9)
+    img.tres_high(f)
+    mainwin.update()
+
+
+def tres_low():
+    print("tres_low")
+    f = tk.simpledialog.askfloat("tres low", "Enter low treshold (float)",
+                                 initialvalue=.1)
+    img.tres_low(f)
     mainwin.update()
 
 
@@ -312,8 +352,8 @@ class Toolbar(tk.Toplevel):
 class History():
 
     def __init__(self):
-        self.undo_queue = deque([], 10)
-        self.redo_queue = deque([], 10)
+        self.undo_queue = deque([], SETTINGS["history_steps"])
+        self.redo_queue = deque([], SETTINGS["history_steps"])
 
     def add(self):
         self.undo_queue.append(img.arr.copy())
@@ -432,12 +472,17 @@ class histWin(tk.Toplevel):
         self.draw()
 
     def draw(self):
-
         self.fig = plt.figure(figsize=(2, 4))
         self.axes = self.fig.add_subplot(111)
+
+        plt.xticks(np.linspace(0, 1, 11), rotation='vertical')
+#        self.ax.set_xtics(np.linspace(0, 1, 10))
+#        self.fig = plt.figure(figsize=(2, 4))
+#        self.axes = self.fig.add_subplot(111)
         self.ims = []
 
         x, hist_data = img.histogram_data()
+
         for color, y in hist_data.items():
             self.ims.append(plt.plot(x, y, color=color,
                                      linewidth=self.linewidth)[0])
@@ -466,8 +511,7 @@ class histWin(tk.Toplevel):
             im.set_data(x, y)
             hist_max = max(hist_max, y.max())
 
-        self.axes.set_xlim(-1, 2 ** img.bitdepth)
-        self.axes.set_ylim(0, hist_max)
+        self.ax.set_ylim(0, hist_max)
 
         self.canvas.draw()
 
