@@ -23,8 +23,15 @@ image operations tutorial:
 
 '''
 BUGS:
+
 error in histogram scaling
 
+self.set_cursor(cursors.SELECT_REGION)
+  File "/home/m/.local/lib/python3.6/site-packages/matplotlib/backends/_backend_tk.py", line 613, in set_cursor
+    window = self.canvas.manager.window
+AttributeError: 'FigureCanvasTkAgg' object has no attribute 'manager'
+
+sometimes incorrect crop region
 
 '''
 
@@ -53,12 +60,6 @@ def commands_dict():
                 ("Crop", "C", crop),
                 ("Rotate", "r", rotate),
             ],
-            "View":
-            [
-                ("Histogram", "h", hist_toggle),
-                ("Stats", "t", stats_toggle),
-                ("Toolbar", "b", toolbar_toggle),
-            ],
             "Filter":
             [
                 ("Gamma", "g", gamma),
@@ -68,11 +69,21 @@ def commands_dict():
                 ("Contrast", "c", contrast),
                 ("Invert", "i", invert),
             ],
+            "View":
+            [
+                ("Histogram", "h", hist_toggle),
+                ("Stats", "t", stats_toggle),
+                ("Toolbar", "b", toolbar_toggle),
+            ],
             }
 
 
 def buttons_dict():
     return [
+            ("Open", load),
+            ("Undo", undo),
+            ("Histogram", hist_toggle),
+            ("Statistics", stats_toggle),
             ("Crop", crop),
             ("Rotate", rotate),
             ]

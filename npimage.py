@@ -132,7 +132,7 @@ class npImage():
         y1 = int(min(y1, self.arr.shape[0]))
         y0 = int(max(y0, 0))
         print(f"apply crop: {x0} {x1} {y0} {y1}")
-        self.arr = self.arr[y0:y1, x0:x1, :]
+        self.arr = self.arr[y0:y1, x0:x1,...]
         self.info()
 
     def info(self):
