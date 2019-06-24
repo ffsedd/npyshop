@@ -19,26 +19,26 @@ Code may be inefficient or unnecessary complicated.
 # FEATURES
 
 
-##FILETYPES:
+## Filetypes:
 * JPG
 * PNG 
 * TIF
 * 16bit PNG  (numpngw library)
 
 
-##VIEW:
+## View:
 * zoom
 * histogram
 * statistics
 
-##EDIT:
+## Edit:
 * rotate
 * crop
 * mirror
 * flip
 * invert
 
-##FILTERS
+## Filters
 * set gamma
 * normalize
 * invert
