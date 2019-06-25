@@ -11,7 +11,6 @@ FILETYPES = ['jpeg', 'bmp', 'png', 'tiff']
 HISTOGRAM_BINS = 256
 
 
-
 def timeit(method):
 
     def timed(*args, **kw):
@@ -21,7 +20,7 @@ def timeit(method):
         print('%r  %2.2f ms' % (method.__qualname__, (te - ts) * 1000))
         return result
     return timed
-    
+
 
 class npImage():
 
@@ -35,7 +34,7 @@ class npImage():
         if fpath:
             self.load(fpath)
 
-    @timeit
+#    @timeit
     def get_mode(self):
         self.mode = imghdr.what(self.fpath)
         assert self.mode in FILETYPES, f"Error, not supported {self.fpath}"
@@ -79,6 +78,7 @@ class npImage():
     def ratio(self):
         return self.arr.shape[0] / self.arr.shape[1]
 
+    @timeit
     def save(self, fpath=None):
 
         fpath = fpath or self.fpath
@@ -196,7 +196,7 @@ class npImage():
 #            "std_dev": round(self.arr.std(), 2),
         }
 
-    @timeit
+#    @timeit
     def histogram_data(self):
         ''' return dict of histogram values (1D)
         result looks like: (0,10,20...), {"red":(15, 7, 3...) ...}
