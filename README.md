@@ -17,3 +17,5 @@ contributions are welcome
 * numpy
 * matplotlib
 * send2trash
+* pillow
+* skimage
