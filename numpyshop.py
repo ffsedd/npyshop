@@ -424,25 +424,23 @@ class History():
 
 class fftWin(tk.Toplevel):
 
-    def __init__(self, master=None, linewidth=1.0):
+    def __init__(self, master=None):
         super().__init__(master)
         self.title("Numpyshop-FFT")
         self.master = master
         self.protocol("WM_DELETE_WINDOW", self.destroy)
         self.geometry("300x300")
         self.bind("<Key>", lambda event: keyPressed(event))
-#        self.linewidth = linewidth
-#        self.bins = 30
 
         self.draw()
 
 #    @timeit
     def draw(self):
-        self.fig = plt.figure(figsize=(5, 5))
-        self.axes = self.fig.add_subplot(111)
 
-        plt.imshow(img.fft_plot, cmap=plt.cm.gray)
-        plt.show()
+        self.fig = plt.figure(figsize=(5, 5))
+
+        self.im = plt.imshow(img.fft_plot, cmap='gray', interpolation=None)
+        self.ax = self.fig.add_subplot(111)
 
         self.canvas = FigureCanvasTkAgg(self.fig, master=self)
         self.canvas.draw()
@@ -570,10 +568,10 @@ class statsWin(tk.Toplevel):
         self.frame.pack(side=tk.LEFT)
 
 
-
 #  ------------------------------------------
 #  MAIN WINDOW
 #  ------------------------------------------
+
 
 class mainWin(tk.Toplevel):
 
@@ -584,11 +582,11 @@ class mainWin(tk.Toplevel):
         self.protocol("WM_DELETE_WINDOW", quit_app)
         self.geometry("900x810")
         self.bind("<Key>", lambda event: keyPressed(event))
-        self.bind("<MouseWheel>", self._on_mousewheel) # windows
-        self.bind("<Button-4>", self._on_mousewheel) # linux
-        self.bind("<Button-5>", self._on_mousewheel) # linux
-        self.bind("<Button-1>", self._on_mouse_left) # linux
-        self.bind("<Button-3>", self._on_mouse_right) # linux
+        self.bind("<MouseWheel>", self._on_mousewheel)  # windows
+        self.bind("<Button-4>", self._on_mousewheel)  # linux
+        self.bind("<Button-5>", self._on_mousewheel)  # linux
+        self.bind("<Button-1>", self._on_mouse_left)
+        self.bind("<Button-3>", self._on_mouse_right)
         self.zoom = max(1, img.width * img.height // 2**22)
         print(self.zoom)
         if not SETTINGS["hide_toolbar"]:
@@ -629,25 +627,17 @@ class mainWin(tk.Toplevel):
     def canvas_init(self):
         width = 800
         height = 800
-        self.canvas = tk.Canvas(self, width=width,\
+        self.canvas = tk.Canvas(self, width=width,
                                 height=height, background="gray")
-#        self.canvas.bind("<Button-1>", lambda event: startCrop(event, canvas))
-#        self.canvas.bind("<B1-Motion>",\
-#                                    lambda event: drawCrop(event, canvas))
-#        self.canvas.bind("<ButtonRelease-1>", \
-#                                    lambda event: endCrop(event, canvas))
-
         self.canvas.pack(fill=tk.BOTH, expand=tk.YES)
-        self.zoom = max(1,min(img.width // 2*9, img.height // 2**9))
-
+        self.zoom = max(1, min(img.width // 2**9, img.height // 2**9))
 
     def _on_mousewheel(self, event):
-        print(event.delta,event.num)
+        print(event.delta, event.num)
         if event.num == 5 or event.delta == -120:
             zoom_in()
         if event.num == 4 or event.delta == 120:
             zoom_out()
-
 
     @timeit
     def make_image_view(self):
@@ -655,20 +645,19 @@ class mainWin(tk.Toplevel):
         print(img.arr.shape)
         print(self.zoom)
 
-        view = img.arr[::self.zoom,::self.zoom,...] # downsize for speed
+        view = img.arr[::self.zoom, ::self.zoom, ...]
         self.view_shape = view.shape[:2]
 
         view = img_as_ubyte(view)
         view = Image.fromarray(view)
         self.view = ImageTk.PhotoImage(view, master=self)
 
-
     @timeit
     def draw(self):
         ''' draw new image '''
         self.make_image_view()
-        self.image = self.canvas.create_image(0,0, \
-                                 anchor="nw", image=self.view)
+        self.image = self.canvas.create_image(0, 0,
+                                              anchor="nw", image=self.view)
 
     @timeit
     def update(self):
@@ -690,11 +679,11 @@ class mainWin(tk.Toplevel):
     def _on_mouse_right(self, event):
         select.set_right()
 
-
     # ensure zoom > 0
     @property
     def zoom(self):
         return self.__dict__['zoom']
+
     @zoom.setter
     def zoom(self, value):
         if value > 0:
@@ -708,7 +697,7 @@ class Selection:
 
     def __init__(self, parent):
         self.parent = parent
-        self.geometry = [0,0,0,0]
+        self.geometry = [0, 0, 0, 0]
         self.rect = None
 
     def set_left(self):
@@ -730,7 +719,8 @@ class Selection:
         self.draw()
 
     def select_all(self):
-        self.geometry = [0, 0, img.width * mainwin.zoom, img.height * mainwin.zoom]
+        self.geometry = [0, 0, img.width * mainwin.zoom,
+                         img.height * mainwin.zoom]
 
     def __str__(self):
         return f"selection geom: {self.geometry}"
@@ -747,7 +737,6 @@ if __name__ == '__main__':
     else:
         Fp = Path(__file__).parent / 'red-pompadour.jpg'
 
-
     root = tk.Tk()
     root.title("Numpyshop")
     root.withdraw()  # root win is hidden
@@ -760,7 +749,6 @@ if __name__ == '__main__':
     print(select)
     select.set_left
     print(select)
-
 
     history = History()
 
