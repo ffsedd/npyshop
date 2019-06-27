@@ -21,7 +21,6 @@ from collections import deque
 from matplotlib.backends.backend_tkagg import FigureCanvasTkAgg
 
 from testing.timeit import timeit
-from gui_utils import ResizingCanvas
 
 print("imports done")
 
@@ -267,7 +266,9 @@ def tres_low():
 def crop():
     print(f"{select} crop")
   
-    geom = (i * mainwin.zoom for i in select.geometry) # convert to image coordinates
+    geom = [i * mainwin.zoom for i in select.geometry] # convert to image coordinates
+    geomx, geomy = sorted(geom[0::2]), sorted(geom[1::2])   # avoid right corner being before left
+    geom = geomx[0], geomy[0], geomx[1], geomy[1], 
     print(geom)
     print(f"call crop: {geom}")
     img.crop(*geom)
@@ -275,8 +276,6 @@ def crop():
     history.add()
     select.reset()
   
-    
-    
     
 def zoom_out():
     print("zoom out")
@@ -522,6 +521,8 @@ class mainWin(tk.Toplevel):
         self.bind("<MouseWheel>", self._on_mousewheel) # windows
         self.bind("<Button-4>", self._on_mousewheel) # linux
         self.bind("<Button-5>", self._on_mousewheel) # linux
+        self.bind("<Button-1>", self._on_mouse_left) # linux
+        self.bind("<Button-3>", self._on_mouse_right) # linux
         self.zoom = max(1, img.width * img.height // 2**22)
         print(self.zoom)
         if not SETTINGS["hide_toolbar"]:
@@ -617,8 +618,13 @@ class mainWin(tk.Toplevel):
         self.ylim = self.ax.get_ylim()
         # print(self.xlim,self.ylim)
 
+    def _on_mouse_left(self, event):
+        select.set_left()    
                
+    def _on_mouse_right(self, event):
+        select.set_right()    
         
+              
     # ensure zoom > 0    
     @property
     def zoom(self):
@@ -636,7 +642,7 @@ class Selection:
     
     def __init__(self, parent):
         self.parent = parent
-        self.geometry = [0, 0, img.width, img.height]
+        self.geometry = [0,0,0,0]
         self.rect = None
         
     def set_left(self):
@@ -654,10 +660,12 @@ class Selection:
         print(self.rect)
         
     def reset(self):
-        
-        self.geometry = [0, 0, img.width, img.height]
+        self.select_all()
         self.draw()
-        
+
+    def select_all(self):
+        self.geometry = [0, 0, img.width * mainwin.zoom, img.height * mainwin.zoom]
+            
     def __str__(self):
         return f"selection geom: {self.geometry}"
 #  ------------------------------------------
