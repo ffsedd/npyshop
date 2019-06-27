@@ -16,6 +16,10 @@ from skimage import img_as_float, img_as_ubyte, img_as_uint
 from testing.timeit import timeit
 
 
+def rgb2gray(rgb):
+    return np.dot(rgb[..., :3], [0.2989, 0.5870, 0.1140])
+
+
 @timeit
 def int_to_float(arr):
     ''' twice as fast then (arr / 255).astype(np.float) '''
@@ -87,4 +91,6 @@ def plti(im, name="", plot_axis=False, vmin=0, vmax=1, **kwargs):
     plt.show()
 
 
-
+def info(y):
+    print(f"{y.dtype}\t{str(y.shape)}\t<{y.min():.3f} \
+            {y.mean():.3f} {y.max():.3f}> ({y.std():.3f})\t{type(y)} ")

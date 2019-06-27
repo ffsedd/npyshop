@@ -1,28 +1,17 @@
 #!/usr/bin/env python3
+from testing.timeit import timeit
+from matplotlib.backends.backend_tkagg import FigureCanvasTkAgg
+from collections import deque
+from PIL import Image, ImageTk
+from skimage import img_as_ubyte
+from matplotlib import pyplot as plt
+from npimage import npImage
+import tkinter as tk
+import numpy as np
+from pathlib import Path
+import sys
 import time
 time0 = time.time()
-print("started")
-import sys
-from pathlib import Path
-import numpy as np
-import tkinter as tk
-from npimage import npImage
-
-from matplotlib import pyplot as plt
-
-from skimage import img_as_ubyte
-from scipy import ndimage
-
-from PIL import Image, ImageTk
-
-from collections import deque
-
-#from testing.null_object import Null
-
-from matplotlib.backends.backend_tkagg import FigureCanvasTkAgg
-
-from testing.timeit import timeit
-
 print("imports done")
 
 '''
@@ -38,6 +27,7 @@ BUGS:
 large images and history on:
 running out of memory
 
+color histogram weird
 
 TODO:
     mouse zoom center on mouse pointer
@@ -51,7 +41,8 @@ SETTINGS = {
     "hide_histogram": True,
     "hide_toolbar": True,
     "hide_stats": True,
-    "history_steps": 2,     # memory !!!
+    "histogram_bins": 32,
+    "history_steps": 3,     # memory !!!
 
 }
 
@@ -59,14 +50,14 @@ SETTINGS = {
 def commands_dict():
     ''' can not be set as a global, contains undefined functions '''
     return {
-            "File":
+        "File":
             [
                 ("Open", "o", load),
                 ("Save", "S", save),
                 ("Save as", "s", save_as),
                 ("Reset", "Q", reset),
             ],
-            "Edit":
+        "Edit":
             [
                 ("Undo", "z", undo),
                 ("Redo", "y", redo),
@@ -78,7 +69,7 @@ def commands_dict():
                 ("Rotate_180", "u", rotate_180),
                 ("Free Rotate", "f", free_rotate),
             ],
-            "Filter":
+        "Filter":
             [
                 ("Gamma", "g", gamma),
                 ("Normalize (BW only)", "n", normalize),
@@ -86,34 +77,35 @@ def commands_dict():
                 ("Add", "a", add),
                 ("Invert", "i", invert),
                 ("Sigma", "I", sigma),
-                ("Subtrackt background", "B", subtract_background),
+                ("Highpass", "H", highpass),
                 ("Clip light (BW only)", "l", clip_high),
                 ("Clip dark (BW only)", "d", clip_low),
                 ("Tres light (BW only)", "L", tres_high),
                 ("Tres dark (BW only)", "D", tres_low),
                 ("FFT", "F", fft),
+                ("rgb2gray", "b", rgb2gray),
             ],
-            "View":
+        "View":
             [
                 ("Histogram", "h", hist_toggle),
                 ("Stats", "t", stats_toggle),
                 ("Zoom in", "KP_Add", zoom_in),
                 ("Zoom out", "KP_Subtract", zoom_out),
             ],
-            }
+    }
 
 
 def buttons_dict():
     return [
-            ("Open", load),
-            ("Undo", undo),
-            ("Histogram", hist_toggle),
-            ("Statistics", stats_toggle),
-            ("Crop", crop),
-            ("Rotate", rotate),
-            ("Zoom in", zoom_in),
-            ("Zoom out", zoom_out),
-            ]
+        ("Open", load),
+        ("Undo", undo),
+        ("Histogram", hist_toggle),
+        ("Statistics", stats_toggle),
+        ("Crop", crop),
+        ("Rotate", rotate),
+        ("Zoom in", zoom_in),
+        ("Zoom out", zoom_out),
+    ]
 
 
 #  ------------------------------------------
@@ -236,17 +228,25 @@ def normalize():
     history.add()
 
 
+def rgb2gray():
+    print("rgb2gray")
+    img.rgb2gray()
+    mainwin.update()
+    history.add()
+
+
 def fft():
+    from matplotlib.colors import LogNorm
     print("fft")
-    fft_plot = img.fft()
-    plotWin(master=mainwin, plot=fft_plot)
+    fftimage = img.fft()
+    plotWin(master=mainwin, plot=fftimage, norm=LogNorm(vmin=5))
 
 
-def subtract_background():
-    print("subtract_background")
+def highpass():
+    print("highpass")
     f = tk.simpledialog.askfloat("subtrack_background", "Enter sigma (float)",
                                  initialvalue=20)
-    img.subtract_background(f)
+    img.highpass(f)
     mainwin.update()
     history.add()
 
@@ -259,6 +259,7 @@ def sigma():
     mainwin.update()
     history.add()
 
+
 def gamma():
     print("gamma")
     g = tk.simpledialog.askfloat("Set Gamma", "Enter gamma (float)",
@@ -266,6 +267,7 @@ def gamma():
     img.gamma(g)
     mainwin.update()
     history.add()
+
 
 def clip_high():
     print("clip_high")
@@ -275,6 +277,7 @@ def clip_high():
     mainwin.update()
     history.add()
 
+
 def clip_low():
     print("clip_low")
     f = tk.simpledialog.askfloat("Cut low", "Enter low treshold (float)",
@@ -282,6 +285,7 @@ def clip_low():
     img.clip_low(f)
     mainwin.update()
     history.add()
+
 
 def tres_high():
     print("tres_high")
@@ -291,6 +295,7 @@ def tres_high():
     mainwin.update()
     history.add()
 
+
 def tres_low():
     print("tres_low")
     f = tk.simpledialog.askfloat("tres low", "Enter low treshold (float)",
@@ -299,15 +304,10 @@ def tres_low():
     mainwin.update()
     history.add()
 
+
 def crop():
     print(f"{select} crop")
-
-    geom = [i * mainwin.zoom for i in select.geometry] # convert to image coordinates
-    geomx, geomy = sorted(geom[0::2]), sorted(geom[1::2])   # avoid right corner being before left
-    geom = geomx[0], geomy[0], geomx[1], geomy[1],
-    print(geom)
-    print(f"call crop: {geom}")
-    img.crop(*geom)
+    img.crop()
     mainwin.update()
     history.add()
     select.reset()
@@ -320,12 +320,14 @@ def zoom_out():
         mainwin.update()
         select.reset()
 
+
 def zoom_in():
     print("zoom in")
     if mainwin.zoom > 1:
         mainwin.zoom -= zoom_step()
         mainwin.update()
         select.reset()
+
 
 def zoom_step():
     return int(mainwin.zoom**1.5/10+1)
@@ -338,8 +340,8 @@ def zoom_step():
 
 def get_mouse():
     ''' get mouse position relative to canvas top left corner '''
-    x = int(mainwin.canvas.winfo_pointerx() -  mainwin.canvas.winfo_rootx())
-    y = int(mainwin.canvas.winfo_pointery() -  mainwin.canvas.winfo_rooty())
+    x = int(mainwin.canvas.winfo_pointerx() - mainwin.canvas.winfo_rootx())
+    y = int(mainwin.canvas.winfo_pointery() - mainwin.canvas.winfo_rooty())
     return x, y
 
 
@@ -424,7 +426,7 @@ class History():
 
 class plotWin(tk.Toplevel):
 
-    def __init__(self, master=None, plot=None):
+    def __init__(self, master=None, plot=None, *a, **kw):
         super().__init__(master)
         self.title("Numpyshop-plot")
         self.master = master
@@ -432,12 +434,13 @@ class plotWin(tk.Toplevel):
         self.protocol("WM_DELETE_WINDOW", self.destroy)
         self.geometry("300x300")
         self.bind("<Key>", lambda event: keyPressed(event))
-        self.draw()
+        self.draw(*a, **kw)
 
 #    @timeit
-    def draw(self):
+    def draw(self, *a, **kw):
         self.fig = plt.figure(figsize=(5, 5))
-        self.im = plt.imshow(self.plot, cmap='gray', interpolation=None)
+        self.im = plt.imshow(self.plot, cmap='gray',
+                             interpolation=None, *a, **kw)
         self.ax = self.fig.add_subplot(111)
 
         self.canvas = FigureCanvasTkAgg(self.fig, master=self)
@@ -460,7 +463,7 @@ class histWin(tk.Toplevel):
         self.geometry("300x300")
         self.bind("<Key>", lambda event: keyPressed(event))
         self.linewidth = linewidth
-        self.bins = 30
+        self.bins = SETTINGS["histogram_bins"]
 
         self.hidden = SETTINGS["hide_histogram"]
         if self.hidden:
@@ -474,12 +477,9 @@ class histWin(tk.Toplevel):
         self.axes = self.fig.add_subplot(111)
 
         plt.xticks(np.linspace(0, 1, 11), rotation='vertical')
-#        self.ax.set_xtics(np.linspace(0, 1, 10))
-#        self.fig = plt.figure(figsize=(2, 4))
-#        self.axes = self.fig.add_subplot(111)
         self.ims = []
 
-        x, hist_data = img.histogram_data()
+        x, hist_data = img.histogram_data(bins=self.bins)
 
         for color, y in hist_data.items():
             self.ims.append(plt.plot(x, y, color=color,
@@ -501,7 +501,7 @@ class histWin(tk.Toplevel):
         if self.hidden:
             return
 
-        x, hist_data = img.histogram_data()
+        x, hist_data = img.histogram_data(bins=self.bins)
         # calculate max of all lines (autoscale did not work, scale manually)
         hist_max = 0
         # loop and update all lines
@@ -698,6 +698,11 @@ class Selection:
         self.geometry = [0, 0, 0, 0]
         self.rect = None
 
+    def image_selected(self):
+        ''' recalculate selection by zoom '''
+        x0, y0, x1, y1 = [mainwin.zoom * c for c in self.geometry]
+        img.slice = np.s_[y0:y1, x0:x1, ...]
+
     def set_left(self):
         self.geometry[:2] = list(get_mouse())
         self.draw()
@@ -707,10 +712,20 @@ class Selection:
         self.draw()
 
     def draw(self):
+        self._valid_selection()
         print(self.geometry)
         mainwin.canvas.delete(self.rect)
         self.rect = mainwin.canvas.create_rectangle(self.geometry)
         print(self.rect)
+        self.image_selected()
+        histwin.update()
+
+    def _valid_selection(self):
+        ''' avoid right corner being before left '''
+#        if len(self.geometry) == 4:
+        geomx = sorted(self.geometry[0::2])
+        geomy = sorted(self.geometry[1::2])
+        self.geometry = [geomx[0], geomy[0], geomx[1], geomy[1]]
 
     def reset(self):
         self.select_all()
@@ -733,7 +748,7 @@ if __name__ == '__main__':
         Fp = Path(sys.argv[1])
         assert Fp.is_file(), f"not a file {Fp}"
     else:
-        Fp = Path(__file__).parent / 'red-pompadour.jpg'
+        Fp = Path(__file__).parent / 'sample.jpg'
 
     root = tk.Tk()
     root.title("Numpyshop")
@@ -754,9 +769,8 @@ if __name__ == '__main__':
 
     statswin = statsWin(root)
 
-#    toolbar = Toolbar(root)
-#    print("show mainwin")
     mainwin = mainWin(root)
+
     print(f"mainloop in {time.time()-time0}")
 
     root.mainloop()
