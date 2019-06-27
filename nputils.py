@@ -13,24 +13,7 @@ from imageio import imread, imwrite
 
 from skimage import img_as_float, img_as_ubyte, img_as_uint
 
-
-
-def timeit(method):
-
-    import time
-
-    def timed(*args, **kw):
-        ts = time.time()
-        result = method(*args, **kw)
-        te = time.time()
-        if 'log_time' in kw:
-            name = kw.get('log_name', method.__name__.upper())
-            kw['log_time'][name] = int((te - ts) * 1000)
-        else:
-            print('%r  %2.2f ms' %
-                  (method.__name__, (te - ts) * 1000))
-        return result
-    return timed
+from testing.timeit import timeit
 
 
 @timeit

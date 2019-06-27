@@ -9,14 +9,20 @@ import tkinter as tk
 from npimage import npImage
 
 from matplotlib import pyplot as plt
-from matplotlib.backends.backend_tkagg import (
-    FigureCanvasTkAgg, NavigationToolbar2Tk)
 
-from skimage import img_as_float, img_as_ubyte, img_as_uint
-    
+from skimage import img_as_ubyte
+
 from PIL import Image, ImageTk
 
 from collections import deque
+
+#from testing.null_object import Null
+
+from matplotlib.backends.backend_tkagg import FigureCanvasTkAgg
+
+from testing.timeit import timeit
+from gui_utils import ResizingCanvas
+
 print("imports done")
 
 '''
@@ -25,29 +31,29 @@ image operations:
     https://homepages.inf.ed.ac.uk/rbf/HIPR2/wksheets.htm
     https://web.cs.wpi.edu/~emmanuel/courses/cs545/S14/slides/lecture02.pdf
 
-'''
 
-'''
 BUGS:
 
-self.set_cursor(cursors.SELECT_REGION)
-  File "/home/m/.local/lib/python3.6/site-packages/matplotlib/backends/_backend_tk.py", line 613, in set_cursor
-    window = self.canvas.manager.window
-AttributeError: 'FigureCanvasTkAgg' object has no attribute 'manager'
 
-sometimes incorrect crop region
-
-large images:
-matplotlib imshow very slow
+large images and history on:
 running out of memory
+
+
+TODO:
+    crop
+    mouse zoom center on mouse pointer
+
+
+
 '''
 
 
 SETTINGS = {
+    "hide_histogram": True,
     "hide_toolbar": True,
-    "hide_histogram": False,
     "hide_stats": True,
-    "history_steps": 4,
+    "history_steps": 2,     # memory !!!
+    
 }
 
 
@@ -66,6 +72,8 @@ def commands_dict():
                 ("Undo", "z", undo),
                 ("Redo", "y", redo),
                 ("Crop", "C", crop),
+                ("Select left corner", "comma", select.set_left),
+                ("Select right corner", "period", select.set_right),
                 ("Rotate_90", "r", rotate),
                 ("Rotate_270", "R", rotate_270),
                 ("Rotate_180", "u", rotate_180),
@@ -73,21 +81,22 @@ def commands_dict():
             "Filter":
             [
                 ("Gamma", "g", gamma),
-                ("Normalize", "n", normalize),
+                ("Normalize (BW only)", "n", normalize),
                 ("Multiply", "m", multiply),
                 ("Add", "a", add),
                 ("Invert", "i", invert),
-                ("Sigma", "G", sigma),
-                ("Clip light", "l", clip_high),
-                ("Clip dark", "d", clip_low),
-                ("Tres light", "L", tres_high),
-                ("Tres dark", "D", tres_low),
+                ("Sigma", "I", sigma),
+                ("Clip light (BW only)", "l", clip_high),
+                ("Clip dark (BW only)", "d", clip_low),
+                ("Tres light (BW only)", "L", tres_high),
+                ("Tres dark (BW only)", "D", tres_low),
             ],
             "View":
             [
                 ("Histogram", "h", hist_toggle),
                 ("Stats", "t", stats_toggle),
-                ("Toolbar", "b", toolbar_toggle),
+                ("Zoom in", "KP_Add", zoom_in),
+                ("Zoom out", "KP_Subtract", zoom_out),
             ],
             }
 
@@ -100,22 +109,14 @@ def buttons_dict():
             ("Statistics", stats_toggle),
             ("Crop", crop),
             ("Rotate", rotate),
+            ("Zoom in", zoom_in),
+            ("Zoom out", zoom_out),
             ]
 
 
 #  ------------------------------------------
 #  FUNCTIONS
 #  ------------------------------------------
-def timeit(method):
-
-    def timed(*args, **kw):
-        ts = time.time()
-        result = method(*args, **kw)
-        te = time.time()
-        print('%r  %2.2f ms' % (method.__qualname__, (te - ts) * 1000))
-        return result
-    return timed
-
 
 def load():
     print("open")
@@ -144,50 +145,55 @@ def reset():
 def undo():
     print("undo")
     history.undo()
-    mainwin.update(add_to_history=False)
+    mainwin.update()
 
 
 def redo():
     print("redo")
     history.redo()
-    mainwin.update(add_to_history=False)
+    mainwin.update()
 
 
 def rotate():
     print("rotate")
     img.rotate()
     mainwin.update()
+    history.add()
+    select.reset()
 
 
 def rotate_270():
     print("rotate left")
     img.rotate(3)
     mainwin.update()
+    history.add()
+    select.reset()
 
 
 def rotate_180():
     print("rotate 180")
     img.rotate(2)
     mainwin.update()
-
+    history.add()
+    select.reset()
 
 def invert():
     print("invert")
     img.invert()
     mainwin.update()
-
+    history.add()
 
 def mirror():
     print("mirror")
     img.mirror()
     mainwin.update()
-
+    history.add()
 
 def flip():
     print("flip")
     img.flip()
     mainwin.update()
-
+    history.add()
 
 def multiply():
     print("multiply")
@@ -195,28 +201,28 @@ def multiply():
                                  initialvalue=1.3)
     img.multiply(f)
     mainwin.update()
-
+    history.add()
 
 def add():
     print("add")
     f = tk.simpledialog.askfloat("Add", "Enter value to add (float)")
     img.add(f)
     mainwin.update()
-
+    history.add()
 
 def normalize():
     print("normalize")
     img.normalize()
     mainwin.update()
-
-
+    history.add()
+    
 def sigma():
     print("sigma")
     g = tk.simpledialog.askfloat("Set Sigma", "Enter sigma (float)",
-                                 initialvalue=2)
+                                 initialvalue=3)
     img.sigma(g)
     mainwin.update()
-
+    history.add()
 
 def gamma():
     print("gamma")
@@ -224,7 +230,7 @@ def gamma():
                                  initialvalue=.8)
     img.gamma(g)
     mainwin.update()
-
+    history.add()
 
 def clip_high():
     print("clip_high")
@@ -232,7 +238,7 @@ def clip_high():
                                  initialvalue=.9)
     img.clip_high(f)
     mainwin.update()
-
+    history.add()
 
 def clip_low():
     print("clip_low")
@@ -240,7 +246,7 @@ def clip_low():
                                  initialvalue=.1)
     img.clip_low(f)
     mainwin.update()
-
+    history.add()
 
 def tres_high():
     print("tres_high")
@@ -248,7 +254,7 @@ def tres_high():
                                  initialvalue=.9)
     img.tres_high(f)
     mainwin.update()
-
+    history.add()
 
 def tres_low():
     print("tres_low")
@@ -256,20 +262,51 @@ def tres_low():
                                  initialvalue=.1)
     img.tres_low(f)
     mainwin.update()
-
-
+    history.add()
+    
 def crop():
-    x0, x1 = sorted(mainwin.xlim)
-    y0, y1 = sorted(mainwin.ylim)
-    print(f"call crop: {x0} {x1} {y0} {y1}")
-    img.crop(x0, x1, y0, y1)
+    print(f"{select} crop")
+  
+    geom = (i * mainwin.zoom for i in select.geometry) # convert to image coordinates
+    print(geom)
+    print(f"call crop: {geom}")
+    img.crop(*geom)
     mainwin.update()
+    history.add()
+    select.reset()
+  
+    
+    
+    
+def zoom_out():
+    print("zoom out")
+    if mainwin.zoom < 50:
+        mainwin.zoom += zoom_step()
+        mainwin.update()
+        select.reset()
 
+def zoom_in():
+    print("zoom in")
+    if mainwin.zoom > 1:
+        mainwin.zoom -= zoom_step()
+        mainwin.update()
+        select.reset()
+        
+def zoom_step():
+    return int(mainwin.zoom**1.5/10+1)
 
+           
 #  ------------------------------------------
 #  GUI FUNCTIONS
 #  ------------------------------------------
 
+
+def get_mouse():
+    ''' get mouse position relative to canvas top left corner '''
+    x = int(mainwin.canvas.winfo_pointerx() -  mainwin.canvas.winfo_rootx())
+    y = int(mainwin.canvas.winfo_pointery() -  mainwin.canvas.winfo_rooty())
+    return x, y
+        
 
 def hist_toggle():
     toggle_win(histwin)
@@ -277,10 +314,6 @@ def hist_toggle():
 
 def stats_toggle():
     toggle_win(statswin)
-
-
-def toolbar_toggle():
-    toggle_win(toolbar)
 
 
 def keyPressed(event):
@@ -293,9 +326,6 @@ def keyPressed(event):
 
 
 def toggle_win(win):
-    ''' shared method for floating windows,
-    I tried to make new class and subclass it,
-    but keybindings did not work then '''
 
     if win.hidden:
         win.deiconify()
@@ -315,55 +345,6 @@ def quit_app():
 
 
 #  ------------------------------------------
-#  TOOLBAR
-#  ------------------------------------------
-
-
-class Toolbar(tk.Toplevel):
-
-    def __init__(self, master=None):
-        super().__init__(master)
-        self.title("Numpyshop-toolbar")
-        self.master = master
-        self.protocol("WM_DELETE_WINDOW", toolbar_toggle)
-        self.geometry("600x30")
-        self.bind("<Key>", lambda event: keyPressed(event))
-        self.ButtonsInit()
-        self.menuInit()
-
-        self.hidden = SETTINGS["hide_toolbar"]
-
-        if self.hidden:
-            self.withdraw()
-
-    def ButtonsInit(self):
-
-        backgroundColour = "white"
-        buttonWidth = 6
-        buttonHeight = 1
-        toolKitFrame = tk.Frame(self)
-
-        for i, b in enumerate(buttons_dict()):
-            button = tk.Button(toolKitFrame, text=b[0],
-                               background=backgroundColour, width=buttonWidth,
-                               height=buttonHeight, command=b[1])
-            button.grid(row=0, column=i)
-
-        toolKitFrame.pack(side=tk.LEFT)
-
-    def menuInit(self):
-
-        menubar = tk.Menu(self)
-        tkmenu = {}
-        for submenu, items in commands_dict().items():
-            tkmenu[submenu] = tk.Menu(menubar, tearoff=0)
-            for name, key, command in items:
-                tkmenu[submenu].add_command(label=f"{name}   {key}",
-                                                  command=command)
-            menubar.add_cascade(label=submenu, menu=tkmenu[submenu])
-            self.config(menu=menubar)
-
-#  ------------------------------------------
 #  HISTORY
 #  ------------------------------------------
 
@@ -375,9 +356,10 @@ class History():
         self.redo_queue = deque([], SETTINGS["history_steps"])
 
     def add(self):
-        self.undo_queue.append(img.arr.copy())
-        self.redo_queue.clear()  # discard redo (new version)
-        print(f"added to history, len:{len(self.undo_queue)}")
+        if SETTINGS["history_steps"] > 0:
+            self.undo_queue.append(img.arr.copy())
+            self.redo_queue.clear()  # discard redo (new version)
+            print(f"added to history, len:{len(self.undo_queue)}")
 
     def undo(self):
         if len(self.undo_queue) > 1:
@@ -394,97 +376,13 @@ class History():
 
         print(f"redo queue len: {len(self.redo_queue)}")
 
-        mainwin.update(add_to_history=False)
+        mainwin.update()
 
     def reset(self):
         img.arr = img.original.copy()
         mainwin.update()
 
-#  ------------------------------------------
-#  MAIN WINDOW
-#  ------------------------------------------
 
-
-class mainWin(tk.Toplevel):
-
-    def __init__(self, master=None):
-        super().__init__(master)
-        self.title("Numpyshop")
-        self.master = master
-        self.protocol("WM_DELETE_WINDOW", quit_app)
-        self.geometry("800x800")
-        self.bind("<Key>", lambda event: keyPressed(event))
-        self.fig = None
-        self.zoom = max(1, img.width * img.height // 2**22)
-        print(self.zoom)
-
-        self.draw()
-
-    @timeit
-    def draw(self):
-        ''' draw new image '''
-        self.view = img.arr[::self.zoom,::self.zoom,...] # downsize for speed
-        
-        self.fig = plt.figure(figsize=(5, 5))
-        self.cmap = "gray" if img.channels == 1 else "jet"
-        
-        self.im = plt.imshow(self.view, cmap=self.cmap, interpolation=None)
-        self.ax = self.fig.add_subplot(111)
-
-        self.canvas = FigureCanvasTkAgg(self.fig, master=self)
-        self.canvas.draw()
-        self.canvas.get_tk_widget().pack(side=tk.TOP, fill=tk.BOTH, expand=1)
-
-        self.toolbar = NavigationToolbar2Tk(self.canvas, self)
-        self.toolbar.update()
-        self.canvas.get_tk_widget().pack(side=tk.TOP, fill=tk.BOTH, expand=1)
-        self.canvas.mpl_connect('draw_event', self.on_draw)
-
-        history.add()
-        
-    # @timeit
-    # def draw(self):
-        # ''' draw using pillow '''
-        # self.zoom = 8 
-        # self.imgtk =  ImageTk.PhotoImage(image=Image.fromarray(img_as_ubyte(img.arr[::self.zoom,::self.zoom,...])))
-
-        # self.canvas = tk.Canvas(self,width=800,height=800)
-        # self.canvas.pack()
-        # self.canvas.create_image(0,0, anchor="nw", image=self.imgtk)
-        
-        # history.add()
-
-    @timeit
-    def update(self, add_to_history=True):
-        ''' update image '''
-        if len(img.arr.ravel()) == 0:
-            print("array is empty")
-            return
-
-#        img.info()
-        print(f"update w:{img.width}, h:{img.height}")
-        self.view = img.arr[::self.zoom,::self.zoom,...] # downsize for speed
-        self.im.set_data(self.view)
-
-        # resize graph after crop, rotate
-        self.im.set_extent((0, img.width, 0, img.height))
-        self.ax.set_xlim(0, img.width)
-        self.ax.set_ylim(0, img.height)
-
-        self.canvas.draw()
-
-        histwin.update()
-
-        statswin.update()
-
-        if add_to_history:
-            history.add()
-
-    def on_draw(self, event):
-        ''' track current selection coordinates '''
-        self.xlim = self.ax.get_xlim()
-        self.ylim = self.ax.get_ylim()
-        # print(self.xlim,self.ylim)
 
 #  ------------------------------------------
 #  HISTOGRAM
@@ -509,7 +407,7 @@ class histWin(tk.Toplevel):
 
         self.draw()
 
-    @timeit
+#    @timeit
     def draw(self):
         self.fig = plt.figure(figsize=(2, 4))
         self.axes = self.fig.add_subplot(111)
@@ -536,7 +434,7 @@ class histWin(tk.Toplevel):
         self.canvas.draw()
         self.canvas.get_tk_widget().pack(side=tk.TOP, fill=tk.BOTH, expand=1)
 
-    @timeit
+#    @timeit
     def update(self):
 
         if self.hidden:
@@ -581,7 +479,7 @@ class statsWin(tk.Toplevel):
         self.frame = tk.Frame(self)
         self._draw_table()
 
-    @timeit
+#    @timeit
     def update(self):
 
         if self.hidden:
@@ -589,7 +487,7 @@ class statsWin(tk.Toplevel):
         self.frame.grid_forget()
         self._draw_table()
 
-    @timeit
+#    @timeit
     def _draw_table(self):
 
         for r, k in enumerate(img.stats):  # loop stats dictionary
@@ -609,6 +507,160 @@ class statsWin(tk.Toplevel):
 
 
 #  ------------------------------------------
+#  MAIN WINDOW
+#  ------------------------------------------
+
+class mainWin(tk.Toplevel):
+
+    def __init__(self, master=None):
+        super().__init__(master)
+        self.title("Numpyshop")
+        self.master = master
+        self.protocol("WM_DELETE_WINDOW", quit_app)
+        self.geometry("900x810")
+        self.bind("<Key>", lambda event: keyPressed(event))
+        self.bind("<MouseWheel>", self._on_mousewheel) # windows
+        self.bind("<Button-4>", self._on_mousewheel) # linux
+        self.bind("<Button-5>", self._on_mousewheel) # linux
+        self.zoom = max(1, img.width * img.height // 2**22)
+        print(self.zoom)
+        if not SETTINGS["hide_toolbar"]:
+            self.buttons_init()
+        self.menu_init()
+        self.canvas_init()
+
+        self.make_image_view()
+        self.draw()
+
+    def buttons_init(self):
+
+        backgroundColour = "white"
+        buttonWidth = 6
+        buttonHeight = 1
+        self.toolbar = tk.Frame(self)
+
+        for i, b in enumerate(buttons_dict()):
+            button = tk.Button(self.toolbar, text=b[0],
+                               background=backgroundColour, width=buttonWidth,
+                               height=buttonHeight, command=b[1])
+            button.grid(row=i, column=0)
+
+        self.toolbar.pack(side=tk.LEFT)
+
+    def menu_init(self):
+
+        self.menubar = tk.Menu(self)
+        tkmenu = {}
+        for submenu, items in commands_dict().items():
+            tkmenu[submenu] = tk.Menu(self.menubar, tearoff=0)
+            for name, key, command in items:
+                tkmenu[submenu].add_command(label=f"{name}   {key}",
+                                                  command=command)
+            self.menubar.add_cascade(label=submenu, menu=tkmenu[submenu])
+            self.config(menu=self.menubar)
+
+    def canvas_init(self):
+        width = 800
+        height = 800
+        self.canvas = tk.Canvas(self, width=width,\
+                                height=height, background="gray")
+#        self.canvas.bind("<Button-1>", lambda event: startCrop(event, canvas))
+#        self.canvas.bind("<B1-Motion>",\
+#                                    lambda event: drawCrop(event, canvas))
+#        self.canvas.bind("<ButtonRelease-1>", \
+#                                    lambda event: endCrop(event, canvas))
+
+        self.canvas.pack(fill=tk.BOTH, expand=tk.YES)
+        self.zoom = max(1,min(img.width // 2*9, img.height // 2**9))
+
+
+    def _on_mousewheel(self, event):
+        print(event.delta,event.num)
+        if event.num == 5 or event.delta == -120:
+            zoom_in()
+        if event.num == 4 or event.delta == 120:
+            zoom_out()
+
+
+    @timeit
+    def make_image_view(self):
+
+        print(img.arr.shape)
+        print(self.zoom)
+
+        view = img.arr[::self.zoom,::self.zoom,...] # downsize for speed
+        self.view_shape = view.shape[:2]
+
+        view = img_as_ubyte(view)
+        view = Image.fromarray(view)
+        self.view = ImageTk.PhotoImage(view, master=self)
+
+
+    @timeit
+    def draw(self):
+        ''' draw new image '''
+        self.make_image_view()
+        self.image = self.canvas.create_image(0,0, \
+                                 anchor="nw", image=self.view)
+
+    @timeit
+    def update(self):
+        ''' update image '''
+        self.draw()
+
+        histwin.update()
+        statswin.update()
+
+    def on_draw(self, event):
+        ''' track current selection coordinates '''
+        self.xlim = self.ax.get_xlim()
+        self.ylim = self.ax.get_ylim()
+        # print(self.xlim,self.ylim)
+
+               
+        
+    # ensure zoom > 0    
+    @property
+    def zoom(self):
+        return self.__dict__['zoom']
+    @zoom.setter
+    def zoom(self, value):
+        if value > 0:
+            self.__dict__['zoom'] = int(value)
+#  ------------------------------------------
+#  Selection
+#  ------------------------------------------
+    
+    
+class Selection:
+    
+    def __init__(self, parent):
+        self.parent = parent
+        self.geometry = [0, 0, img.width, img.height]
+        self.rect = None
+        
+    def set_left(self):
+        self.geometry[:2] = list(get_mouse())
+        self.draw()
+        
+    def set_right(self):
+        self.geometry[2:] = list(get_mouse())
+        self.draw()
+        
+    def draw(self):
+        print(self.geometry)
+        mainwin.canvas.delete(self.rect)
+        self.rect = mainwin.canvas.create_rectangle(self.geometry)
+        print(self.rect)
+        
+    def reset(self):
+        
+        self.geometry = [0, 0, img.width, img.height]
+        self.draw()
+        
+    def __str__(self):
+        return f"selection geom: {self.geometry}"
+#  ------------------------------------------
 #  MAIN
 #  ------------------------------------------
 
@@ -619,7 +671,8 @@ if __name__ == '__main__':
         Fp = Path(sys.argv[1])
         assert Fp.is_file(), f"not a file {Fp}"
     else:
-        Fp = Path(__file__).parent / 'sample.tif'
+        Fp = Path(__file__).parent / 'red-pompadour.jpg'
+
 
     root = tk.Tk()
     root.title("Numpyshop")
@@ -628,14 +681,21 @@ if __name__ == '__main__':
     # load image into numpy array
     img = npImage(Fp)
     print("image loaded")
+    
+    select = Selection(root)
+    print(select)
+    select.set_left
+    print(select)
+    
+    
     history = History()
 
     histwin = histWin(root)
 
     statswin = statsWin(root)
 
-    toolbar = Toolbar(root)
-    print("show mainwin")
+#    toolbar = Toolbar(root)
+#    print("show mainwin")
     mainwin = mainWin(root)
     print(f"mainloop in {time.time()-time0}")
 

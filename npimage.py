@@ -1,25 +1,14 @@
 #!/usr/bin/env python3
-import time
 import imghdr
 import numpy as np
 from pathlib import Path
 from send2trash import send2trash
 from tkinter import filedialog
 import nputils
+from testing.timeit import timeit
 
 FILETYPES = ['jpeg', 'bmp', 'png', 'tiff']
 HISTOGRAM_BINS = 256
-
-
-def timeit(method):
-
-    def timed(*args, **kw):
-        ts = time.time()
-        result = method(*args, **kw)
-        te = time.time()
-        print('%r  %2.2f ms' % (method.__qualname__, (te - ts) * 1000))
-        return result
-    return timed
 
 
 class npImage():
@@ -65,7 +54,12 @@ class npImage():
 
     def reset(self):
         self.arr = self.original.copy()
-
+        
+    @property
+    def center(self):
+        x,y = (size//2 for size in self.arr.shape[:2])
+      #  return int(self.arr.shape[0]/2), int(self.arr.shape[1]/2)
+        return x,y
     @property
     def width(self):
         return self.arr.shape[1]
@@ -122,6 +116,14 @@ class npImage():
         y = self.arr ** g
         self.arr = np.clip(y, 0, 1)
 
+    def cgamma(self, f):
+        """s-shaped correction of an numpy float image, where
+        f = 1. : no effect
+        f > 1. : image will darken
+        f < 1. : image will brighten"""
+        y = (self.arr -.5) ** f + .5
+        self.arr = np.clip(y, 0, 1)
+
     def multiply(self, f):
         """ change contrast """
         y = .5 + f * (self.arr - .5)
@@ -152,7 +154,7 @@ class npImage():
         y = np.tanh((self.arr - .5) * sigma) / 2 + .5
         self.arr = np.clip(y, 0, 1)
 
-    def crop(self, x0, x1, y0, y1):
+    def crop(self, x0, y0, x1, y1):
 
         # ensure crop area in image
         x0 = int(max(x0, 0))
