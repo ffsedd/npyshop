@@ -180,7 +180,8 @@ class npImage():
         import scipy.fftpack as fftpack
         F1 = fftpack.fft2((self.arr).astype(float))
         F2 = fftpack.fftshift(F1)
-        self.fft_plot = (20 * np.log10(0.1 + F2)).astype(int)
+        fft_plot = (20 * np.log10(0.1 + F2)).astype(int)
+        return fft_plot
 
     def subtract_background(self, sigma):
         from scipy import ndimage

@@ -238,8 +238,8 @@ def normalize():
 
 def fft():
     print("fft")
-    img.fft()
-    fftWin(master=mainwin)
+    fft_plot = img.fft()
+    plotWin(master=mainwin, plot=fft_plot)
 
 
 def subtract_background():
@@ -422,24 +422,22 @@ class History():
 #  ------------------------------------------
 
 
-class fftWin(tk.Toplevel):
+class plotWin(tk.Toplevel):
 
-    def __init__(self, master=None):
+    def __init__(self, master=None, plot=None):
         super().__init__(master)
-        self.title("Numpyshop-FFT")
+        self.title("Numpyshop-plot")
         self.master = master
+        self.plot = plot
         self.protocol("WM_DELETE_WINDOW", self.destroy)
         self.geometry("300x300")
         self.bind("<Key>", lambda event: keyPressed(event))
-
         self.draw()
 
 #    @timeit
     def draw(self):
-
         self.fig = plt.figure(figsize=(5, 5))
-
-        self.im = plt.imshow(img.fft_plot, cmap='gray', interpolation=None)
+        self.im = plt.imshow(self.plot, cmap='gray', interpolation=None)
         self.ax = self.fig.add_subplot(111)
 
         self.canvas = FigureCanvasTkAgg(self.fig, master=self)
