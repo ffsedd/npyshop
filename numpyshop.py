@@ -11,6 +11,7 @@ from npimage import npImage
 from matplotlib import pyplot as plt
 
 from skimage import img_as_ubyte
+from scipy import ndimage
 
 from PIL import Image, ImageTk
 
@@ -39,7 +40,6 @@ running out of memory
 
 
 TODO:
-    crop
     mouse zoom center on mouse pointer
 
 
@@ -52,7 +52,7 @@ SETTINGS = {
     "hide_toolbar": True,
     "hide_stats": True,
     "history_steps": 2,     # memory !!!
-    
+
 }
 
 
@@ -76,6 +76,7 @@ def commands_dict():
                 ("Rotate_90", "r", rotate),
                 ("Rotate_270", "R", rotate_270),
                 ("Rotate_180", "u", rotate_180),
+                ("Free Rotate", "f", free_rotate),
             ],
             "Filter":
             [
@@ -85,10 +86,12 @@ def commands_dict():
                 ("Add", "a", add),
                 ("Invert", "i", invert),
                 ("Sigma", "I", sigma),
+                ("Subtrackt background", "B", subtract_background),
                 ("Clip light (BW only)", "l", clip_high),
                 ("Clip dark (BW only)", "d", clip_low),
                 ("Tres light (BW only)", "L", tres_high),
                 ("Tres dark (BW only)", "D", tres_low),
+                ("FFT", "F", fft),
             ],
             "View":
             [
@@ -153,6 +156,16 @@ def redo():
     mainwin.update()
 
 
+def free_rotate():
+    print("free rotate")
+    f = tk.simpledialog.askfloat("Rotate", "Angle (float)",
+                                 initialvalue=2.)
+    img.free_rotate(f)
+    mainwin.update()
+    history.add()
+    select.reset()
+
+
 def rotate():
     print("rotate")
     img.rotate()
@@ -176,11 +189,13 @@ def rotate_180():
     history.add()
     select.reset()
 
+
 def invert():
     print("invert")
     img.invert()
     mainwin.update()
     history.add()
+
 
 def mirror():
     print("mirror")
@@ -188,11 +203,13 @@ def mirror():
     mainwin.update()
     history.add()
 
+
 def flip():
     print("flip")
     img.flip()
     mainwin.update()
     history.add()
+
 
 def multiply():
     print("multiply")
@@ -202,19 +219,38 @@ def multiply():
     mainwin.update()
     history.add()
 
+
 def add():
     print("add")
-    f = tk.simpledialog.askfloat("Add", "Enter value to add (float)")
+    f = tk.simpledialog.askfloat("Add", "Enter value to add (float)",
+                                 initialvalue=.2)
     img.add(f)
     mainwin.update()
     history.add()
+
 
 def normalize():
     print("normalize")
     img.normalize()
     mainwin.update()
     history.add()
-    
+
+
+def fft():
+    print("fft")
+    img.fft()
+    fftWin(master=mainwin)
+
+
+def subtract_background():
+    print("subtract_background")
+    f = tk.simpledialog.askfloat("subtrack_background", "Enter sigma (float)",
+                                 initialvalue=20)
+    img.subtract_background(f)
+    mainwin.update()
+    history.add()
+
+
 def sigma():
     print("sigma")
     g = tk.simpledialog.askfloat("Set Sigma", "Enter sigma (float)",
@@ -262,21 +298,21 @@ def tres_low():
     img.tres_low(f)
     mainwin.update()
     history.add()
-    
+
 def crop():
     print(f"{select} crop")
-  
+
     geom = [i * mainwin.zoom for i in select.geometry] # convert to image coordinates
     geomx, geomy = sorted(geom[0::2]), sorted(geom[1::2])   # avoid right corner being before left
-    geom = geomx[0], geomy[0], geomx[1], geomy[1], 
+    geom = geomx[0], geomy[0], geomx[1], geomy[1],
     print(geom)
     print(f"call crop: {geom}")
     img.crop(*geom)
     mainwin.update()
     history.add()
     select.reset()
-  
-    
+
+
 def zoom_out():
     print("zoom out")
     if mainwin.zoom < 50:
@@ -290,11 +326,11 @@ def zoom_in():
         mainwin.zoom -= zoom_step()
         mainwin.update()
         select.reset()
-        
+
 def zoom_step():
     return int(mainwin.zoom**1.5/10+1)
 
-           
+
 #  ------------------------------------------
 #  GUI FUNCTIONS
 #  ------------------------------------------
@@ -305,7 +341,7 @@ def get_mouse():
     x = int(mainwin.canvas.winfo_pointerx() -  mainwin.canvas.winfo_rootx())
     y = int(mainwin.canvas.winfo_pointery() -  mainwin.canvas.winfo_rooty())
     return x, y
-        
+
 
 def hist_toggle():
     toggle_win(histwin)
@@ -381,6 +417,36 @@ class History():
         img.arr = img.original.copy()
         mainwin.update()
 
+#  ------------------------------------------
+#  FFT
+#  ------------------------------------------
+
+
+class fftWin(tk.Toplevel):
+
+    def __init__(self, master=None, linewidth=1.0):
+        super().__init__(master)
+        self.title("Numpyshop-FFT")
+        self.master = master
+        self.protocol("WM_DELETE_WINDOW", self.destroy)
+        self.geometry("300x300")
+        self.bind("<Key>", lambda event: keyPressed(event))
+#        self.linewidth = linewidth
+#        self.bins = 30
+
+        self.draw()
+
+#    @timeit
+    def draw(self):
+        self.fig = plt.figure(figsize=(5, 5))
+        self.axes = self.fig.add_subplot(111)
+
+        plt.imshow(img.fft_plot, cmap=plt.cm.gray)
+        plt.show()
+
+        self.canvas = FigureCanvasTkAgg(self.fig, master=self)
+        self.canvas.draw()
+        self.canvas.get_tk_widget().pack(side=tk.TOP, fill=tk.BOTH, expand=1)
 
 
 #  ------------------------------------------
@@ -619,13 +685,13 @@ class mainWin(tk.Toplevel):
         # print(self.xlim,self.ylim)
 
     def _on_mouse_left(self, event):
-        select.set_left()    
-               
+        select.set_left()
+
     def _on_mouse_right(self, event):
-        select.set_right()    
-        
-              
-    # ensure zoom > 0    
+        select.set_right()
+
+
+    # ensure zoom > 0
     @property
     def zoom(self):
         return self.__dict__['zoom']
@@ -636,36 +702,36 @@ class mainWin(tk.Toplevel):
 #  ------------------------------------------
 #  Selection
 #  ------------------------------------------
-    
-    
+
+
 class Selection:
-    
+
     def __init__(self, parent):
         self.parent = parent
         self.geometry = [0,0,0,0]
         self.rect = None
-        
+
     def set_left(self):
         self.geometry[:2] = list(get_mouse())
         self.draw()
-        
+
     def set_right(self):
         self.geometry[2:] = list(get_mouse())
         self.draw()
-        
+
     def draw(self):
         print(self.geometry)
         mainwin.canvas.delete(self.rect)
         self.rect = mainwin.canvas.create_rectangle(self.geometry)
         print(self.rect)
-        
+
     def reset(self):
         self.select_all()
         self.draw()
 
     def select_all(self):
         self.geometry = [0, 0, img.width * mainwin.zoom, img.height * mainwin.zoom]
-            
+
     def __str__(self):
         return f"selection geom: {self.geometry}"
 #  ------------------------------------------
@@ -689,13 +755,13 @@ if __name__ == '__main__':
     # load image into numpy array
     img = npImage(Fp)
     print("image loaded")
-    
+
     select = Selection(root)
     print(select)
     select.set_left
     print(select)
-    
-    
+
+
     history = History()
 
     histwin = histWin(root)

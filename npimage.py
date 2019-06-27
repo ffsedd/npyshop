@@ -4,7 +4,9 @@ import numpy as np
 from pathlib import Path
 from send2trash import send2trash
 from tkinter import filedialog
+
 import nputils
+
 from testing.timeit import timeit
 
 FILETYPES = ['jpeg', 'bmp', 'png', 'tiff']
@@ -54,12 +56,12 @@ class npImage():
 
     def reset(self):
         self.arr = self.original.copy()
-        
+
     @property
     def center(self):
-        x,y = (size//2 for size in self.arr.shape[:2])
-      #  return int(self.arr.shape[0]/2), int(self.arr.shape[1]/2)
-        return x,y
+        x, y = (size//2 for size in self.arr.shape[:2])
+        return x, y
+
     @property
     def width(self):
         return self.arr.shape[1]
@@ -96,6 +98,15 @@ class npImage():
         # self.arr = ndimage.rotate(self.arr, angle=-90, reshape=True)
         self.arr = np.rot90(self.arr, -k, axes=(0, 1))
 
+    def free_rotate(self, angle):
+        ''' rotate array
+        '''
+        from scipy import ndimage
+        self.arr = ndimage.rotate(self.arr, angle, reshape=True, mode='nearest')
+
+        self.info()
+        self.arr = np.clip(self.arr, 0, 1)
+
     def invert(self):
         self.arr = 1 - self.arr
 
@@ -121,7 +132,7 @@ class npImage():
         f = 1. : no effect
         f > 1. : image will darken
         f < 1. : image will brighten"""
-        y = (self.arr -.5) ** f + .5
+        y = (self.arr - .5) ** f + .5
         self.arr = np.clip(y, 0, 1)
 
     def multiply(self, f):
@@ -164,6 +175,18 @@ class npImage():
         print(f"apply crop: {x0} {x1} {y0} {y1}")
         self.arr = self.arr[y0:y1, x0:x1, ...]
 #        self.info() # slow
+
+    def fft(self):
+        import scipy.fftpack as fftpack
+        F1 = fftpack.fft2((self.arr).astype(float))
+        F2 = fftpack.fftshift(F1)
+        self.fft_plot = (20 * np.log10(0.1 + F2)).astype(int)
+
+    def subtract_background(self, sigma):
+        from scipy import ndimage
+        bg = ndimage.gaussian_filter(self.arr, sigma=sigma)
+        self.arr = (bg + self.arr) / 2
+        np.clip(self.arr, 0, 1)  # inplace
 
     def info(self):
         ''' print info about numpy array
