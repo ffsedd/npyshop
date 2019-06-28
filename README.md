@@ -1,4 +1,4 @@
-# Numpyshop - Image Editor based on Numpy arrays, Matplotlib and Tkinter
+# Npyshop - Image Editor based on Numpy arrays, Matplotlib and Tkinter
 --------------------------------------------------------
 
 Adapted from https://github.com/riyasavla/Image-Editor
