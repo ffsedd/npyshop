@@ -690,9 +690,9 @@ class mainWin(tk.Toplevel):
 
     def _on_mousewheel(self, event):
         print(event.delta, event.num)
-        if event.num == 5 or event.delta == -120:
+        if event.num == 4 or event.delta == -120:
             zoom_in()
-        if event.num == 4 or event.delta == 120:
+        if event.num == 5 or event.delta == 120:
             zoom_out()
 
     @timeit
