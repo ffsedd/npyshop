@@ -1,11 +1,11 @@
 #!/usr/bin/env python3
 from testing.timeit import timeit
 from matplotlib.backends.backend_tkagg import FigureCanvasTkAgg
-from collections import deque
 from PIL import Image, ImageTk
 from skimage import img_as_ubyte
 from matplotlib import pyplot as plt
 from npimage import npImage
+from nphistory import History
 import nputils
 import tkinter as tk
 import numpy as np
@@ -56,7 +56,7 @@ def commands_dict():
                 ("Open", "o", load),
                 ("Save", "S", save),
                 ("Save as", "s", save_as),
-                ("Reset", "Q", reset),
+                ("Reset", "Q", original),
             ],
         "Edit":
             [
@@ -120,10 +120,11 @@ def buttons_dict():
 #  FUNCTIONS
 #  ------------------------------------------
 
-def load():
+def load(fp=""):
     print("open")
-    img.load()
-#    img.info()
+    img.load(fp)
+    history.original = img.arr
+    print(history.original)
     mainwin.title(img.fpath)
     mainwin.reset()
     histwin.reset()
@@ -141,22 +142,34 @@ def save_as():
     mainwin.title(img.fpath)
 
 
-def reset():
-    print("reset")
-    img.reset()
-    mainwin.update()
+def original():
+    print("toggle original")
+#    img.reset()
+    if not history.toggle_original:
+        img.arr = history.original
+        history.toggle_original = not history.toggle_original
+        mainwin.update()
+    else:
+        if history.last() is not None:
+            img.arr = history.last()
+            history.toggle_original = not history.toggle_original
+            mainwin.update()
 
 
 def undo():
     print("undo")
-    history.undo()
-    mainwin.update()
+    prev_arr = history.undo()
+    if prev_arr is not None:
+        img.arr = prev_arr
+        mainwin.update()
 
 
 def redo():
     print("redo")
-    history.redo()
-    mainwin.update()
+    next_arr = history.redo()
+    if next_arr is not None:
+        img.arr = next_arr
+        mainwin.update()
 
 
 def free_rotate():
@@ -165,7 +178,7 @@ def free_rotate():
                                  initialvalue=2.)
     img.free_rotate(-f)  # clockwise
     mainwin.update()
-    history.add()
+    history.add(img.arr)
     select.reset()
 
 
@@ -173,7 +186,7 @@ def rotate_90():
     print("rotate")
     img.rotate()
     mainwin.update()
-    history.add()
+    history.add(img.arr)
     select.reset()
 
 
@@ -181,7 +194,7 @@ def rotate_270():
     print("rotate left")
     img.rotate(3)
     mainwin.update()
-    history.add()
+    history.add(img.arr)
     select.reset()
 
 
@@ -189,7 +202,7 @@ def rotate_180():
     print("rotate 180")
     img.rotate(2)
     mainwin.update()
-    history.add()
+    history.add(img.arr)
     select.reset()
 
 
@@ -197,21 +210,21 @@ def invert():
     print("invert")
     img.invert()
     mainwin.update()
-    history.add()
+    history.add(img.arr)
 
 
 def mirror():
     print("mirror")
     img.mirror()
     mainwin.update()
-    history.add()
+    history.add(img.arr)
 
 
 def flip():
     print("flip")
     img.flip()
     mainwin.update()
-    history.add()
+    history.add(img.arr)
 
 
 def contrast():
@@ -220,7 +233,7 @@ def contrast():
                                  initialvalue=1.3)
     img.contrast(f)
     mainwin.update()
-    history.add()
+    history.add(img.arr)
 
 
 def multiply():
@@ -229,7 +242,7 @@ def multiply():
                                  initialvalue=1.3)
     img.multiply(f)
     mainwin.update()
-    history.add()
+    history.add(img.arr)
 
 
 def add():
@@ -238,14 +251,14 @@ def add():
                                  initialvalue=.2)
     img.add(f)
     mainwin.update()
-    history.add()
+    history.add(img.arr)
 
 
 def normalize():
     print("normalize")
     img.normalize()
     mainwin.update()
-    history.add()
+    history.add(img.arr)
 
 
 def fill():
@@ -254,21 +267,21 @@ def fill():
                                  initialvalue=0)
     img.fill(f)
     mainwin.update()
-    history.add()
+    history.add(img.arr)
 
 
 def delete():
     print("delete")
     img.fill(1)
     mainwin.update()
-    history.add()
+    history.add(img.arr)
 
 def delete_cirk():
     print("delete")
 #    print(select.cirk_mask)
     img.arr = img.arr*(1-select.cirk_mask())
     mainwin.update()
-    history.add()
+    history.add(img.arr)
 
 
 
@@ -278,7 +291,7 @@ def rgb2gray():
     img.rgb2gray()
     mainwin.update()
     histwin.reset()
-    history.add()
+    history.add(img.arr)
 
 
 def fft():
@@ -303,7 +316,7 @@ def unsharp_mask():
                                  initialvalue=0.2)
     img.unsharp_mask(r,a)
     mainwin.update()
-    history.add()
+    history.add(img.arr)
 
 
 
@@ -313,7 +326,7 @@ def blur():
                                  initialvalue=1)
     img.blur(f)
     mainwin.update()
-    history.add()
+    history.add(img.arr)
 
 
 def highpass():
@@ -322,7 +335,7 @@ def highpass():
                                  initialvalue=20)
     img.highpass(f)
     mainwin.update()
-    history.add()
+    history.add(img.arr)
 
 
 def sigma():
@@ -331,7 +344,7 @@ def sigma():
                                  initialvalue=3)
     img.sigma(g)
     mainwin.update()
-    history.add()
+    history.add(img.arr)
 
 
 def gamma():
@@ -340,7 +353,7 @@ def gamma():
                                  initialvalue=.8)
     img.gamma(g)
     mainwin.update()
-    history.add()
+    history.add(img.arr)
 
 
 def clip_high():
@@ -349,7 +362,7 @@ def clip_high():
                                  initialvalue=.9)
     img.clip_high(f)
     mainwin.update()
-    history.add()
+    history.add(img.arr)
 
 
 def clip_low():
@@ -358,7 +371,7 @@ def clip_low():
                                  initialvalue=.1)
     img.clip_low(f)
     mainwin.update()
-    history.add()
+    history.add(img.arr)
 
 
 def tres_high():
@@ -367,7 +380,7 @@ def tres_high():
                                  initialvalue=.9)
     img.tres_high(f)
     mainwin.update()
-    history.add()
+    history.add(img.arr)
 
 
 def tres_low():
@@ -376,7 +389,7 @@ def tres_low():
                                  initialvalue=.1)
     img.tres_low(f)
     mainwin.update()
-    history.add()
+    history.add(img.arr)
 
 
 def crop():
@@ -384,7 +397,7 @@ def crop():
 
     img.crop(*select.geometry)
     mainwin.update()
-    history.add()
+    history.add(img.arr)
     select.reset()
 
 
@@ -460,43 +473,6 @@ def quit_app():
     root.destroy()
 
 
-#  ------------------------------------------
-#  HISTORY
-#  ------------------------------------------
-
-
-class History():
-
-    def __init__(self):
-        self.undo_queue = deque([], SETTINGS["history_steps"])
-        self.redo_queue = deque([], SETTINGS["history_steps"])
-
-    def add(self):
-        if SETTINGS["history_steps"] > 0:
-            self.undo_queue.append(img.arr.copy())
-            self.redo_queue.clear()  # discard redo (new version)
-            print(f"added to history, len:{len(self.undo_queue)}")
-
-    def undo(self):
-        if len(self.undo_queue) > 1:
-            lastImage = self.undo_queue.pop()
-            self.redo_queue.append(lastImage)
-            img.arr = self.undo_queue[-1]
-
-        print(f"undo queue len: {len(self.undo_queue)}")
-
-    def redo(self):
-        if len(self.redo_queue) > 0:
-            img.arr = self.redo_queue.pop()
-            self.undo_queue.append(img.arr.copy())
-
-        print(f"redo queue len: {len(self.redo_queue)}")
-
-        mainwin.update()
-
-    def reset(self):
-        img.arr = img.original.copy()
-        mainwin.update()
 
 #  ------------------------------------------
 #  FFT
@@ -861,8 +837,12 @@ if __name__ == '__main__':
     root.title("Numpyshop")
     root.withdraw()  # root win is hidden
 
+    history = History(max_length=SETTINGS["history_steps"])
+
     # load image into numpy array
     img = npImage(Fp)
+    history.original = img.arr
+
     print("image loaded")
 
     select = Selection(root)
@@ -870,7 +850,7 @@ if __name__ == '__main__':
     select.set_left
     print(select)
 
-    history = History()
+
 
     histwin = histWin(root)
 

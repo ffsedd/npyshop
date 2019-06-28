@@ -39,7 +39,13 @@ class npImage():
     def load(self, fpath=None):
 
         fpath = fpath or filedialog.askopenfilename()
+        if not fpath:
+            return
+
         print(f"open file {fpath}")
+
+
+
 
         # make sure it's an image file
         #
@@ -151,13 +157,13 @@ class npImage():
         y = gaussian_filter(y, radius)
         self.arr[self.slice] = np.clip(y, 0, 1)
 
-    def multiply(self, f):
-        """ multiply by scalar and clip """
+    def contrast(self, f):
+        """ change contrast """
         y = .5 + f * (self.arr[self.slice] - .5)
         self.arr[self.slice] = np.clip(y, 0, 1)
 
-    def contrast(self, f):
-        """ change contrast """
+    def multiply(self, f):
+        """ multiply by scalar and clip """
         y = f * self.arr[self.slice]
         self.arr[self.slice] = np.clip(y, 0, 1)
 
