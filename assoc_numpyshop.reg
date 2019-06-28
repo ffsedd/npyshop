@@ -1,0 +1,15 @@
+Windows Registry Editor Version 5.00
+
+[HKEY_CLASSES_ROOT\numpyshop]
+@=""
+
+[HKEY_CLASSES_ROOT\numpyshop\shell]
+
+[HKEY_CLASSES_ROOT\numpyshop\shell\open]
+
+[HKEY_CLASSES_ROOT\numpyshop\shell\open\command]
+@="\"c:\\Dropbox\\alma_scripts\\pyalma\\numpyshop\\numpyshop.bat\" \"%1\""
+
+
+[HKEY_CLASSES_ROOT\.jpg]
+@="numpyshop"

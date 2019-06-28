@@ -6,6 +6,7 @@ from PIL import Image, ImageTk
 from skimage import img_as_ubyte
 from matplotlib import pyplot as plt
 from npimage import npImage
+import nputils
 import tkinter as tk
 import numpy as np
 from pathlib import Path
@@ -38,10 +39,10 @@ TODO:
 
 
 SETTINGS = {
-    "hide_histogram": True,
+    "hide_histogram": False,
     "hide_toolbar": True,
     "hide_stats": True,
-    "histogram_bins": 32,
+    "histogram_bins": 256,
     "history_steps": 3,     # memory !!!
 
 }
@@ -64,7 +65,7 @@ def commands_dict():
                 ("Crop", "C", crop),
                 ("Select left corner", "comma", select.set_left),
                 ("Select right corner", "period", select.set_right),
-                ("Rotate_90", "r", rotate),
+                ("Rotate_90", "r", rotate_90),
                 ("Rotate_270", "R", rotate_270),
                 ("Rotate_180", "u", rotate_180),
                 ("Free Rotate", "f", free_rotate),
@@ -74,16 +75,23 @@ def commands_dict():
                 ("Gamma", "g", gamma),
                 ("Normalize (BW only)", "n", normalize),
                 ("Multiply", "m", multiply),
+                ("Contrast", "c", contrast),
                 ("Add", "a", add),
                 ("Invert", "i", invert),
                 ("Sigma", "I", sigma),
+                ("Unsharp mask", "M", unsharp_mask),
+                ("Blur", "B", blur),
                 ("Highpass", "H", highpass),
                 ("Clip light (BW only)", "l", clip_high),
                 ("Clip dark (BW only)", "d", clip_low),
                 ("Tres light (BW only)", "L", tres_high),
                 ("Tres dark (BW only)", "D", tres_low),
                 ("FFT", "F", fft),
+                ("iFFT", "Control-F", ifft),
                 ("rgb2gray", "b", rgb2gray),
+                ("delete", "Delete", delete),
+                ("delete c", "Control-Delete", delete_cirk),
+                ("fill", "Insert", fill),
             ],
         "View":
             [
@@ -102,7 +110,7 @@ def buttons_dict():
         ("Histogram", hist_toggle),
         ("Statistics", stats_toggle),
         ("Crop", crop),
-        ("Rotate", rotate),
+        ("Rotate", rotate_90),
         ("Zoom in", zoom_in),
         ("Zoom out", zoom_out),
     ]
@@ -116,8 +124,9 @@ def load():
     print("open")
     img.load()
 #    img.info()
-    mainwin.update()
-    histwin.update()
+    mainwin.title(img.fpath)
+    mainwin.reset()
+    histwin.reset()
 
 
 def save():
@@ -128,6 +137,8 @@ def save():
 def save_as():
     print("save as")
     img.save_as()
+    mainwin.title(img.fpath)
+    mainwin.title(img.fpath)
 
 
 def reset():
@@ -150,15 +161,15 @@ def redo():
 
 def free_rotate():
     print("free rotate")
-    f = tk.simpledialog.askfloat("Rotate", "Angle (float)",
+    f = tk.simpledialog.askfloat("Rotate", "Angle (float - clockwise)",
                                  initialvalue=2.)
-    img.free_rotate(f)
+    img.free_rotate(-f)  # clockwise
     mainwin.update()
     history.add()
     select.reset()
 
 
-def rotate():
+def rotate_90():
     print("rotate")
     img.rotate()
     mainwin.update()
@@ -203,6 +214,15 @@ def flip():
     history.add()
 
 
+def contrast():
+    print("contrast")
+    f = tk.simpledialog.askfloat("contrast", "Value to multiply with (float)",
+                                 initialvalue=1.3)
+    img.contrast(f)
+    mainwin.update()
+    history.add()
+
+
 def multiply():
     print("multiply")
     f = tk.simpledialog.askfloat("Multiply", "Value to multiply with (float)",
@@ -228,18 +248,72 @@ def normalize():
     history.add()
 
 
-def rgb2gray():
-    print("rgb2gray")
-    img.rgb2gray()
+def fill():
+    print("fill")
+    f = tk.simpledialog.askfloat("Fill", "Value to fill (float)",
+                                 initialvalue=0)
+    img.fill(f)
     mainwin.update()
     history.add()
 
 
+def delete():
+    print("delete")
+    img.fill(1)
+    mainwin.update()
+    history.add()
+
+def delete_cirk():
+    print("delete")
+#    print(select.cirk_mask)
+    img.arr = img.arr*(1-select.cirk_mask())
+    mainwin.update()
+    history.add()
+
+
+
+
+def rgb2gray():
+    print("rgb2gray")
+    img.rgb2gray()
+    mainwin.update()
+    histwin.reset()
+    history.add()
+
+
 def fft():
-    from matplotlib.colors import LogNorm
+#    from matplotlib.colors import LogNorm
     print("fft")
     fftimage = img.fft()
-    plotWin(master=mainwin, plot=fftimage, norm=LogNorm(vmin=5))
+#    plotWin(master=mainwin, plot=fftimage, norm=LogNorm(vmin=5))
+    plotWin(master=mainwin, plot=fftimage)
+
+
+def ifft():
+    print("ifft")
+    im = img.ifft()
+    plotWin(master=mainwin, plot=im)
+
+
+def unsharp_mask():
+    print("unsharp_mask")
+    r = tk.simpledialog.askfloat("unsharp_mask", "Enter radius (float)",
+                                 initialvalue=.5)
+    a = tk.simpledialog.askfloat("unsharp_mask", "Enter amount (float)",
+                                 initialvalue=0.2)
+    img.unsharp_mask(r,a)
+    mainwin.update()
+    history.add()
+
+
+
+def blur():
+    print("blur")
+    f = tk.simpledialog.askfloat("blur", "Enter radius (float)",
+                                 initialvalue=1)
+    img.blur(f)
+    mainwin.update()
+    history.add()
 
 
 def highpass():
@@ -307,7 +381,8 @@ def tres_low():
 
 def crop():
     print(f"{select} crop")
-    img.crop()
+
+    img.crop(*select.geometry)
     mainwin.update()
     history.add()
     select.reset()
@@ -320,6 +395,10 @@ def zoom_out():
         mainwin.update()
         select.reset()
 
+
+def circular_mask():
+    print("zoom in")
+    select.make_cirk_mask()
 
 def zoom_in():
     print("zoom in")
@@ -433,10 +512,19 @@ class plotWin(tk.Toplevel):
         self.plot = plot
         self.protocol("WM_DELETE_WINDOW", self.destroy)
         self.geometry("300x300")
+        self.bind("<Control-s>", self._save)
         self.bind("<Key>", lambda event: keyPressed(event))
         self.draw(*a, **kw)
 
+    def _save(self, event):
+        #        self.fig.savefig(str(img.fpath) + "_plot.png")
+        y = self.plot
+        nputils.info(y)
+#        y = nputils.normalize(self.plot)
+        nputils.save_image(y, str(img.fpath) +
+                           "_plot.png", bitdepth=img.bitdepth)
 #    @timeit
+
     def draw(self, *a, **kw):
         self.fig = plt.figure(figsize=(5, 5))
         self.im = plt.imshow(self.plot, cmap='gray',
@@ -457,60 +545,57 @@ class histWin(tk.Toplevel):
 
     def __init__(self, master=None, linewidth=1.0):
         super().__init__(master)
-        self.title("Numpyshop-histogram")
+        self.title("Histogram")
         self.master = master
         self.protocol("WM_DELETE_WINDOW", hist_toggle)
         self.geometry("300x300")
         self.bind("<Key>", lambda event: keyPressed(event))
         self.linewidth = linewidth
         self.bins = SETTINGS["histogram_bins"]
-
         self.hidden = SETTINGS["hide_histogram"]
+        self.draw()
         if self.hidden:
             self.withdraw()
 
-        self.draw()
-
-#    @timeit
     def draw(self):
-        self.fig = plt.figure(figsize=(2, 4))
-        self.axes = self.fig.add_subplot(111)
-
-        plt.xticks(np.linspace(0, 1, 11), rotation='vertical')
-        self.ims = []
-
-        x, hist_data = img.histogram_data(bins=self.bins)
-
-        for color, y in hist_data.items():
-            self.ims.append(plt.plot(x, y, color=color,
-                                     linewidth=self.linewidth)[0])
-
-        self.ax = plt.gca()
+        # empty graph
+        self.fig, self.ax = plt.subplots()
+        self.ax.set_xticks(np.linspace(0, 1, 11))
+        self.ax.set_ylim(0, 10)
+        self.ax.set_title("Histogram")
         self.ax.spines['right'].set_visible(False)
         self.ax.spines['top'].set_visible(False)
         self.ax.spines['left'].set_visible(False)
         self.ax.tick_params(left=False)
-
+        self.fig.tight_layout()
         self.canvas = FigureCanvasTkAgg(self.fig, master=self)
         self.canvas.draw()
         self.canvas.get_tk_widget().pack(side=tk.TOP, fill=tk.BOTH, expand=1)
 
-#    @timeit
-    def update(self):
+        self.data = {'black':None, 'red':None, 'green':None, 'blue':None,}
 
+        # get data
+        self.x, hist_data = img.histogram_data(bins=self.bins)
+
+        for color in self.data:
+            self.data[color] = self.ax.plot(self.x, 0*self.x, color=color)[0]
+        self.update()
+
+    def reset(self):
+
+        for color in self.data:
+            self.data[color].set_data(self.x,0*self.x)
+
+        self.update()
+
+
+    def update(self):
         if self.hidden:
             return
-
         x, hist_data = img.histogram_data(bins=self.bins)
-        # calculate max of all lines (autoscale did not work, scale manually)
-        hist_max = 0
         # loop and update all lines
-        for im, color in zip(self.ims, hist_data):
-            y = hist_data[color]
-            im.set_data(x, y)
-            hist_max = max(hist_max, y.max())
-
-        self.ax.set_ylim(0, hist_max)
+        for color, y in hist_data.items():
+            self.data[color].set_data(x,y)
 
         self.canvas.draw()
 
@@ -575,7 +660,6 @@ class mainWin(tk.Toplevel):
 
     def __init__(self, master=None):
         super().__init__(master)
-        self.title("Numpyshop")
         self.master = master
         self.protocol("WM_DELETE_WINDOW", quit_app)
         self.geometry("900x810")
@@ -585,15 +669,13 @@ class mainWin(tk.Toplevel):
         self.bind("<Button-5>", self._on_mousewheel)  # linux
         self.bind("<Button-1>", self._on_mouse_left)
         self.bind("<Button-3>", self._on_mouse_right)
-        self.zoom = max(1, img.width * img.height // 2**22)
-        print(self.zoom)
+        self.title(img.fpath)
+        self.zoom = 1
         if not SETTINGS["hide_toolbar"]:
             self.buttons_init()
         self.menu_init()
         self.canvas_init()
-
-        self.make_image_view()
-        self.draw()
+        self.reset()
 
     def buttons_init(self):
 
@@ -657,11 +739,18 @@ class mainWin(tk.Toplevel):
         self.image = self.canvas.create_image(0, 0,
                                               anchor="nw", image=self.view)
 
+    def reset(self):
+        self.zoom = max(1, img.width * img.height // 2**22)
+        print(f"initial zoom set: {self.zoom}")
+        self.update()
+
+
+
     @timeit
     def update(self):
         ''' update image '''
         self.draw()
-
+        self.title(img.properties)
         histwin.update()
         statswin.update()
 
@@ -697,6 +786,8 @@ class Selection:
         self.parent = parent
         self.geometry = [0, 0, 0, 0]
         self.rect = None
+        self.mask = None
+        self.cirk_mode = False
 
     def image_selected(self):
         ''' recalculate selection by zoom '''
@@ -713,11 +804,13 @@ class Selection:
 
     def draw(self):
         self._valid_selection()
-        print(self.geometry)
+#        print(self.geometry)
         mainwin.canvas.delete(self.rect)
         self.rect = mainwin.canvas.create_rectangle(self.geometry)
-        print(self.rect)
+#        print(self.rect)
         self.image_selected()
+        if self.cirk_mode:
+            self.make_cirk_mask()
         histwin.update()
 
     def _valid_selection(self):
@@ -734,6 +827,20 @@ class Selection:
     def select_all(self):
         self.geometry = [0, 0, img.width * mainwin.zoom,
                          img.height * mainwin.zoom]
+
+
+    def make_cirk_mask(self):
+        x0, y0, x1, y1 = self.geometry
+        b, a = (x1+x0)/2, (y1+y0)/2
+
+        nx,ny = img.arr.shape[:2]
+        y,x = np.ogrid[-a:nx-a,-b:ny-b]
+        print(y,x)
+        radius = x0-b
+        print(radius)
+        mask = x*x + y*y <= radius*radius
+
+        return mask
 
     def __str__(self):
         return f"selection geom: {self.geometry}"

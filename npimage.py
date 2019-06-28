@@ -25,12 +25,17 @@ class npImage():
         if fpath:
             self.load(fpath)
 
+    @property
+    def properties(self):
+        return f"{self.fpath}      |  {self.bitdepth}bit {self.mode}  |  {self.filesize/2**20:.2f} MB  |  {self.width} x {self.height} x {self.channels}  |"
+
+
 #    @timeit
     def get_mode(self):
         self.mode = imghdr.what(self.fpath)
         assert self.mode in FILETYPES, f"Error, not supported {self.fpath}"
 
-    @timeit
+
     def load(self, fpath=None):
 
         fpath = fpath or filedialog.askopenfilename()
@@ -55,7 +60,8 @@ class npImage():
 #        self.info()
 
     def rgb2gray(self):
-        self.arr = nputils.rgb2gray(self.arr)
+        if self.arr.ndim > 2:
+            self.arr = nputils.rgb2gray(self.arr)
 
     def reset(self):
         self.arr = self.original.copy()
@@ -89,6 +95,7 @@ class npImage():
             send2trash(str(Fp))
 
         nputils.save_image(self.arr, fpath, bitdepth=self.bitdepth)
+        self.fpath = fpath
 
     def save_as(self, fpath=None):
         fpath = fpath or filedialog.asksaveasfilename(defaultextension=".jpg")
@@ -104,8 +111,8 @@ class npImage():
     def free_rotate(self, angle):
         ''' rotate array
         '''
-        from scipy import ndimage
-        self.arr = ndimage.rotate(self.arr, angle,
+        from scipy.ndimage import rotate
+        self.arr = rotate(self.arr, angle,
                                   reshape=True, mode='nearest')
 
         self.info()
@@ -131,18 +138,32 @@ class npImage():
         y = self.arr[self.slice] ** g
         self.arr[self.slice] = np.clip(y, 0, 1)
 
-    def cgamma(self, f):
-        """s-shaped correction of an numpy float image, where
-        f = 1. : no effect
-        f > 1. : image will darken
-        f < 1. : image will brighten"""
-        y = (self.arr[self.slice] - .5) ** f + .5
+    def unsharp_mask(self, radius, amount):
+        from scipy.ndimage import gaussian_filter
+        y = self.arr[self.slice]
+        mask = gaussian_filter(y, radius)
+        y = y + amount * (y - mask)
+        self.arr[self.slice] = np.clip(y, 0, 1)
+
+    def blur(self, radius=3):
+        from scipy.ndimage import gaussian_filter
+        y = self.arr[self.slice]
+        y = gaussian_filter(y, radius)
         self.arr[self.slice] = np.clip(y, 0, 1)
 
     def multiply(self, f):
-        """ change contrast """
+        """ multiply by scalar and clip """
         y = .5 + f * (self.arr[self.slice] - .5)
         self.arr[self.slice] = np.clip(y, 0, 1)
+
+    def contrast(self, f):
+        """ change contrast """
+        y = f * self.arr[self.slice]
+        self.arr[self.slice] = np.clip(y, 0, 1)
+
+    def fill(self, f=1):
+        """ change to constant """
+        self.arr[self.slice] = f
 
     def add(self, f):
         """ change brightness """
@@ -181,30 +202,40 @@ class npImage():
 #        self.info() # slow
 
     def fft(self):
-        #        from scipy.fftpack import fft2
-        #        im2freq = lambda channel: fp.fft2(channel, axis=0),
-        #        im2freq = lambda data: fp.rfft(fp.rfft(data, axis=0),
-        #                               axis=1)
-        #        freq2im = lambda f: fp.irfft(fp.irfft(f, axis=1),
-        #                             axis=0)
-        #        ftimage = fft2(self.arr)
-        img_freq = np.fft.fft2(self.arr)
-        ftimage = np.fft.fftshift(np.abs(img_freq))
-        ftimage = np.abs(ftimage)
-#        nputils.info(ftimage)
-
-#        back = freq2im(freq)
-
+        from scipy import fftpack
+        # Take the fourier transform of the image.
+        y = self.arr * 255
+        nputils.info(y)
+        F1 = fftpack.fft2(y)
+        nputils.info(F1)
+        # Now shift the quadrants around so that low spatial frequencies are in
+        # the center of the 2D fourier transformed image.
+        F2 = np.fft.fftshift(F1).real
+        nputils.info(F2)
+        ftimage = np.abs(F2)
+        ftimage = np.log(ftimage)
+        nputils.info(ftimage)
         return ftimage
 
+    def ifft(self):
+        nputils.info(self.arr)
+        F2 = np.exp(self.arr)
+        nputils.info(F2)
+        F1 = np.fft.ifftshift(F2)
+        img = np.fft.ifft2(F1).real
+        nputils.info(img)
+        img = img / 255
+        nputils.info(img)
+
+        return img
+
     def high_pass(self, sigma):
-        from scipy import ndimage
+        from scipy.ndimage import gaussian_filter
         y = self.arr[self.slice]
-        bg = ndimage.gaussian_filter(y, sigma=sigma)
+        bg = gaussian_filter(y, sigma=sigma)
         y -= bg
         np.clip(y, 0, 1)  # inplace
         self.arr[self.slice] = y
-
 
     def info(self):
         ''' print info about numpy array
@@ -246,21 +277,25 @@ class npImage():
 
         '''
 
-        if self.channels < 3:
-            colors = ('black',)
-        else:
-            colors = ('red', 'green', 'blue')
-
+        colors = ('red', 'green', 'blue', 'black')
 #        x = np.linspace(0, 2 ** self.bitdepth - 1, HISTOGRAM_BINS)
         x = np.linspace(0, 1, bins)
-        hist_data = {}
 
-        for i, color in enumerate(colors):
+        # reset data
+        hist_data = {color:x*0 for color in colors}
 
-            channel = self.arr[self.slice][i] if self.arr.ndim > 2 else self.arr[self.slice]
 
-            h = np.histogram(channel, bins=bins, range=(0, 1),
-                             density=True)[0]
-            hist_data[color] = h
+
+        if self.arr.ndim > 2:  # rgb or rgba
+            for i, color in enumerate(colors[:3]):
+                channel = self.arr[self.slice][i]
+                hist_data[color] = np.histogram(channel, bins=bins,
+                         range=(0, 1), density=True)[0]
+
+
+        else:   # k or ka
+            channel = self.arr[self.slice]
+            hist_data['black'] = np.histogram(channel, bins=bins,
+                         range=(0, 1), density=True)[0]
 
         return x, hist_data
