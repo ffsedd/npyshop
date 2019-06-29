@@ -776,13 +776,13 @@ class mainWin(tk.Toplevel):
 
     @ofset.setter
     def ofset(self, coords):
-        ofset = coords
+
         if hasattr(self, "canvas"):
             view_wid = img.width / self.zoom
             print('view_wid', view_wid)
             max_offset = [- img.width / self.zoom + self.canvas.winfo_width(), -img.height / self.zoom + self.canvas.winfo_height() ]
             print('max_offset', max_offset)
-            ofset = [max(max_offset[i], c) for i, c in enumerate(ofset)]  # will whole canvas 
+            ofset = [max(max_offset[i], c) for i, c in enumerate(coords)]  # will whole canvas 
             print(ofset)
         ofset = [min(0, c) for c in ofset]  # only allow negative ofset 
         print(ofset)
