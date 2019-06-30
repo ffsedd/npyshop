@@ -31,7 +31,8 @@ running out of memory
 color histogram weird
 
 TODO:
-    mouse zoom center on mouse pointer
+    circular selection?
+    arrows - move ofset
 
 
 
@@ -120,7 +121,7 @@ def buttons_dict():
 #  FUNCTIONS
 #  ------------------------------------------
 
-def load(fp=""):
+def load(fp=None):
     print("open")
     img.load(fp)
     history.original = img.arr

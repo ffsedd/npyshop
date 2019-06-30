@@ -295,7 +295,7 @@ class npImage():
 
         if self.arr.ndim > 2:  # rgb or rgba
             for i, color in enumerate(colors[:3]):
-                channel = self.arr[self.slice][:, :, i]
+                channel = self.arr[self.slice][i]
                 hist_data[color] = np.histogram(channel, bins=bins,
                          range=(0, 1), density=True)[0]
 
