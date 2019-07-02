@@ -25,14 +25,15 @@ image operations:
 BUGS:
 
 
-large images and history on:
-running out of memory
+    large images and history on:
+    running out of memory
 
-color histogram weird
+    history not working properly
 
 TODO:
     circular selection?
-    arrows - move ofset
+    view area - crop before showing?
+    editable FFT - new mainwin
 
 
 
@@ -44,7 +45,7 @@ SETTINGS = {
     "hide_toolbar": True,
     "hide_stats": True,
     "histogram_bins": 256,
-    "history_steps": 3,     # memory !!!
+    "history_steps": 10,     # memory !!!
 
 }
 
@@ -74,7 +75,7 @@ def commands_dict():
         "Filter":
             [
                 ("Gamma", "g", gamma),
-                ("Normalize (BW only)", "n", normalize),
+                ("Normalize", "n", normalize),
                 ("Multiply", "m", multiply),
                 ("Contrast", "c", contrast),
                 ("Add", "a", add),
@@ -83,10 +84,10 @@ def commands_dict():
                 ("Unsharp mask", "M", unsharp_mask),
                 ("Blur", "B", blur),
                 ("Highpass", "H", highpass),
-                ("Clip light (BW only)", "l", clip_high),
-                ("Clip dark (BW only)", "d", clip_low),
-                ("Tres light (BW only)", "L", tres_high),
-                ("Tres dark (BW only)", "D", tres_low),
+                ("Clip light", "l", clip_high),
+                ("Clip dark", "d", clip_low),
+                ("Tres light", "L", tres_high),
+                ("Tres dark", "D", tres_low),
                 ("FFT", "F", fft),
                 ("iFFT", "Control-F", ifft),
                 ("rgb2gray", "b", rgb2gray),
@@ -353,6 +354,7 @@ def gamma():
     g = tk.simpledialog.askfloat("Set Gamma", "Enter gamma (float)",
                                  initialvalue=.8)
     img.gamma(g)
+
     mainwin.update()
     history.add(img.arr)
 
@@ -669,8 +671,8 @@ class mainWin(tk.Toplevel):
         self.bind("<Button-5>", self.__wheel)  # linux
         self.bind("<Button-1>", self._on_mouse_left)
         self.bind("<Button-3>", self._on_mouse_right)
-        self.title(img.fpath)
-        self.zoom = 1
+        self.zoom =  1
+        print("zoom",  self.zoom)
         self.ofset = [0, 0]
         print("ofset ", self.ofset)
         if not SETTINGS["hide_toolbar"]:
@@ -683,9 +685,9 @@ class mainWin(tk.Toplevel):
         """ Zoom with mouse wheel """
         x = self.canvas.canvasx(event.x)  # get coordinates of the event on the canvas
         y = self.canvas.canvasy(event.y)        
-        if event.num == 4 or event.delta == -120:
+        if event.num == 4 or event.delta == +120:
             zoom_in(x, y)
-        if event.num == 5 or event.delta == 120:
+        if event.num == 5 or event.delta == -120:
             zoom_out(x, y)
 
     def buttons_init(self):
@@ -746,7 +748,7 @@ class mainWin(tk.Toplevel):
                                               anchor="nw", image=self.view)
 
     def reset(self):
-        self.zoom = max(1, img.width * img.height // 2**22)
+        self.zoom = max(1, img.width//800,  img.height//800)
         self.ofset = [0, 0]
         print(f"initial zoom set: {self.zoom}")
         self.update()
@@ -812,10 +814,13 @@ class Selection:
         self.mask = None
         self.cirk_mode = False
 
-    def image_selected(self):
+    def slice(self):
         ''' recalculate selection by zoom '''
         x0, y0, x1, y1 = [mainwin.zoom * c for c in self.geometry]
-        img.slice = np.s_[y0:y1, x0:x1, ...]
+        slice = np.s_[y0:y1, x0:x1, ...]
+        img.slice = slice
+        
+        return slice
 
     def set_left(self):
         self.geometry[:2] = list(get_mouse())
@@ -831,7 +836,7 @@ class Selection:
         mainwin.canvas.delete(self.rect)
         self.rect = mainwin.canvas.create_rectangle(self.geometry)
 #        print(self.rect)
-        self.image_selected()
+        self.slice()
         if self.cirk_mode:
             self.make_cirk_mask()
         histwin.update()
@@ -856,8 +861,8 @@ class Selection:
         x0, y0, x1, y1 = self.geometry
         b, a = (x1+x0)/2, (y1+y0)/2
 
-        nx,ny = img.arr.shape[:2]
         y,x = np.ogrid[-a:nx-a,-b:ny-b]
+        nx,ny = img.arr.shape[:2]
         print(y,x)
         radius = x0-b
         print(radius)

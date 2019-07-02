@@ -12,6 +12,7 @@ from pathlib import Path
 from imageio import imread, imwrite
 
 from skimage import img_as_float, img_as_ubyte, img_as_uint
+from matplotlib.colors import rgb_to_hsv, hsv_to_rgb
 
 from testing.timeit import timeit
 
@@ -48,6 +49,12 @@ def get_bitdepth(arr):
         return 8
     elif arr.dtype == np.uint16:
         return 16
+
+
+
+
+
+
 
 
 def normalize(y, inrange=None, outrange=(0, 1)):
@@ -109,3 +116,32 @@ def create_circular_mask(h, w, center=None, radius=None):
 
     mask = dist_from_center <= radius
     return mask
+
+
+
+
+
+
+# MAKE FILTERS WORK WITH RGB
+
+# A decorator is a function that expects ANOTHER function as parameter
+def work_with_hsv_decorator(decorated_f):
+
+    def wrapper_f(arr, *args, **kwargs):
+        print("convert to hsv")
+        arr = rgb_to_hsv(arr)
+        y = decorated_f(arr=arr, *args, **kwargs)
+        y = hsv_to_rgb(y)
+        print("convert to rgb")
+        return y
+    return wrapper_f
+
+@work_with_hsv_decorator
+def gamma(arr, g):
+    """gamma correction of an numpy float image, where
+    gamma = 1. : no effect
+    gamma > 1. : image will darken
+    gamma < 1. : image will brighten"""
+    arr = arr ** g
+    arr = np.clip(arr, 0, 1)
+    return arr

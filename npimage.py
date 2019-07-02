@@ -4,7 +4,8 @@ import numpy as np
 from pathlib import Path
 from send2trash import send2trash
 from tkinter import filedialog
-
+#from matplotlib.colors import rgb_to_hsv, hsv_to_rgb  # normalizes
+from matplotlib.colors import rgb_to_hsv, hsv_to_rgb
 import nputils
 
 from testing.timeit import timeit
@@ -17,24 +18,58 @@ class npImage():
     def __init__(self, fpath=None):
         self.fpath = fpath
         self.arr = None
-        self.channels = None
         self.bitdepth = None
         self.original = None
         self.slice = np.s_[:, :, ...]
+        self.filetype = None
+
 
         if fpath:
             self.load(fpath)
+            
+                   
 
     @property
     def properties(self):
-        return f"{self.fpath}      |  {self.bitdepth}bit {self.mode}  |  {self.filesize/2**20:.2f} MB  |  {self.width} x {self.height} x {self.channels}  |"
+        return f"{self.fpath}      |  {self.bitdepth}bit {self.filetype}  |  {self.filesize/2**20:.2f} MB  |  {self.width} x {self.height} x {self.channels}  | color:{self.color_model}"
 
+    def __repr__(self):
+        return self.properties
+    
+    
+    def check_filetype(self):
+        filetype = imghdr.what(self.fpath)
+        assert filetype in FILETYPES, f"Error, not supported {self.fpath}"
+        return filetype
 
-#    @timeit
-    def get_mode(self):
-        self.mode = imghdr.what(self.fpath)
-        assert self.mode in FILETYPES, f"Error, not supported {self.fpath}"
+    @property
+    def channels(self):
+        return 1 if self.arr.ndim == 2 else self.arr.shape[2]
+        
+    @property
+    def color_model(self):
+        return self.__dict__['color_model']
 
+    @color_model.setter
+    def color_model(self, model):
+
+        if model == self.color_model:  # do not change anything
+            return
+        elif model == 'rgb' and self.color_model == 'hsv':  # HSV -> RGB
+            self.arr = hsv_to_rgb(self.arr)
+        elif model == 'hsv' and self.color_model == 'rgb':  # RGB -> HSV
+            print("rgb max",self.arr.max())
+            self.arr = rgb_to_hsv(self.arr)
+            print("v max",self.arr[:,:,2].max())
+        elif model == 'gray':  # RGB/HSV -> GRAY
+            self.color_model = 'hsv'  # convert to hsv 
+            self.arr = self.arr[:,:,2] # use value only
+        elif model == 'rgb' and self.color_model == 'gray':  # GRAY -> RGB 
+            self.arr = np.stack((self.arr)*3, axis=-1)
+        elif model == 'hsv' and self.color_model == 'gray':  # GRAY -> HSV 
+            self.arr = np.stack((np.zeros_like(self.arr))*2, self.arr, axis=-1)
+            
+        self.__dict__['color_model'] = model  # conversion done, update mode
 
     def load(self, fpath=None):
         if not fpath:
@@ -53,14 +88,15 @@ class npImage():
         self.name = Path(fpath).stem
         self.filesize = Path(fpath).stat().st_size
         self.fpath = fpath
-        self.get_mode()
+        self.filetype = self.check_filetype()
 
         self.arr = nputils.load_image(fpath)
 
         self.bitdepth = nputils.get_bitdepth(self.arr)
-        self.channels = 1 if self.arr.ndim == 2 else self.arr.shape[2]
-
+        self.__dict__['color_model'] = 'rgb' if self.channels == 3 else 'gray' 
+        
         self.arr = nputils.int_to_float(self.arr)  # convert to float
+        
         self.original = self.arr.copy()
 
         print(f"bitdepth {self.bitdepth}")
@@ -95,7 +131,7 @@ class npImage():
 
         fpath = fpath or self.fpath
         Fp = Path(fpath)
-        print(f"save to {Fp} bitdepth:{self.bitdepth} mode:{self.mode}")
+        print(f"save to {Fp} bitdepth:{self.bitdepth} filetype:{self.filetype}")
 #        print(f"{self.info()}")
 
         if Fp.is_file():
@@ -135,6 +171,7 @@ class npImage():
         self.arr[self.slice] = np.flip(self.arr[self.slice], 0)
 
     def normalize(self):
+  
         self.arr[self.slice] = nputils.normalize(self.arr[self.slice])
 
     def gamma(self, g):
@@ -264,17 +301,17 @@ class npImage():
         '''
         return {
             "name": self.name,
-            "mode": self.mode,
+            "filetype": self.filetype,
             "bitdepth": self.bitdepth,
             "channels": self.channels,
             "size": f"{self.filesize/1024/1024: .3f} MB",
             "height": self.height,
             "width": self.width,
             "ratio": round(self.ratio, 2),
-            #            "min": round(self.arr[self.slice].min(), 2),
-            #            "max": round(self.arr[self.slice].max(), 2),
-            #            "mean": round(self.arr[self.slice].mean(), 2),
-            #            "std_dev": round(self.arr[self.slice].std(), 2),
+            "min": round(self.arr[self.slice].min(), 2),
+            "max": round(self.arr[self.slice].max(), 2),
+            "mean": round(self.arr[self.slice].mean(), 2),
+            "std_dev": round(self.arr[self.slice].std(), 2),
         }
 
 #    @timeit
