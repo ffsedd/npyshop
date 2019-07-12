@@ -44,9 +44,8 @@ def adaptive_equalize(y, clip_limit=0.03):
 @clip_result
 def gamma(y, g):
     """gamma correction of an numpy float image, where
-    gamma = 1. : no effect
-    gamma > 1. : image will darken
-    gamma < 1. : image will brighten"""
+    g = 1 ~ no effect, g > 1 ~ darken, g < 1 ~ brighten
+    """
     return y ** g
 
 
@@ -72,7 +71,7 @@ def contrast(y, f):
 
 @clip_result
 def multiply(y, f):
-    """ multiply by scalar and clip """
+    """ multiply by scalar """
     return y * f
 
 
@@ -89,25 +88,25 @@ def add(y, f):
 
 
 def tres_high(y, f):
-    """  """
+    """  change value of light pixels to 1 """
     y[y > f] = 1
     return y
 
 
 def tres_low(y, f):
-    """  """
+    """ change value of dark pixels to 0 """
     y[y < f] = 0
     return y
 
 
 def clip_high(y, f):
-    """  """
+    """ change value of light pixels to limit """
     y[y > f] = f
     return y
 
 
 def clip_low(y, f):
-    """  """
+    """ change value of dark pixels to limit """
     y[y < f] = f
     return y
 

@@ -916,8 +916,6 @@ if __name__ == '__main__':
 
     select = Selection(root)
     print(select)
-    select.set_left
-    print(select)
 
     histwin = histWin(root)
 
