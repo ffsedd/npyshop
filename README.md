@@ -1,7 +1,7 @@
 # Npyshop - Simple Image Editor based on Python3 & Numpy
 --------------------------------------------------------
 
-* basic image tools - crop, rotate, normalize ...
+* basic image tools - crop, rotate, contrast, gamma, unsharp mask, normalize ...
 * 16bit support
 * easy to add custom funcions
 
