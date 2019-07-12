@@ -1,12 +1,16 @@
 #!/usr/bin/env python3
+import os
 from testing.timeit import timeit
 from matplotlib.backends.backend_tkagg import FigureCanvasTkAgg
 from PIL import Image, ImageTk
 from skimage import img_as_ubyte
+from skimage import exposure # histogram plotting
+
 from matplotlib import pyplot as plt
 from npimage import npImage
 from nphistory import History
 import nputils
+import npfilters
 import tkinter as tk
 import numpy as np
 from pathlib import Path
@@ -25,26 +29,28 @@ image operations:
 BUGS:
 
 
-large images and history on:
-running out of memory
+    large images and history on:
+    running out of memory
 
+    history not working properly
 
 TODO:
     circular selection?
-    arrows - move ofset
-    mouse drag n drop?
+    view area - crop before showing?
+    editable FFT - new mainwin
 
+    Z - undo, y - redo
 
 
 '''
 
 
 SETTINGS = {
-    "hide_histogram": False,
+    "hide_histogram": True,
     "hide_toolbar": True,
     "hide_stats": True,
     "histogram_bins": 256,
-    "history_steps": 3,     # memory !!!
+    "history_steps": 10,     # memory !!!
 
 }
 
@@ -57,24 +63,35 @@ def commands_dict():
                 ("Open", "o", load),
                 ("Save", "S", save),
                 ("Save as", "s", save_as),
-                ("Reset", "Q", original),
+                ("Save as png", "P", save_as_png),
+
             ],
-        "Edit":
+        "History":
             [
                 ("Undo", "z", undo),
                 ("Redo", "y", redo),
+                ("Original", "q", original),
+
+            ],
+        "Image":
+            [
                 ("Crop", "C", crop),
-                ("Select left corner", "comma", select.set_left),
-                ("Select right corner", "period", select.set_right),
                 ("Rotate_90", "r", rotate_90),
                 ("Rotate_270", "R", rotate_270),
                 ("Rotate_180", "u", rotate_180),
                 ("Free Rotate", "f", free_rotate),
+                ("rgb2gray", "b", rgb2gray),
             ],
-        "Filter":
+        "Selection":
             [
+                ("Select left corner", "comma", select.set_left),
+                ("Select right corner", "period", select.set_right),
+                ("Flip", ")", flip),
+                ("Mirror", "(", mirror),
                 ("Gamma", "g", gamma),
                 ("Normalize", "n", normalize),
+                ("Equalize", "e", equalize),
+                ("Adaptive Equalize", "E", adaptive_equalize),
                 ("Multiply", "m", multiply),
                 ("Contrast", "c", contrast),
                 ("Add", "a", add),
@@ -89,7 +106,6 @@ def commands_dict():
                 ("Tres dark", "D", tres_low),
                 ("FFT", "F", fft),
                 ("iFFT", "Control-F", ifft),
-                ("rgb2gray", "b", rgb2gray),
                 ("delete", "Delete", delete),
                 ("delete c", "Control-Delete", delete_cirk),
                 ("fill", "Insert", fill),
@@ -118,14 +134,14 @@ def buttons_dict():
 
 
 #  ------------------------------------------
-#  FUNCTIONS
+#  FILE
 #  ------------------------------------------
 
 def load(fp=None):
     print("open")
     img.load(fp)
+    os.chdir(img.fpath.parent)
     history.original = img.arr
-    print(history.original)
     mainwin.title(img.fpath)
     mainwin.reset()
     histwin.reset()
@@ -140,22 +156,32 @@ def save_as():
     print("save as")
     img.save_as()
     mainwin.title(img.fpath)
-    mainwin.title(img.fpath)
+
+
+def save_as_png():
+    print("save as png")
+    img.fpath = img.fpath.with_suffix(".png")
+    img.save()
 
 
 def original():
     print("toggle original")
 #    img.reset()
+    if history.last() is None:
+        print("nothing to toggle")
+        return
+
     if not history.toggle_original:
         img.arr = history.original
-        history.toggle_original = not history.toggle_original
-        mainwin.update()
     else:
-        if history.last() is not None:
-            img.arr = history.last()
-            history.toggle_original = not history.toggle_original
-            mainwin.update()
+        img.arr = history.last()
+        
+    history.toggle_original = not history.toggle_original
+    mainwin.update()
 
+#  ------------------------------------------
+#  HISTORY
+#  ------------------------------------------
 
 def undo():
     print("undo")
@@ -172,61 +198,73 @@ def redo():
         img.arr = next_arr
         mainwin.update()
 
+#  ------------------------------------------
+#  IMAGE
+#  ------------------------------------------
 
+def edit_image(func):
+    ''' decorator :
+   apply changes, update gui and history '''
+    def wrapper(*args, **kwargs):
+        print(func.__name__)
+        func(*args, **kwargs)
+        mainwin.update()
+        history.add(img.arr,  func.__name__,  )
+        select.reset()
+    return wrapper
+    
+@edit_image    
 def free_rotate():
-    print("free rotate")
     f = tk.simpledialog.askfloat("Rotate", "Angle (float - clockwise)",
                                  initialvalue=2.)
     img.free_rotate(-f)  # clockwise
-    mainwin.update()
-    history.add(img.arr)
-    select.reset()
 
-
+@edit_image
 def rotate_90():
-    print("rotate")
     img.rotate()
-    mainwin.update()
-    history.add(img.arr)
-    select.reset()
 
-
+@edit_image
 def rotate_270():
-    print("rotate left")
     img.rotate(3)
-    mainwin.update()
-    history.add(img.arr)
-    select.reset()
 
-
+@edit_image
 def rotate_180():
-    print("rotate 180")
     img.rotate(2)
-    mainwin.update()
-    history.add(img.arr)
-    select.reset()
 
+@edit_image
+def rgb2gray():
+    img.rgb2gray()
 
-def invert():
-    print("invert")
-    img.invert()
-    mainwin.update()
-    history.add(img.arr)
+    
+    
+#  ------------------------------------------
+#  SELECTION
+#  ------------------------------------------
 
-
-def mirror():
-    print("mirror")
-    img.mirror()
-    mainwin.update()
-    history.add(img.arr)
-
-
-def flip():
-    print("flip")
-    img.flip()
-    mainwin.update()
-    history.add(img.arr)
-
+def edit_selection(func):
+    ''' decorator :
+   load selection, apply changes, save to image, update gui and history '''
+    def wrapper(*args, **kwargs):
+        print(func.__name__)
+        y = img.get_selection()
+        y = func(y, *args, **kwargs)
+        img.set_selection(y)
+        mainwin.update()
+        history.add(img.arr,  func.__name__,  )
+    return wrapper
+    
+    
+@edit_selection
+def invert(y):
+    return npfilters.invert(y)
+    
+@edit_selection
+def mirror(y):
+    return npfilters.mirror(y)
+    
+@edit_selection
+def flip(y):
+    return npfilters.flip(y)
 
 def contrast():
     print("contrast")
@@ -260,8 +298,30 @@ def normalize():
     img.normalize()
     mainwin.update()
     history.add(img.arr)
-
-
+    
+    
+def adaptive_equalize():
+    print("adaptive_equalize")
+    f = tk.simpledialog.askfloat("adaptive_equalize", "clip limit (float)",
+                                 initialvalue=.02)
+    y = img.arr[img.slice]
+    y = exposure.equalize_adapthist(y, clip_limit=f)
+    img.arr[img.slice] = y
+    mainwin.update()
+    history.add(img.arr)
+        
+    
+def equalize():
+    print("equalize")
+#    f = tk.simpledialog.askfloat("adaptive_equalize", "clip limit (float)",
+#                                 initialvalue=.02)
+    y = img.arr[img.slice]
+    y, cdf = nputils.image_histogram_equalization(y, bins=256)
+    img.arr[img.slice] = y
+    mainwin.update()
+    history.add(img.arr)
+    
+    
 def fill():
     print("fill")
     f = tk.simpledialog.askfloat("Fill", "Value to fill (float)",
@@ -287,26 +347,26 @@ def delete_cirk():
 
 
 
-def rgb2gray():
-    print("rgb2gray")
-    img.rgb2gray()
-    mainwin.update()
-    histwin.reset()
-    history.add(img.arr)
-
 
 def fft():
 #    from matplotlib.colors import LogNorm
     print("fft")
-    fftimage = img.fft()
+    fft_arr = img.fft()
+    fft_img = npImage(arr=fft_arr)
+    fft_img.arr = nputils.normalize(fft_img.arr)
 #    plotWin(master=mainwin, plot=fftimage, norm=LogNorm(vmin=5))
-    plotWin(master=mainwin, plot=fftimage)
+#    plotWin(master=mainwin, plot=fftimage)
+    fftWin = mainWin(master=root,  curr_img=fft_img)
 
 
 def ifft():
     print("ifft")
-    im = img.ifft()
-    plotWin(master=mainwin, plot=im)
+    ifft_arr = img.ifft()
+    ifft_img = npImage(arr=ifft_arr)
+    ifft_img.arr = nputils.normalize(ifft_img.arr)
+#    plotWin(master=mainwin, plot=fftimage, norm=LogNorm(vmin=5))
+#    plotWin(master=mainwin, plot=fftimage)
+    ifftWin = mainWin(master=root,  curr_img=ifft_img)
 
 
 def unsharp_mask():
@@ -352,8 +412,7 @@ def gamma():
     print("gamma")
     g = tk.simpledialog.askfloat("Set Gamma", "Enter gamma (float)",
                                  initialvalue=.8)
-    print(img.arr[select.slice()])
-    img.arr[select.slice()] = img.gamma(arr=img.arr[select.slice()], g=g)
+    img.gamma(g)
 
     mainwin.update()
     history.add(img.arr)
@@ -559,48 +618,97 @@ class histWin(tk.Toplevel):
         if self.hidden:
             self.withdraw()
 
+#    def draw2(self):
+#        # empty graph
+#        self.fig, self.ax = plt.subplots()
+#        self.ax.set_xticks(np.linspace(0, 1, 11))
+#        self.ax.set_ylim(0, 10)
+#        self.ax.set_title("Histogram")
+#        self.ax.spines['right'].set_visible(False)
+#        self.ax.spines['top'].set_visible(False)
+#        self.ax.spines['left'].set_visible(False)
+#        self.ax.tick_params(left=False)
+#        self.fig.tight_layout()
+#        self.canvas = FigureCanvasTkAgg(self.fig, master=self)
+#        self.canvas.draw()
+#        self.canvas.get_tk_widget().pack(side=tk.TOP, fill=tk.BOTH, expand=1)
+#
+#        self.data = {'black':None, 'red':None, 'green':None, 'blue':None,}
+#
+#        # get data
+#        self.x, hist_data = img.histogram_data(bins=self.bins)
+#
+#        for color in self.data:
+#            self.data[color] = self.ax.plot(self.x, 0*self.x, color=color)[0]
+#        self.update()
+        
     def draw(self):
-        # empty graph
-        self.fig, self.ax = plt.subplots()
-        self.ax.set_xticks(np.linspace(0, 1, 11))
-        self.ax.set_ylim(0, 10)
-        self.ax.set_title("Histogram")
-        self.ax.spines['right'].set_visible(False)
-        self.ax.spines['top'].set_visible(False)
-        self.ax.spines['left'].set_visible(False)
-        self.ax.tick_params(left=False)
+                
+
+        self.fig, self.ax_hist = plt.subplots()
+#        self.ax_hist.set_xticks(np.linspace(0, 1, 11))
+        self.ax_hist.set_xlim(0, 1)
+        self.ax_hist.set_ylim(0, 10)
+#        self.ax_hist.set_title("Histogram")
+        
+        # Display histogram
+        self.ax_hist.spines['right'].set_visible(False)
+        self.ax_hist.spines['top'].set_visible(False)
+        self.ax_hist.spines['left'].set_visible(False)
+        self.ax_hist.tick_params(left=False)
+        self.ax_hist.hist(img.arr.ravel(), bins=self.bins, range=(0,1), density=True, histtype='step', color='black')
+
+
+        # Display cumulative distribution
+        self.ax_cdf = self.ax_hist.twinx()
+        self.ax_cdf.spines['right'].set_visible(False)
+        self.ax_cdf.spines['top'].set_visible(False)
+        self.ax_cdf.spines['left'].set_visible(False)
+        self.ax_cdf.tick_params(left=False)
+        img_cdf, bins = exposure.cumulative_distribution(img.arr, self.bins)
+        self.ax_cdf.plot(bins, img_cdf, 'r')
+        self.ax_cdf.set_yticks([])
+
+
+
         self.fig.tight_layout()
         self.canvas = FigureCanvasTkAgg(self.fig, master=self)
         self.canvas.draw()
         self.canvas.get_tk_widget().pack(side=tk.TOP, fill=tk.BOTH, expand=1)
+#        self.ax_hist.plot(self.x, 0*self.x, color=color)[0]   
 
-        self.data = {'black':None, 'red':None, 'green':None, 'blue':None,}
 
-        # get data
-        self.x, hist_data = img.histogram_data(bins=self.bins)
 
-        for color in self.data:
-            self.data[color] = self.ax.plot(self.x, 0*self.x, color=color)[0]
-        self.update()
-
+        
+        
     def reset(self):
 
-        for color in self.data:
-            self.data[color].set_data(self.x,0*self.x)
+#        for color in self.data:
+#            self.data[color].set_data(self.x,0*self.x)
 
         self.update()
 
+
+#    def update2(self):
+#        if self.hidden:
+#            return
+#        x, hist_data = img.histogram_data(bins=self.bins)
+#        # loop and update all lines
+#        for color, y in hist_data.items():
+#            self.data[color].set_data(x,y)
+#
+#        self.canvas.draw()
 
     def update(self):
         if self.hidden:
             return
-        x, hist_data = img.histogram_data(bins=self.bins)
-        # loop and update all lines
-        for color, y in hist_data.items():
-            self.data[color].set_data(x,y)
-
+        
+        self.ax_hist.cla()
+        self.ax_cdf.cla()
+        self.ax_hist.hist(img.arr.ravel(), bins=self.bins, range=(0,1), density=True, histtype='step', color='black')
+        img_cdf, bins = exposure.cumulative_distribution(img.arr, self.bins)
+        self.ax_cdf.plot(bins, img_cdf, 'r')
         self.canvas.draw()
-
 
 #  ------------------------------------------
 #  STATISTICS
@@ -660,8 +768,10 @@ class statsWin(tk.Toplevel):
 
 class mainWin(tk.Toplevel):
 
-    def __init__(self, master=None):
+    def __init__(self, master=None,  curr_img=None):
         super().__init__(master)
+        self.img = curr_img
+        print(curr_img)
         self.master = master
         self.protocol("WM_DELETE_WINDOW", quit_app)
         self.geometry("900x810")
@@ -671,7 +781,7 @@ class mainWin(tk.Toplevel):
         self.bind("<Button-5>", self.__wheel)  # linux
         self.bind("<Button-1>", self._on_mouse_left)
         self.bind("<Button-3>", self._on_mouse_right)
-        self.zoom =  img.height // 800  # try to fit to screen
+        self.zoom =  1
         print("zoom",  self.zoom)
         self.ofset = [0, 0]
         print("ofset ", self.ofset)
@@ -729,10 +839,10 @@ class mainWin(tk.Toplevel):
     @timeit
     def make_image_view(self):
 
-        print(img.arr.shape)
+        print(self.img.arr.shape)
         print(self.zoom)
 
-        view = img.arr[::self.zoom, ::self.zoom, ...]
+        view = self.img.arr[::self.zoom, ::self.zoom, ...]
         self.view_shape = view.shape[:2]
 
         view = img_as_ubyte(view)
@@ -860,9 +970,9 @@ class Selection:
     def make_cirk_mask(self):
         x0, y0, x1, y1 = self.geometry
         b, a = (x1+x0)/2, (y1+y0)/2
+        nx,ny = img.arr.shape[:2]
 
         y,x = np.ogrid[-a:nx-a,-b:ny-b]
-        nx,ny = img.arr.shape[:2]
         print(y,x)
         radius = x0-b
         print(radius)
@@ -908,7 +1018,7 @@ if __name__ == '__main__':
 
     statswin = statsWin(root)
 
-    mainwin = mainWin(root)
+    mainwin = mainWin(root, curr_img=img)
 
     print(f"mainloop in {time.time()-time0}")
 

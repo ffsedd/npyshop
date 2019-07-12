@@ -15,19 +15,22 @@ FILETYPES = ['jpeg', 'bmp', 'png', 'tiff']
 
 class npImage():
 
-    def __init__(self, fpath=None):
+    def __init__(self, fpath=None, arr=None):
         self.fpath = fpath
-        self.arr = None
+        self.arr = arr
         self.bitdepth = None
         self.original = None
         self.slice = np.s_[:, :, ...]
         self.filetype = None
+        self.filesize = 0
 
 
         if fpath:
             self.load(fpath)
             
-                   
+
+        print(f"bitdepth {self.bitdepth}")
+#        self.info()           
 
     @property
     def properties(self):
@@ -79,29 +82,35 @@ class npImage():
             return
 
         print(f"open file {fpath}")
-
+        
+        Fpath = Path(fpath)
 
 
 
         # make sure it's an image file
         #
-        self.name = Path(fpath).stem
-        self.filesize = Path(fpath).stat().st_size
-        self.fpath = fpath
+        self.name = Fpath.stem
+        self.filesize = Fpath.stat().st_size
+        self.fpath = Fpath
         self.filetype = self.check_filetype()
 
-        self.arr = nputils.load_image(fpath)
+        self.arr = nputils.load_image(Fpath)
+        nputils.info(self.arr)
 
+        
         self.bitdepth = nputils.get_bitdepth(self.arr)
         self.__dict__['color_model'] = 'rgb' if self.channels == 3 else 'gray' 
         
         self.arr = nputils.int_to_float(self.arr)  # convert to float
-        
+        nputils.info(self.arr)
         self.original = self.arr.copy()
-
-        print(f"bitdepth {self.bitdepth}")
-#        self.info()
-
+        
+    def get_selection(self):
+        return self.arr[self.slice]
+        
+    def set_selection(self,  y):
+        self.arr[self.slice] = y
+        
     def rgb2gray(self):
         if self.arr.ndim > 2:
             self.arr = nputils.rgb2gray(self.arr)
@@ -315,31 +324,31 @@ class npImage():
         }
 
 #    @timeit
-    def histogram_data(self, bins=256):
-        ''' return dict of histogram values (1D)
-        result looks like: (0,10,20...), {"red":(15, 7, 3...) ...}
-
-        '''
-
-        colors = ('red', 'green', 'blue', 'black')
-#        x = np.linspace(0, 2 ** self.bitdepth - 1, HISTOGRAM_BINS)
-        x = np.linspace(0, 1, bins)
-
-        # reset data
-        hist_data = {color:x*0 for color in colors}
-
-
-
-        if self.arr.ndim > 2:  # rgb or rgba
-            for i, color in enumerate(colors[:3]):
-                channel = self.arr[self.slice][:, :, i]
-                hist_data[color] = np.histogram(channel, bins=bins,
-                         range=(0, 1), density=True)[0]
-
-
-        else:   # k or ka
-            channel = self.arr[self.slice]
-            hist_data['black'] = np.histogram(channel, bins=bins,
-                         range=(0, 1), density=True)[0]
-
-        return x, hist_data
+#    def histogram_data(self, bins=256):
+#        ''' return dict of histogram values (1D)
+#        result looks like: (0,10,20...), {"red":(15, 7, 3...) ...}
+#
+#        '''
+#
+#        colors = ('red', 'green', 'blue', 'black')
+##        x = np.linspace(0, 2 ** self.bitdepth - 1, HISTOGRAM_BINS)
+#        x = np.linspace(0, 1, bins)
+#
+#        # reset data
+#        hist_data = {color:x*0 for color in colors}
+#
+#
+#
+#        if self.arr.ndim > 2:  # rgb or rgba
+#            for i, color in enumerate(colors[:3]):
+#                channel = self.arr[self.slice][:, :, i]
+#                hist_data[color] = np.histogram(channel, bins=bins,
+#                         range=(0, 1), density=True)[0]
+#
+#
+#        else:   # k or ka
+#            channel = self.arr[self.slice]
+#            hist_data['black'] = np.histogram(channel, bins=bins,
+#                         range=(0, 1), density=True)[0]
+#
+#        return x, hist_data

@@ -51,12 +51,6 @@ def get_bitdepth(arr):
         return 16
 
 
-
-
-
-
-
-
 def normalize(y, inrange=None, outrange=(0, 1)):
     ''' Normalize numpy array --> values 0...1 '''
 
@@ -78,7 +72,7 @@ def save_image(float_arr, fp_out, bitdepth=8):
 
     Fp = Path(fp_out)
     Fp.parent.mkdir(exist_ok=True)
-
+    print(f"save image {Fp.name} min:{float_arr.min()}, max:{float_arr.max()}")
     float_arr = np.clip(float_arr, a_min=0, a_max=1)
 
     arr = float_to_int(float_arr, bitdepth)
