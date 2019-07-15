@@ -6,7 +6,7 @@ def clip_result(func):
     ''' decorator to ensure result in limits 0..1 '''
     def wrapper(*args, **kwargs):
         y = func(*args, **kwargs)
-        np.clip(y, 0, 1)
+        y = np.clip(y, 0, 1)
         return y
     return wrapper
 

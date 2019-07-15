@@ -14,6 +14,7 @@ import npfilters
 import tkinter as tk
 import numpy as np
 from pathlib import Path
+import logging
 import sys
 import time
 time0 = time.time()
@@ -138,7 +139,8 @@ def load(fp=None):
     print("open")
     img.load(fp)
     os.chdir(img.fpath.parent)
-    history.original = img.arr
+    history.original = img.arr.copy()
+    history.add(img.arr,"load")
     mainwin.title(img.fpath)
     mainwin.reset()
     histwin.reset()
@@ -162,16 +164,18 @@ def save_as_png():
 
 
 def original():
-    print("toggle original")
+
 #    img.reset()
-    if history.last() is None:
+    if not history.last():
         print("nothing to toggle")
         return
 
     if not history.toggle_original:
-        img.arr = history.original
+        print("show original")
+        img.arr = history.original.copy()
     else:
-        img.arr = history.last()
+        print("show last")
+        img.arr = history.last()['arr'].copy()
 
     history.toggle_original = not history.toggle_original
     mainwin.update()
@@ -183,17 +187,17 @@ def original():
 
 def undo():
     print("undo")
-    prev_arr = history.undo()
-    if prev_arr is not None:
-        img.arr = prev_arr
+    prev = history.undo()
+    if prev:
+        img.arr = prev['arr'].copy()
         mainwin.update()
 
 
 def redo():
     print("redo")
-    next_arr = history.redo()
-    if next_arr is not None:
-        img.arr = next_arr
+    nex = history.redo()
+    if nex:
+        img.arr = nex['arr'].copy()
         mainwin.update()
 
 #  ------------------------------------------
@@ -243,86 +247,91 @@ def rgb2gray():
 #  ------------------------------------------
 #  SELECTION
 #  ------------------------------------------
+def select_all():
+    print("select all")
+    select.reset()
 
-def edit_selection(func):
+
+def edit_selected(func):
     ''' decorator :
    load selection, apply changes, save to image, update gui and history '''
     def wrapper(*args, **kwargs):
-        print(func.__name__)
+        print("edit_selected: ",func.__name__)
         y = img.get_selection()
         y = func(y, *args, **kwargs)
         img.set_selection(y)
         mainwin.update()
         history.add(img.arr,  func.__name__)
+        print("added to history")
     return wrapper
 
 
-@edit_selection
+@edit_selected
 def invert(y):
     return npfilters.invert(y)
 
 
-@edit_selection
+@edit_selected
 def mirror(y):
     return npfilters.mirror(y)
 
 
-@edit_selection
+@edit_selected
 def flip(y):
     return npfilters.flip(y)
 
 
-@edit_selection
+@edit_selected
 def contrast(y):
     f = tk.simpledialog.askfloat("contrast", "Value to multiply with (float)",
                                  initialvalue=1.3)
     return npfilters.contrast(y, f)
 
 
-@edit_selection
+@edit_selected
 def multiply(y):
     f = tk.simpledialog.askfloat("Multiply", "Value to multiply with (float)",
                                  initialvalue=1.3)
     return npfilters.multiply(y, f)
 
 
-@edit_selection
+@edit_selected
 def add(y):
     f = tk.simpledialog.askfloat("Add", "Enter value to add (float)",
                                  initialvalue=.2)
     return npfilters.add(y, f)
 
 
-@edit_selection
+@edit_selected
 def normalize(y):
     return npfilters.normalize(y)
 
 
-@edit_selection
+@edit_selected
 def adaptive_equalize(y):
     f = tk.simpledialog.askfloat("adaptive_equalize", "clip limit (float)",
                                  initialvalue=.02)
     return npfilters.adaptive_equalize(y, clip_limit=f)
 
 
-@edit_selection
+@edit_selected
 def equalize(y):
     return npfilters.equalize(y)
 
 
-@edit_selection
+@edit_selected
 def fill(y):
     f = tk.simpledialog.askfloat("Fill", "Value to fill (float)",
                                  initialvalue=0)
     return npfilters.fill(y, f)
 
 
-@edit_selection
+@edit_selected
 def delete(y):
     return npfilters.fill(y, 1)
 
 
-@edit_selection
+@edit_selected
 def fft():
     fft_arr = img.fft()
     fft_img = npImage(arr=fft_arr)
@@ -330,7 +339,7 @@ def fft():
     mainWin(master=root,  curr_img=fft_img)
 
 
-@edit_selection
+@edit_selected
 def ifft():
     ifft_arr = img.ifft()
     ifft_img = npImage(arr=ifft_arr)
@@ -338,7 +347,7 @@ def ifft():
     mainWin(master=root,  curr_img=ifft_img)
 
 
-@edit_selection
+@edit_selected
 def unsharp_mask(y):
     r = tk.simpledialog.askfloat("unsharp_mask", "Enter radius (float)",
                                  initialvalue=.5)
@@ -347,56 +356,56 @@ def unsharp_mask(y):
     return npfilters.unsharp_mask(y, radius=r, amount=a)
 
 
-@edit_selection
+@edit_selected
 def blur(y):
     f = tk.simpledialog.askfloat("blur", "Enter radius (float)",
                                  initialvalue=1)
     return npfilters.blur(y, f)
 
 
-@edit_selection
+@edit_selected
 def highpass(y):
     f = tk.simpledialog.askfloat("subtrack_background", "Enter sigma (float)",
                                  initialvalue=20)
     return npfilters.highpass(y, f)
 
 
-@edit_selection
+@edit_selected
 def sigma(y):
     f = tk.simpledialog.askfloat("Set Sigma", "Enter sigma (float)",
                                  initialvalue=3)
     return npfilters.sigma(y, f)
 
 
-@edit_selection
+@edit_selected
 def gamma(y):
     f = tk.simpledialog.askfloat("Set Gamma", "Enter gamma (float)",
                                  initialvalue=.8)
     return npfilters.gamma(y, f)
 
 
-@edit_selection
+@edit_selected
 def clip_high(y):
     f = tk.simpledialog.askfloat("Cut high", "Enter high treshold (float)",
                                  initialvalue=.9)
     return npfilters.clip_high(y, f)
 
 
-@edit_selection
+@edit_selected
 def clip_low(y):
     f = tk.simpledialog.askfloat("Cut low", "Enter low treshold (float)",
                                  initialvalue=.1)
     return npfilters.clip_low(y, f)
 
 
-@edit_selection
+@edit_selected
 def tres_high(y):
     f = tk.simpledialog.askfloat("tres high", "Enter high treshold (float)",
                                  initialvalue=.9)
     return npfilters.tres_high(y, f)
 
 
-@edit_selection
+@edit_selected
 def tres_low(y):
     f = tk.simpledialog.askfloat("tres low", "Enter low treshold (float)",
                                  initialvalue=.1)
@@ -407,7 +416,7 @@ def crop():
     print(f"{select} crop")
     img.crop(*select.geometry)
     mainwin.update()
-    history.add(img.arr)
+    history.add(img.arr, "crop")
     select.reset()
 
 
@@ -682,6 +691,7 @@ class mainWin(tk.Toplevel):
         self.protocol("WM_DELETE_WINDOW", quit_app)
         self.geometry("900x810")
         self.bind("<Key>", lambda event: keyPressed(event))
+        self.bind("<Escape>", lambda event: select_all())
         self.bind("<MouseWheel>", self.__wheel)  # windows
         self.bind("<Button-4>", self.__wheel)  # linux
         self.bind("<Button-5>", self.__wheel)  # linux
@@ -874,6 +884,7 @@ class Selection:
         self.geometry = [0, 0, img.width * mainwin.zoom,
                          img.height * mainwin.zoom]
 
+
     def make_cirk_mask(self):
         x0, y0, x1, y1 = self.geometry
         b, a = (x1+x0)/2, (y1+y0)/2
@@ -896,6 +907,8 @@ class Selection:
 
 if __name__ == '__main__':
 
+    logging.basicConfig(level=10, format='!%(levelno)s [%(module)10s%(lineno)4d]\t%(message)s')
+
     if len(sys.argv) > 1:
         Fp = Path(sys.argv[1])
         assert Fp.is_file(), f"not a file {Fp}"
@@ -910,6 +923,7 @@ if __name__ == '__main__':
 
     # load image into numpy array
     img = npImage(Fp)
+    history.add(img.arr, "orig")
     history.original = img.arr
 
     print("image loaded")
@@ -922,6 +936,7 @@ if __name__ == '__main__':
     statswin = statsWin(root)
 
     mainwin = mainWin(root, curr_img=img)
+    mainwin.focus_set()
 
     print(f"mainloop in {time.time()-time0}")
 
