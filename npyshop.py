@@ -784,7 +784,7 @@ class mainWin(tk.Toplevel):
     def update(self):
         ''' update image '''
         self.draw()
-        self.title(img.properties)
+        self.title(img.properties())
         histwin.update()
         statswin.update()
 
@@ -912,7 +912,7 @@ if __name__ == '__main__':
     logging.basicConfig(level=10, format='%(relativeCreated)d !%(levelno)s [%(module)10s%(lineno)4d]\t%(message)s')
 
     if len(sys.argv) > 1:
-        Fp = Path(sys.argv[1])
+        Fp = Path(sys.argv[1].strip("'").strip('"'))
         assert Fp.is_file(), f"not a file {Fp}"
     else:
         Fp = Path(__file__).parent / 'sample.jpg'
