@@ -29,17 +29,15 @@ image operations:
 
 BUGS:
 
-
     large images and history on:
     running out of memory
-
-    history not working properly
 
 TODO:
     circular selection?
     view area - crop before showing?
     editable FFT - new mainwin
 
+    apply clipping only when necessary
 
 '''
 
@@ -136,7 +134,7 @@ def buttons_dict():
 #  ------------------------------------------
 
 def load(fp=None):
-    print("open")
+    logging.info("open")
     img.load(fp)
     os.chdir(img.fpath.parent)
     history.original = img.arr.copy()
@@ -147,18 +145,18 @@ def load(fp=None):
 
 
 def save():
-    print("save")
+    logging.info("save")
     img.save()
 
 
 def save_as():
-    print("save as")
+    logging.info("save as")
     img.save_as()
     mainwin.title(img.fpath)
 
 
 def save_as_png():
-    print("save as png")
+    logging.info("save as png")
     img.fpath = img.fpath.with_suffix(".png")
     img.save()
 
@@ -167,14 +165,14 @@ def original():
 
 #    img.reset()
     if not history.last():
-        print("nothing to toggle")
+        logging.info("nothing to toggle")
         return
 
     if not history.toggle_original:
-        print("show original")
+        logging.info("show original")
         img.arr = history.original.copy()
     else:
-        print("show last")
+        logging.info("show last")
         img.arr = history.last()['arr'].copy()
 
     history.toggle_original = not history.toggle_original
@@ -186,7 +184,7 @@ def original():
 
 
 def undo():
-    print("undo")
+    logging.info("undo")
     prev = history.undo()
     if prev:
         img.arr = prev['arr'].copy()
@@ -194,7 +192,7 @@ def undo():
 
 
 def redo():
-    print("redo")
+    logging.info("redo")
     nex = history.redo()
     if nex:
         img.arr = nex['arr'].copy()
@@ -209,7 +207,7 @@ def edit_image(func):
     ''' decorator :
    apply changes, update gui and history '''
     def wrapper(*args, **kwargs):
-        print(func.__name__)
+        logging.info(func.__name__)
         func(*args, **kwargs)
         mainwin.update()
         history.add(img.arr,  func.__name__)
@@ -248,7 +246,7 @@ def rgb2gray():
 #  SELECTION
 #  ------------------------------------------
 def select_all():
-    print("select all")
+    logging.info("select all")
     select.reset()
 
 
@@ -262,7 +260,7 @@ def edit_selected(func):
         img.set_selection(y)
         mainwin.update()
         history.add(img.arr,  func.__name__)
-        print("added to history")
+        logging.info("added to history")
     return wrapper
 
 
@@ -413,7 +411,7 @@ def tres_low(y):
 
 
 def crop():
-    print(f"{select} crop")
+    logging.info(f"{select} crop")
     img.crop(*select.geometry)
     mainwin.update()
     history.add(img.arr, "crop")
@@ -421,12 +419,12 @@ def crop():
 
 
 def circular_mask():
-    print("zoom in")
+    logging.info("zoom in")
     select.make_cirk_mask()
 
 
 def zoom_out(x, y):
-    print("zoom out")
+    logging.info("zoom out")
     if mainwin.zoom < 50:
         old_zoom = mainwin.zoom
         mainwin.zoom += zoom_step()  #
@@ -442,7 +440,7 @@ def zoom_out(x, y):
 def zoom_in(x, y):
     ''' zoom in in allowed steps,
     put pixel with mouse pointer to canvas center'''
-    print("zoom in")
+    logging.info("zoom in")
     if mainwin.zoom > 1:
         # get canvas center
         zs = zoom_step()  #
@@ -455,7 +453,7 @@ def zoom_in(x, y):
                  ccy - y * magnif_change]
         mainwin.ofset = [ofset[0]+mainwin.ofset[0],
                          ofset[1]+mainwin.ofset[1]]
-        print(f"xy {x} {y} canvas c {ccx} {ccy} ofset {ofset} \
+        logging.info(f"xy {x} {y} canvas c {ccx} {ccy} ofset {ofset} \
         mofset {mainwin.ofset} zoom {mainwin.zoom} \
         zoom step {zoom_step()} magnif_change {magnif_change}")
 
@@ -511,10 +509,10 @@ def toggle_win(win):
 
 def quit_app():
 
-    print("quit app")
+    logging.info("quit app")
     root.destroy()
     root.quit()
-    sys.exit()
+#    sys.exit()
 
 
 #  ------------------------------------------
@@ -561,7 +559,8 @@ class plotWin(tk.Toplevel):
 
 
 class histWin(tk.Toplevel):
-
+    
+    @timeit
     def __init__(self, master=None, linewidth=1.0):
         super().__init__(master)
         self.title("Histogram")
@@ -575,7 +574,8 @@ class histWin(tk.Toplevel):
         self.draw()
         if self.hidden:
             self.withdraw()
-
+            
+    @timeit
     def draw(self):
 
         self.fig, self.ax_hist = plt.subplots()
@@ -589,8 +589,8 @@ class histWin(tk.Toplevel):
         self.ax_hist.spines['top'].set_visible(False)
         self.ax_hist.spines['left'].set_visible(False)
         self.ax_hist.tick_params(left=False)
-        self.ax_hist.hist(img.arr.ravel(), bins=self.bins, range=(0, 1),
-                          density=True, histtype='step', color='black')
+        # self.ax_hist.hist(img.arr.ravel(), bins=self.bins, range=(0, 1),
+                          # density=True, histtype='step', color='black')
 
         # Display cumulative distribution
         self.ax_cdf = self.ax_hist.twinx()
@@ -598,8 +598,8 @@ class histWin(tk.Toplevel):
         self.ax_cdf.spines['top'].set_visible(False)
         self.ax_cdf.spines['left'].set_visible(False)
         self.ax_cdf.tick_params(left=False)
-        img_cdf, bins = exposure.cumulative_distribution(img.arr, self.bins)
-        self.ax_cdf.plot(bins, img_cdf, 'r')
+        # img_cdf, bins = exposure.cumulative_distribution(img.arr, self.bins)
+        # self.ax_cdf.plot(bins, img_cdf, 'r')
         self.ax_cdf.set_yticks([])
 
         self.fig.tight_layout()
@@ -609,9 +609,9 @@ class histWin(tk.Toplevel):
 #        self.ax_hist.plot(self.x, 0*self.x, color=color)[0]
 
     def reset(self):
-
         self.update()
 
+    @timeit
     def update(self):
 
         if self.hidden:
@@ -631,7 +631,7 @@ class histWin(tk.Toplevel):
 
 
 class statsWin(tk.Toplevel):
-
+    @timeit
     def __init__(self, master=None):
         super().__init__(master)
         self.title("Numpyshop-stats")
@@ -641,16 +641,17 @@ class statsWin(tk.Toplevel):
         self.bind("<Key>", lambda event: keyPressed(event))
 
         self.hidden = SETTINGS["hide_stats"]
+        self.frame = tk.Frame(self)
         if self.hidden:
             self.withdraw()
+        
+        # self.draw()
 
-        self.draw()
+    # def draw(self):
+        # self.frame = tk.Frame(self)
+        # self._draw_table()
 
-    def draw(self):
-        self.frame = tk.Frame(self)
-        self._draw_table()
-
-#    @timeit
+    @timeit
     def update(self):
 
         if self.hidden:
@@ -686,7 +687,7 @@ class mainWin(tk.Toplevel):
     def __init__(self, master=None,  curr_img=None):
         super().__init__(master)
         self.img = curr_img
-        print(curr_img)
+        # print(curr_img)
         self.master = master
         self.protocol("WM_DELETE_WINDOW", quit_app)
         self.geometry("900x810")
@@ -755,8 +756,8 @@ class mainWin(tk.Toplevel):
     @timeit
     def make_image_view(self):
 
-        print(self.img.arr.shape)
-        print(self.zoom)
+        logging.info(self.img.arr.shape)
+        logging.info(self.zoom)
 
         view = self.img.arr[::self.zoom, ::self.zoom, ...]
         self.view_shape = view.shape[:2]
@@ -776,7 +777,7 @@ class mainWin(tk.Toplevel):
     def reset(self):
         self.zoom = max(1, img.width//800,  img.height//800)
         self.ofset = [0, 0]
-        print(f"initial zoom set: {self.zoom}")
+        # print(f"initial zoom set: {self.zoom}")
         self.update()
 
     @timeit
@@ -808,15 +809,13 @@ class mainWin(tk.Toplevel):
         ofset = coords
         if hasattr(self, "canvas"):
             view_wid = img.width / self.zoom
-            print('view_wid', view_wid)
+            # print('view_wid', view_wid)
             max_offset = [-img.width / self.zoom + self.canvas.winfo_width(),
                           -img.height / self.zoom + self.canvas.winfo_height()]
-            print('max_offset', max_offset)
+            # print('max_offset', max_offset)
             # will whole canvas
             ofset = [max(max_offset[i], c) for i, c in enumerate(ofset)]
-            print(ofset)
         ofset = [min(0, c) for c in ofset]  # only allow negative ofset
-        print(ofset)
         self.__dict__['ofset'] = ofset
 
     # ensure zoom > 0
@@ -834,7 +833,8 @@ class mainWin(tk.Toplevel):
 
 
 class Selection:
-
+    
+    @timeit
     def __init__(self, parent):
         self.parent = parent
         self.geometry = [0, 0, 0, 0]
@@ -857,7 +857,8 @@ class Selection:
     def set_right(self):
         self.geometry[2:] = list(get_mouse())
         self.draw()
-
+    
+    @timeit
     def draw(self):
         self._valid_selection()
 #        print(self.geometry)
@@ -868,7 +869,8 @@ class Selection:
         if self.cirk_mode:
             self.make_cirk_mask()
         histwin.update()
-
+    
+    @timeit
     def _valid_selection(self):
         ''' avoid right corner being before left '''
 #        if len(self.geometry) == 4:
@@ -891,9 +893,9 @@ class Selection:
         nx, ny = img.arr.shape[:2]
 
         y, x = np.ogrid[-a:nx-a, -b:ny-b]
-        print(y, x)
+        # print(y, x)
         radius = x0 - b
-        print(radius)
+        # print(radius)
         mask = x*x + y*y <= radius*radius
 
         return mask
@@ -907,7 +909,7 @@ class Selection:
 
 if __name__ == '__main__':
 
-    logging.basicConfig(level=10, format='!%(levelno)s [%(module)10s%(lineno)4d]\t%(message)s')
+    logging.basicConfig(level=10, format='%(relativeCreated)d !%(levelno)s [%(module)10s%(lineno)4d]\t%(message)s')
 
     if len(sys.argv) > 1:
         Fp = Path(sys.argv[1])
@@ -926,10 +928,10 @@ if __name__ == '__main__':
     history.add(img.arr, "orig")
     history.original = img.arr
 
-    print("image loaded")
+    logging.info("image loaded")
 
     select = Selection(root)
-    print(select)
+    logging.info(select)
 
     histwin = histWin(root)
 
@@ -938,6 +940,6 @@ if __name__ == '__main__':
     mainwin = mainWin(root, curr_img=img)
     mainwin.focus_set()
 
-    print(f"mainloop in {time.time()-time0}")
+    logging.info(f"mainloop in {time.time()-time0}")
 
     root.mainloop()

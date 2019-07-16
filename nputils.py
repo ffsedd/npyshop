@@ -72,7 +72,7 @@ def save_image(float_arr, fp_out, bitdepth=8):
 
     Fp = Path(fp_out)
     Fp.parent.mkdir(exist_ok=True)
-    print(f"save image {Fp.name} min:{float_arr.min()}, max:{float_arr.max()}")
+    logging.info(f"save image {Fp.name}")
     float_arr = np.clip(float_arr, a_min=0, a_max=1)
 
     arr = float_to_int(float_arr, bitdepth)
@@ -94,7 +94,7 @@ def plti(im, name="", plot_axis=False, vmin=0, vmax=1, **kwargs):
 
 
 def info(y):
-    print(f"{y.dtype}\t{str(y.shape)}\t<{y.min():.3f} \
+    logging.info(f"{y.dtype}\t{str(y.shape)}\t<{y.min():.3f} \
             {y.mean():.3f} {y.max():.3f}> ({y.std():.3f})\t{type(y)} ")
 
 
@@ -122,11 +122,11 @@ def create_circular_mask(h, w, center=None, radius=None):
 def work_with_hsv_decorator(decorated_f):
 
     def wrapper_f(arr, *args, **kwargs):
-        print("convert to hsv")
+        logging.info("convert to hsv")
         arr = rgb_to_hsv(arr)
         y = decorated_f(arr=arr, *args, **kwargs)
         y = hsv_to_rgb(y)
-        print("convert to rgb")
+        logging.info("convert to rgb")
         return y
     return wrapper_f
 

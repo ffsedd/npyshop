@@ -28,7 +28,7 @@ class History():
         self.undo_queue.append({'func_name' : func_name, 'arr' : arr.copy() })
         self.redo_queue.clear()  # discard redo queue
         logging.debug(f"added to history: {func_name}, len:{len(self.undo_queue)}")
-        print(self)
+        logging.info(self)
 #        self.log.append(func_name)  # save caller function name to history
 #        logging.debug(f"modification log: {self.log}")
 
@@ -44,7 +44,7 @@ class History():
         previous = self.undo_queue[-1]
         logging.debug(f"undone {current['func_name']}, \
                                 undo queue len: {len(self.undo_queue)}")
-        print(self)
+        logging.info(self)
 
         return previous
 
@@ -61,6 +61,6 @@ class History():
         next_item = self.redo_queue.pop()
         self.undo_queue.append(next_item)  # deep copy needed?
         logging.debug(f"redo queue len: {len(self.redo_queue)}")
-        print(self)
+        logging.info(self)
 
         return next_item
