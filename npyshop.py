@@ -37,7 +37,8 @@ BUGS:
     running out of memory
 
 TODO:
-    circular selection?
+    circular selection
+    
     view area - crop before showing?
     editable FFT - new app
 
@@ -122,6 +123,8 @@ def commands_dict():
 
 def buttons_dict():
     return [
+        ("+", zoom_in),
+        ("-", zoom_out),
         ("Open", load),
         ("Save as", save_as),
         ("Undo", undo),
@@ -132,8 +135,7 @@ def buttons_dict():
         ("Rotate", rotate_90),
         ("Normalize", normalize),
         ("Gamma", gamma),
-        ("Zoom in", zoom_in),
-        ("Zoom out", zoom_out),
+
     ]
 
 
@@ -437,7 +439,7 @@ def circular_mask():
 #  ------------------------------------------
 
 
-def zoom_out(x, y):
+def zoom_out(x=0, y=0):
     logging.info("zoom out")
     if app.zoom < 50:
         old_zoom = app.zoom
@@ -451,7 +453,7 @@ def zoom_out(x, y):
         app.selection.reset()
 
 
-def zoom_in(x, y):
+def zoom_in(x=0, y=0):
     ''' zoom in in allowed steps,
     put pixel with mouse pointer to canvas center'''
     logging.info("zoom in")
@@ -542,6 +544,7 @@ class App(tk.Toplevel):
         self.geometry("900x810")
 
         self.img = npimage.npImage(img_path=img_path, img_arr=img_arr)
+        self.zoom_var = tk.StringVar()
         self.zoom = 1
         self.ofset = [0, 0]
 
@@ -579,16 +582,16 @@ class App(tk.Toplevel):
         buttonWidth = 6
         buttonHeight = 1
         self.toolbar = tk.Frame(self)
-
+        
+        self.zoom_label = tk.Label(self.toolbar, width=buttonWidth, textvariable=self.zoom_var)
+        self.zoom_label.grid(row=0, column=0)
+        
         for i, b in enumerate(buttons_dict()):
             button = tk.Button(self.toolbar, text=b[0], font=('Arial Narrow', '10'),
                                background=backgroundColour, width=buttonWidth,
                                height=buttonHeight, command=b[1])
-            button.grid(row=i, column=0)
-
-        self.zoom_entry = tk.Entry(self.toolbar, width=buttonWidth, textvariable = self.zoom)
-        self.zoom_entry.grid(row=i+1, column=0)
-
+            button.grid(row=i+1, column=0)
+            
         self.toolbar.pack(side=tk.LEFT)
 
     def _gui_bind_keys(self):
@@ -699,6 +702,7 @@ class App(tk.Toplevel):
     def zoom(self, value):
         if value > 0:
             self.__dict__['zoom'] = int(value)
+            self.zoom_var.set(f"{100/value:.0f} %")
 
 
     def _quit(self):
@@ -742,12 +746,12 @@ class Selection:
         self._valid_selection()
 #        print(self.geometry)
         app.canvas.delete(self.rect)
-        self.rect = app.canvas.create_rectangle(self.geometry)
+        self.rect = app.canvas.create_rectangle(self.geometry, outline='red')
 #        print(self.rect)
         self.slice()
         if self.cirk_mode:
             self.make_cirk_mask()
-#        app.histwin.update()
+
 
     @timeit
     def _valid_selection(self):
