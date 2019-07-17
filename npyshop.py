@@ -29,6 +29,8 @@ image operations:
 
 BUGS:
 
+    click on toolbar changes selection
+
     large images and history on:
     running out of memory
 
@@ -44,7 +46,7 @@ TODO:
 
 SETTINGS = {
     "hide_histogram": True,
-    "hide_toolbar": True,
+    "hide_toolbar": False,
     "hide_stats": True,
     "histogram_bins": 256,
     "history_steps": 10,     # memory !!!
@@ -119,11 +121,15 @@ def commands_dict():
 def buttons_dict():
     return [
         ("Open", load),
+        ("Save as", save_as),
         ("Undo", undo),
+        ("Redo", redo),
         ("Histogram", hist_toggle),
         ("Statistics", stats_toggle),
         ("Crop", crop),
         ("Rotate", rotate_90),
+        ("Normalize", normalize),
+        ("Gamma", gamma),
         ("Zoom in", zoom_in),
         ("Zoom out", zoom_out),
     ]
