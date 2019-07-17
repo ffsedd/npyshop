@@ -11,7 +11,7 @@ from pathlib import Path
 from PIL import Image, ImageTk
 
 from skimage import img_as_ubyte
-#from skimage import exposure  # histogram plotting, equalizing
+# from skimage import exposure  # histogram plotting, equalizing
 
 import npimage
 import nphistory
@@ -19,6 +19,7 @@ import nputils
 import npfilters
 import nphistwin
 import npstatswin
+from npgui import askfloat
 from testing.timeit import timeit
 
 time0 = time.time()
@@ -33,8 +34,6 @@ image operations:
 
 BUGS:
 
-    large images and history on:
-    running out of memory
 
 TODO:
     circular selection
@@ -148,7 +147,7 @@ def load(fp=None):
     app.img.load(fp)
     os.chdir(app.img.fpath.parent)
     app.history.original = app.img.arr.copy()
-    app.history.add(app.img.arr,"load")
+    app.history.add(app.img.arr, "load")
     app.title(app.img.fpath)
     app.reset()
     app.histwin.update()
@@ -173,7 +172,7 @@ def save_as_png():
 
 def toggle_original():
 
-#    app.img.reset()
+    #    app.img.reset()
     if not app.history.last():
         logging.info("nothing to toggle")
         return
@@ -227,8 +226,7 @@ def edit_image(func):
 
 @edit_image
 def free_rotate():
-    f = tk.simpledialog.askfloat("Rotate", "Angle (float - clockwise)",
-                                 initialvalue=2.)
+    f = askfloat("Rotate angle (clockwise)", initialvalue=2.)
     app.img.free_rotate(-f)  # clockwise
 
 
@@ -264,9 +262,13 @@ def edit_selected(func):
     ''' decorator :
    load selection, ly changes, save to image, update gui and history '''
     def wrapper(*args, **kwargs):
-        print("edit_selected: ",func.__name__)
+        print("edit_selected: ", func.__name__)
         y = app.img.get_selection()
-        y = func(y, *args, **kwargs)
+        try:
+            y = func(y, *args, **kwargs)
+        except Exception as e:
+            print(e) # ignore error (eg. dialog cancel)
+            return
         app.img.set_selection(y)
         app.update()
         app.histwin.update()
@@ -293,23 +295,21 @@ def flip(y):
 
 @edit_selected
 def contrast(y):
-    f = tk.simpledialog.askfloat("contrast", "Value to multiply with (float)",
-                                 initialvalue=1.3)
+    f = askfloat("contrast", initialvalue=1.3)
     return npfilters.contrast(y, f)
 
 
 @edit_selected
 def multiply(y):
-    f = tk.simpledialog.askfloat("Multiply", "Value to multiply with (float)",
-                                 initialvalue=1.3)
+    f = askfloat("Multiply", initialvalue=1.3)
     return npfilters.multiply(y, f)
 
 
 @edit_selected
 def add(y):
-    f = tk.simpledialog.askfloat("Add", "Enter value to add (float)",
-                                 initialvalue=.2)
-    return npfilters.add(y, f)
+    f = askfloat("Add", initialvalue=.2)
+    if f is not None:
+        return npfilters.add(y, f)
 
 
 @edit_selected
@@ -319,8 +319,7 @@ def normalize(y):
 
 @edit_selected
 def adaptive_equalize(y):
-    f = tk.simpledialog.askfloat("adaptive_equalize", "clip limit (float)",
-                                 initialvalue=.02)
+    f = askfloat("adaptive_equalize clip limit", initialvalue=.02)
     return npfilters.adaptive_equalize(y, clip_limit=f)
 
 
@@ -331,8 +330,7 @@ def equalize(y):
 
 @edit_selected
 def fill(y):
-    f = tk.simpledialog.askfloat("Fill", "Value to fill (float)",
-                                 initialvalue=0)
+    f = askfloat("Fill with:", initialvalue=0)
     return npfilters.fill(y, f)
 
 
@@ -359,66 +357,56 @@ def ifft():
 
 @edit_selected
 def unsharp_mask(y):
-    r = tk.simpledialog.askfloat("unsharp_mask", "Enter radius (float)",
-                                 initialvalue=.5)
-    a = tk.simpledialog.askfloat("unsharp_mask", "Enter amount (float)",
-                                 initialvalue=0.2)
+    r = askfloat("unsharp_mask - radius:", initialvalue=.5)
+    a = askfloat("unsharp_mask - amount:", initialvalue=0.2)
     return npfilters.unsharp_mask(y, radius=r, amount=a)
 
 
 @edit_selected
 def blur(y):
-    f = tk.simpledialog.askfloat("blur", "Enter radius (float)",
-                                 initialvalue=1)
+    f = askfloat("gaussian blur radius:", initialvalue=1)
     return npfilters.blur(y, f)
 
 
 @edit_selected
 def highpass(y):
-    f = tk.simpledialog.askfloat("subtrack_background", "Enter sigma (float)",
-                                 initialvalue=20)
+    f = askfloat("subtrack_background", initialvalue=20)
     return npfilters.highpass(y, f)
 
 
 @edit_selected
 def sigma(y):
-    f = tk.simpledialog.askfloat("Set Sigma", "Enter sigma (float)",
-                                 initialvalue=3)
+    f = askfloat("S-shape curve:", initialvalue=3)
     return npfilters.sigma(y, f)
 
 
 @edit_selected
 def gamma(y):
-    f = tk.simpledialog.askfloat("Set Gamma", "Enter gamma (float)",
-                                 initialvalue=.8)
+    f = askfloat("Set Gamma:", initialvalue=.8)
     return npfilters.gamma(y, f)
 
 
 @edit_selected
 def clip_high(y):
-    f = tk.simpledialog.askfloat("Cut high", "Enter high treshold (float)",
-                                 initialvalue=.9)
+    f = askfloat("Cut high:", initialvalue=.9)
     return npfilters.clip_high(y, f)
 
 
 @edit_selected
 def clip_low(y):
-    f = tk.simpledialog.askfloat("Cut low", "Enter low treshold (float)",
-                                 initialvalue=.1)
+    f = askfloat("Cut low:", initialvalue=.1)
     return npfilters.clip_low(y, f)
 
 
 @edit_selected
 def tres_high(y):
-    f = tk.simpledialog.askfloat("tres high", "Enter high treshold (float)",
-                                 initialvalue=.9)
+    f = askfloat("treshold high", initialvalue=.9)
     return npfilters.tres_high(y, f)
 
 
 @edit_selected
 def tres_low(y):
-    f = tk.simpledialog.askfloat("tres low", "Enter low treshold (float)",
-                                 initialvalue=.1)
+    f = askfloat("treshold low", initialvalue=.1)
     return npfilters.tres_low(y, f)
 
 
@@ -468,7 +456,7 @@ def zoom_in(x=0, y=0):
         ofset = [ccx - x * magnif_change,
                  ccy - y * magnif_change]
         app.ofset = [ofset[0]+app.ofset[0],
-                         ofset[1]+app.ofset[1]]
+                     ofset[1]+app.ofset[1]]
         logging.info(f"xy {x} {y} canvas c {ccx} {ccy} ofset {ofset} \
         mofset {app.ofset} zoom {app.zoom} \
         zoom step {zoom_step()} magnif_change {magnif_change}")
@@ -528,8 +516,6 @@ def toggle_win(win):
     app.focus_force()
 
 
-
-
 #  ------------------------------------------
 #  MAIN WINDOW
 #  ------------------------------------------
@@ -550,8 +536,10 @@ class App(tk.Toplevel):
 
         self.selection = Selection(master=self)
         self.history = nphistory.History(max_length=CFG["history_steps"])
-        self.histwin = nphistwin.histWin(master=self, hide=CFG["hide_histogram"])
-        self.statswin = npstatswin.statsWin(master=self, hide=CFG["hide_stats"])
+        self.histwin = nphistwin.histWin(
+            master=self, hide=CFG["hide_histogram"])
+        self.statswin = npstatswin.statsWin(
+            master=self, hide=CFG["hide_stats"])
 
         self.history.add(self.img.arr, "orig")
         self.history.original = self.img.arr.copy()
@@ -582,16 +570,17 @@ class App(tk.Toplevel):
         buttonWidth = 6
         buttonHeight = 1
         self.toolbar = tk.Frame(self)
-        
-        self.zoom_label = tk.Label(self.toolbar, width=buttonWidth, textvariable=self.zoom_var)
+
+        self.zoom_label = tk.Label(
+            self.toolbar, width=buttonWidth, textvariable=self.zoom_var)
         self.zoom_label.grid(row=0, column=0)
-        
+
         for i, b in enumerate(buttons_dict()):
             button = tk.Button(self.toolbar, text=b[0], font=('Arial Narrow', '10'),
                                background=backgroundColour, width=buttonWidth,
                                height=buttonHeight, command=b[1])
             button.grid(row=i+1, column=0)
-            
+
         self.toolbar.pack(side=tk.LEFT)
 
     def _gui_bind_keys(self):
@@ -612,7 +601,8 @@ class App(tk.Toplevel):
         self.canvas = tk.Canvas(self, width=width,
                                 height=height, background="gray")
         self.canvas.pack(fill=tk.BOTH, expand=tk.YES)
-        self.zoom = max(1, min(self.img.width // 2**9, self.img.height // 2**9))
+        self.zoom = max(1, min(self.img.width // 2 **
+                               9, self.img.height // 2**9))
         self.ofset = [0, 0]  # position of image NW corner relative to canvas
 
     @timeit
@@ -653,15 +643,14 @@ class App(tk.Toplevel):
     def _mouse_draw(self, event):
         ''' not implemented '''
 
-
     def _mouse_left(self, event):
-        x,y = get_mouse()
+        x, y = get_mouse()
         if x < 0 or y < 0:
             return
         self.selection.set_left()
 
     def _mouse_right(self, event):
-        x,y = get_mouse()
+        x, y = get_mouse()
         if x < 0 or y < 0:
             return
         self.selection.set_right()
@@ -683,7 +672,7 @@ class App(tk.Toplevel):
     def ofset(self, coords):
         ofset = coords
         if hasattr(self, "canvas"):
-#            view_wid = self.img.width / self.zoom
+            #            view_wid = self.img.width / self.zoom
             # print('view_wid', view_wid)
             max_offset = [-self.img.width / self.zoom + self.canvas.winfo_width(),
                           -self.img.height / self.zoom + self.canvas.winfo_height()]
@@ -703,7 +692,6 @@ class App(tk.Toplevel):
         if value > 0:
             self.__dict__['zoom'] = int(value)
             self.zoom_var.set(f"{100/value:.0f} %")
-
 
     def _quit(self):
 
@@ -752,7 +740,6 @@ class Selection:
         if self.cirk_mode:
             self.make_cirk_mask()
 
-
     @timeit
     def _valid_selection(self):
         ''' avoid right corner being before left '''
@@ -768,7 +755,6 @@ class Selection:
     def select_all(self):
         self.geometry = [0, 0, app.img.width * app.zoom,
                          app.img.height * app.zoom]
-
 
     def make_cirk_mask(self):
         x0, y0, x1, y1 = self.geometry
@@ -792,7 +778,8 @@ class Selection:
 
 if __name__ == '__main__':
 
-    logging.basicConfig(level=10, format='%(relativeCreated)d !%(levelno)s [%(module)10s%(lineno)4d]\t%(message)s')
+    logging.basicConfig(
+        level=10, format='%(relativeCreated)d !%(levelno)s [%(module)10s%(lineno)4d]\t%(message)s')
 
     # get filename from command line argument or sample
     if len(sys.argv) > 1:

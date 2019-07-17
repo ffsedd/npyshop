@@ -28,9 +28,11 @@ class histWin(tk.Toplevel):
         self.linewidth = linewidth
         self.bins = bins
         self.hidden = hide
+        plt.rcParams.update({'font.size': 5})
         self.draw()
         if self.hidden:
             self.withdraw()
+        self.master.focus_force() 
 
     @timeit
     def draw(self):
@@ -45,7 +47,9 @@ class histWin(tk.Toplevel):
         self.ax_hist.spines['right'].set_visible(False)
         self.ax_hist.spines['top'].set_visible(False)
         self.ax_hist.spines['left'].set_visible(False)
-        self.ax_hist.tick_params(left=False)
+        # self.ax_hist.tick_params(left=False)
+        # self.ax_hist.tick_params(top='off', bottom='on', left='off', right='off', labelleft='off', labelbottom='on')
+
         # self.ax_hist.hist(app.img.arr.ravel(), bins=self.bins, range=(0, 1),
                           # density=True, histtype='step', color='black')
 
@@ -59,14 +63,15 @@ class histWin(tk.Toplevel):
         # self.ax_cdf.plot(bins, img_cdf, 'r')
         self.ax_cdf.set_yticks([])
 
-        self.fig.tight_layout()
+        self.fig.tight_layout(pad=6)
         self.canvas = FigureCanvasTkAgg(self.fig, master=self)
         self.canvas.draw()
         self.canvas.get_tk_widget().pack(side=tk.TOP, fill=tk.BOTH, expand=1)
 #        self.ax_hist.plot(self.x, 0*self.x, color=color)[0]
 
     def reset(self):
-        self.update()
+        self.update
+
 
     @timeit
     def update(self):
