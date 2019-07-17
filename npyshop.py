@@ -910,7 +910,8 @@ class Selection:
 if __name__ == '__main__':
 
     logging.basicConfig(level=10, format='%(relativeCreated)d !%(levelno)s [%(module)10s%(lineno)4d]\t%(message)s')
-
+    
+    # get filename from command line argument or sample
     if len(sys.argv) > 1:
         Fp = Path(sys.argv[1].strip("'").strip('"'))
         assert Fp.is_file(), f"not a file {Fp}"
@@ -918,7 +919,7 @@ if __name__ == '__main__':
         Fp = Path(__file__).parent / 'sample.jpg'
 
     root = tk.Tk()
-    root.title("Numpyshop")
+    root.title("Npyshop")
     root.withdraw()  # root win is hidden
 
     history = History(max_length=SETTINGS["history_steps"])
@@ -926,7 +927,7 @@ if __name__ == '__main__':
     # load image into numpy array
     img = npImage(Fp)
     history.add(img.arr, "orig")
-    history.original = img.arr
+    history.original = img.arr.copy()
 
     logging.info("image loaded")
 
