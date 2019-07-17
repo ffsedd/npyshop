@@ -36,6 +36,13 @@ BUGS:
 
 
 TODO:
+
+    repeat command
+    
+    command parameters to history
+    
+    command history to text file or iptc?
+    
     circular selection
     
     view area - crop before showing?
