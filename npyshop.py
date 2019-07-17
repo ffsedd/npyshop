@@ -1,22 +1,26 @@
 #!/usr/bin/env python3
-import os
-from testing.timeit import timeit
-from matplotlib.backends.backend_tkagg import FigureCanvasTkAgg
-from PIL import Image, ImageTk
-from skimage import img_as_ubyte
-from skimage import exposure  # histogram plotting, equalizing
-
-from matplotlib import pyplot as plt
-from npimage import npImage
-from nphistory import History
-import nputils
-import npfilters
-import tkinter as tk
-import numpy as np
-from pathlib import Path
 import logging
 import sys
 import time
+import os
+
+import tkinter as tk
+import numpy as np
+from pathlib import Path
+
+from PIL import Image, ImageTk
+
+from skimage import img_as_ubyte
+#from skimage import exposure  # histogram plotting, equalizing
+
+import npimage
+import nphistory
+import nputils
+import npfilters
+import nphistwin
+import npstatswin
+from testing.timeit import timeit
+
 time0 = time.time()
 print("imports done")
 
@@ -29,22 +33,20 @@ image operations:
 
 BUGS:
 
-    click on toolbar changes selection
-
     large images and history on:
     running out of memory
 
 TODO:
     circular selection?
     view area - crop before showing?
-    editable FFT - new mainwin
+    editable FFT - new app
 
     apply clipping only when necessary
 
 '''
 
 
-SETTINGS = {
+CFG = {
     "hide_histogram": True,
     "hide_toolbar": False,
     "hide_stats": True,
@@ -69,7 +71,7 @@ def commands_dict():
             [
                 ("Undo", "z", undo),
                 ("Redo", "y", redo),
-                ("Original", "q", original),
+                ("Original_toggle", "q", toggle_original),
 
             ],
         "Image":
@@ -83,8 +85,8 @@ def commands_dict():
             ],
         "Selection":
             [
-                ("Select left corner", "comma", select.set_left),
-                ("Select right corner", "period", select.set_right),
+                ("Select left corner", "comma", selection_set_left),
+                ("Select right corner", "period", selection_set_right),
                 ("Flip", ")", flip),
                 ("Mirror", "(", mirror),
                 ("Gamma", "g", gamma),
@@ -141,48 +143,48 @@ def buttons_dict():
 
 def load(fp=None):
     logging.info("open")
-    img.load(fp)
-    os.chdir(img.fpath.parent)
-    history.original = img.arr.copy()
-    history.add(img.arr,"load")
-    mainwin.title(img.fpath)
-    mainwin.reset()
-    histwin.reset()
+    app.img.load(fp)
+    os.chdir(app.img.fpath.parent)
+    app.history.original = app.img.arr.copy()
+    app.history.add(app.img.arr,"load")
+    app.title(app.img.fpath)
+    app.reset()
+    app.histwin.update()
 
 
 def save():
     logging.info("save")
-    img.save()
+    app.img.save()
 
 
 def save_as():
     logging.info("save as")
-    img.save_as()
-    mainwin.title(img.fpath)
+    app.img.save_as()
+    app.title(app.img.fpath)
 
 
 def save_as_png():
     logging.info("save as png")
-    img.fpath = img.fpath.with_suffix(".png")
-    img.save()
+    app.img.fpath = app.img.fpath.with_suffix(".png")
+    app.img.save()
 
 
-def original():
+def toggle_original():
 
-#    img.reset()
-    if not history.last():
+#    app.img.reset()
+    if not app.history.last():
         logging.info("nothing to toggle")
         return
 
-    if not history.toggle_original:
+    if not app.history.toggle_original:
         logging.info("show original")
-        img.arr = history.original.copy()
+        app.img.arr = app.history.original.copy()
     else:
         logging.info("show last")
-        img.arr = history.last()['arr'].copy()
+        app.img.arr = app.history.last()['arr'].copy()
 
-    history.toggle_original = not history.toggle_original
-    mainwin.update()
+    app.history.toggle_original = not app.history.toggle_original
+    app.update()
 
 #  ------------------------------------------
 #  HISTORY
@@ -191,18 +193,18 @@ def original():
 
 def undo():
     logging.info("undo")
-    prev = history.undo()
+    prev = app.history.undo()
     if prev:
-        img.arr = prev['arr'].copy()
-        mainwin.update()
+        app.img.arr = prev['arr'].copy()
+        app.update()
 
 
 def redo():
     logging.info("redo")
-    nex = history.redo()
+    nex = app.history.redo()
     if nex:
-        img.arr = nex['arr'].copy()
-        mainwin.update()
+        app.img.arr = nex['arr'].copy()
+        app.update()
 
 #  ------------------------------------------
 #  IMAGE
@@ -211,13 +213,13 @@ def redo():
 
 def edit_image(func):
     ''' decorator :
-   apply changes, update gui and history '''
+   ly changes, update gui and history '''
     def wrapper(*args, **kwargs):
         logging.info(func.__name__)
         func(*args, **kwargs)
-        mainwin.update()
-        history.add(img.arr,  func.__name__)
-        select.reset()
+        app.update()
+        app.history.add(app.img.arr,  func.__name__)
+        app.selection.reset()
     return wrapper
 
 
@@ -225,27 +227,27 @@ def edit_image(func):
 def free_rotate():
     f = tk.simpledialog.askfloat("Rotate", "Angle (float - clockwise)",
                                  initialvalue=2.)
-    img.free_rotate(-f)  # clockwise
+    app.img.free_rotate(-f)  # clockwise
 
 
 @edit_image
 def rotate_90():
-    img.rotate()
+    app.img.rotate()
 
 
 @edit_image
 def rotate_270():
-    img.rotate(3)
+    app.img.rotate(3)
 
 
 @edit_image
 def rotate_180():
-    img.rotate(2)
+    app.img.rotate(2)
 
 
 @edit_image
 def rgb2gray():
-    img.rgb2gray()
+    app.img.rgb2gray()
 
 
 #  ------------------------------------------
@@ -253,19 +255,21 @@ def rgb2gray():
 #  ------------------------------------------
 def select_all():
     logging.info("select all")
-    select.reset()
+    app.selection.reset()
 
 
 def edit_selected(func):
     ''' decorator :
-   load selection, apply changes, save to image, update gui and history '''
+   load selection, ly changes, save to image, update gui and history '''
     def wrapper(*args, **kwargs):
         print("edit_selected: ",func.__name__)
-        y = img.get_selection()
+        y = app.img.get_selection()
         y = func(y, *args, **kwargs)
-        img.set_selection(y)
-        mainwin.update()
-        history.add(img.arr,  func.__name__)
+        app.img.set_selection(y)
+        app.update()
+        app.histwin.update()
+        app.statswin.update()
+        app.history.add(app.img.arr,  func.__name__)
         logging.info("added to history")
     return wrapper
 
@@ -337,18 +341,18 @@ def delete(y):
 
 @edit_selected
 def fft():
-    fft_arr = img.fft()
-    fft_img = npImage(arr=fft_arr)
+    fft_arr = app.img.fft()
+    fft_img = npimage.npImage(arr=fft_arr)
     fft_img.arr = nputils.normalize(fft_img.arr)
-    mainWin(master=root,  curr_img=fft_img)
+    app(master=root,  img_arr=fft_img)
 
 
 @edit_selected
 def ifft():
-    ifft_arr = img.ifft()
-    ifft_img = npImage(arr=ifft_arr)
+    ifft_arr = app.img.ifft()
+    ifft_img = npimage.npImage(arr=ifft_arr)
     ifft_img.arr = nputils.normalize(ifft_img.arr)
-    mainWin(master=root,  curr_img=ifft_img)
+    app(master=root,  img_arr=ifft_img)
 
 
 @edit_selected
@@ -417,78 +421,85 @@ def tres_low(y):
 
 
 def crop():
-    logging.info(f"{select} crop")
-    img.crop(*select.geometry)
-    mainwin.update()
-    history.add(img.arr, "crop")
-    select.reset()
+    logging.info(f"{app.selection} crop")
+    app.img.crop(*app.selection.geometry)
+    app.update()
+    app.history.add(app.img.arr, "crop")
+    app.selection.reset()
 
 
 def circular_mask():
     logging.info("zoom in")
-    select.make_cirk_mask()
-
-
-def zoom_out(x, y):
-    logging.info("zoom out")
-    if mainwin.zoom < 50:
-        old_zoom = mainwin.zoom
-        mainwin.zoom += zoom_step()  #
-        view_wid = img.width / mainwin.zoom
-        print('view_wid', view_wid)
-        mainwin.ofset = [c * mainwin.zoom / old_zoom for c in mainwin.ofset]
-
-#        mainwin.ofset = [x, y]
-        mainwin.update()
-        select.reset()
-
-
-def zoom_in(x, y):
-    ''' zoom in in allowed steps,
-    put pixel with mouse pointer to canvas center'''
-    logging.info("zoom in")
-    if mainwin.zoom > 1:
-        # get canvas center
-        zs = zoom_step()  #
-        mainwin.zoom -= zs
-        ccy, ccx = [mainwin.canvas.winfo_width() / 2,
-                    mainwin.canvas.winfo_height() / 2]
-        magnif_change = 1 + zs / mainwin.zoom
-        # calculate ofset so that center of image is in center of canvas
-        ofset = [ccx - x * magnif_change,
-                 ccy - y * magnif_change]
-        mainwin.ofset = [ofset[0]+mainwin.ofset[0],
-                         ofset[1]+mainwin.ofset[1]]
-        logging.info(f"xy {x} {y} canvas c {ccx} {ccy} ofset {ofset} \
-        mofset {mainwin.ofset} zoom {mainwin.zoom} \
-        zoom step {zoom_step()} magnif_change {magnif_change}")
-
-        mainwin.update()
-        select.reset()
-
-
-def zoom_step():
-    return int(mainwin.zoom**1.5/10+1)
-
+    app.selection.make_cirk_mask()
 
 #  ------------------------------------------
 #  GUI FUNCTIONS
 #  ------------------------------------------
 
 
+def zoom_out(x, y):
+    logging.info("zoom out")
+    if app.zoom < 50:
+        old_zoom = app.zoom
+        app.zoom += zoom_step()  #
+        view_wid = app.img.width / app.zoom
+        print('view_wid', view_wid)
+        app.ofset = [c * app.zoom / old_zoom for c in app.ofset]
+
+#        app.ofset = [x, y]
+        app.update()
+        app.selection.reset()
+
+
+def zoom_in(x, y):
+    ''' zoom in in allowed steps,
+    put pixel with mouse pointer to canvas center'''
+    logging.info("zoom in")
+    if app.zoom > 1:
+        # get canvas center
+        zs = zoom_step()  #
+        app.zoom -= zs
+        ccy, ccx = [app.canvas.winfo_width() / 2,
+                    app.canvas.winfo_height() / 2]
+        magnif_change = 1 + zs / app.zoom
+        # calculate ofset so that center of image is in center of canvas
+        ofset = [ccx - x * magnif_change,
+                 ccy - y * magnif_change]
+        app.ofset = [ofset[0]+app.ofset[0],
+                         ofset[1]+app.ofset[1]]
+        logging.info(f"xy {x} {y} canvas c {ccx} {ccy} ofset {ofset} \
+        mofset {app.ofset} zoom {app.zoom} \
+        zoom step {zoom_step()} magnif_change {magnif_change}")
+
+        app.update()
+        app.selection.reset()
+
+
+def zoom_step():
+    return int(app.zoom**1.5/10+1)
+
+
+def selection_set_left():
+    app.selection.set_left()
+
+
+def selection_set_right():
+    app.selection.set_right()
+
+
 def get_mouse():
     ''' get mouse position relative to canvas top left corner '''
-    x = int(mainwin.canvas.winfo_pointerx() - mainwin.canvas.winfo_rootx())
-    y = int(mainwin.canvas.winfo_pointery() - mainwin.canvas.winfo_rooty())
+    x = int(app.canvas.winfo_pointerx() - app.canvas.winfo_rootx())
+    y = int(app.canvas.winfo_pointery() - app.canvas.winfo_rooty())
     return x, y
 
 
 def hist_toggle():
-    toggle_win(histwin)
+    toggle_win(app.histwin)
 
 
 def stats_toggle():
-    toggle_win(statswin)
+    toggle_win(app.statswin)
 
 
 def keyPressed(event):
@@ -506,181 +517,15 @@ def toggle_win(win):
         win.deiconify()
         win.hidden = False
         win.update()  # works only when not hidden
+
     else:
         win.withdraw()
         win.hidden = True
 
-    mainwin.focus_force()
+    app.focus_set()
+    app.focus_force()
 
 
-def quit_app():
-
-    logging.info("quit app")
-    root.destroy()
-    root.quit()
-#    sys.exit()
-
-
-#  ------------------------------------------
-#  FFT
-#  ------------------------------------------
-
-
-class plotWin(tk.Toplevel):
-
-    def __init__(self, master=None, plot=None, *a, **kw):
-        super().__init__(master)
-        self.title("Numpyshop-plot")
-        self.master = master
-        self.plot = plot
-        self.protocol("WM_DELETE_WINDOW", self.destroy)
-        self.geometry("300x300")
-        self.bind("<Control-s>", self._save)
-        self.bind("<Key>", lambda event: keyPressed(event))
-        self.draw(*a, **kw)
-
-    def _save(self, event):
-        #        self.fig.savefig(str(img.fpath) + "_plot.png")
-        y = self.plot
-        nputils.info(y)
-#        y = nputils.normalize(self.plot)
-        nputils.save_image(y, str(img.fpath) +
-                           "_plot.png", bitdepth=img.bitdepth)
-#    @timeit
-
-    def draw(self, *a, **kw):
-        self.fig = plt.figure(figsize=(5, 5))
-        self.im = plt.imshow(self.plot, cmap='gray',
-                             interpolation=None, *a, **kw)
-        self.ax = self.fig.add_subplot(111)
-
-        self.canvas = FigureCanvasTkAgg(self.fig, master=self)
-        self.canvas.draw()
-        self.canvas.get_tk_widget().pack(side=tk.TOP, fill=tk.BOTH, expand=1)
-
-
-#  ------------------------------------------
-#  HISTOGRAM
-#  ------------------------------------------
-
-
-class histWin(tk.Toplevel):
-    
-    @timeit
-    def __init__(self, master=None, linewidth=1.0):
-        super().__init__(master)
-        self.title("Histogram")
-        self.master = master
-        self.protocol("WM_DELETE_WINDOW", hist_toggle)
-        self.geometry("300x300")
-        self.bind("<Key>", lambda event: keyPressed(event))
-        self.linewidth = linewidth
-        self.bins = SETTINGS["histogram_bins"]
-        self.hidden = SETTINGS["hide_histogram"]
-        self.draw()
-        if self.hidden:
-            self.withdraw()
-            
-    @timeit
-    def draw(self):
-
-        self.fig, self.ax_hist = plt.subplots()
-#        self.ax_hist.set_xticks(np.linspace(0, 1, 11))
-        self.ax_hist.set_xlim(0, 1)
-        self.ax_hist.set_ylim(0, 10)
-#        self.ax_hist.set_title("Histogram")
-
-        # Display histogram
-        self.ax_hist.spines['right'].set_visible(False)
-        self.ax_hist.spines['top'].set_visible(False)
-        self.ax_hist.spines['left'].set_visible(False)
-        self.ax_hist.tick_params(left=False)
-        # self.ax_hist.hist(img.arr.ravel(), bins=self.bins, range=(0, 1),
-                          # density=True, histtype='step', color='black')
-
-        # Display cumulative distribution
-        self.ax_cdf = self.ax_hist.twinx()
-        self.ax_cdf.spines['right'].set_visible(False)
-        self.ax_cdf.spines['top'].set_visible(False)
-        self.ax_cdf.spines['left'].set_visible(False)
-        self.ax_cdf.tick_params(left=False)
-        # img_cdf, bins = exposure.cumulative_distribution(img.arr, self.bins)
-        # self.ax_cdf.plot(bins, img_cdf, 'r')
-        self.ax_cdf.set_yticks([])
-
-        self.fig.tight_layout()
-        self.canvas = FigureCanvasTkAgg(self.fig, master=self)
-        self.canvas.draw()
-        self.canvas.get_tk_widget().pack(side=tk.TOP, fill=tk.BOTH, expand=1)
-#        self.ax_hist.plot(self.x, 0*self.x, color=color)[0]
-
-    def reset(self):
-        self.update()
-
-    @timeit
-    def update(self):
-
-        if self.hidden:
-            return
-
-        self.ax_hist.cla()
-        self.ax_cdf.cla()
-        self.ax_hist.hist(img.arr.ravel(), bins=self.bins, range=(0, 1),
-                          density=True, histtype='step', color='black')
-        img_cdf, bins = exposure.cumulative_distribution(img.arr, self.bins)
-        self.ax_cdf.plot(bins, img_cdf, 'r')
-        self.canvas.draw()
-
-#  ------------------------------------------
-#  STATISTICS
-#  ------------------------------------------
-
-
-class statsWin(tk.Toplevel):
-    @timeit
-    def __init__(self, master=None):
-        super().__init__(master)
-        self.title("Numpyshop-stats")
-        self.master = master
-        self.protocol("WM_DELETE_WINDOW", stats_toggle)
-        self.geometry("150x230")
-        self.bind("<Key>", lambda event: keyPressed(event))
-
-        self.hidden = SETTINGS["hide_stats"]
-        self.frame = tk.Frame(self)
-        if self.hidden:
-            self.withdraw()
-        
-        # self.draw()
-
-    # def draw(self):
-        # self.frame = tk.Frame(self)
-        # self._draw_table()
-
-    @timeit
-    def update(self):
-
-        if self.hidden:
-            return
-        self.frame.grid_forget()
-        self._draw_table()
-
-#    @timeit
-    def _draw_table(self):
-
-        for r, k in enumerate(img.stats):  # loop stats dictionary
-            bg = "#ffffff" if r % 2 else "#ddffee"  # alternating row colors
-            # keys
-            b1 = tk.Label(self.frame, text=k, font=(None, 9),
-                          background=bg, width=9)
-            b1.grid(row=r, column=1)
-
-            # values
-            b2 = tk.Label(self.frame, text=img.stats[k], font=(None, 9),
-                          background=bg, width=9)
-            b2.grid(row=r, column=2)
-
-        self.frame.pack(side=tk.LEFT)
 
 
 #  ------------------------------------------
@@ -688,58 +533,36 @@ class statsWin(tk.Toplevel):
 #  ------------------------------------------
 
 
-class mainWin(tk.Toplevel):
+class App(tk.Toplevel):
 
-    def __init__(self, master=None,  curr_img=None):
+    def __init__(self, master=None,  img_path=None, img_arr=None):
         super().__init__(master)
-        self.img = curr_img
-        # print(curr_img)
+
         self.master = master
-        self.protocol("WM_DELETE_WINDOW", quit_app)
         self.geometry("900x810")
-        self.bind("<Key>", lambda event: keyPressed(event))
-        self.bind("<Escape>", lambda event: select_all())
-        self.bind("<MouseWheel>", self.__wheel)  # windows
-        self.bind("<Button-4>", self.__wheel)  # linux
-        self.bind("<Button-5>", self.__wheel)  # linux
-        self.bind("<Button-1>", self._on_mouse_left)
-        self.bind("<Button-3>", self._on_mouse_right)
+
+        self.img = npimage.npImage(img_path=img_path, img_arr=img_arr)
         self.zoom = 1
-        print("zoom",  self.zoom)
         self.ofset = [0, 0]
-        print("ofset ", self.ofset)
-        if not SETTINGS["hide_toolbar"]:
-            self.buttons_init()
-        self.menu_init()
-        self.canvas_init()
+
+        self.selection = Selection(master=self)
+        self.history = nphistory.History(max_length=CFG["history_steps"])
+        self.histwin = nphistwin.histWin(master=self, hide=CFG["hide_histogram"])
+        self.statswin = npstatswin.statsWin(master=self, hide=CFG["hide_stats"])
+
+        self.history.add(self.img.arr, "orig")
+        self.history.original = self.img.arr.copy()
+
+        self._gui_buttons_init()
+        self._gui_menu_init()
+        self._gui_canvas_init()
+        self._gui_bind_keys()
+
         self.reset()
 
-    def __wheel(self, event):
-        """ Zoom with mouse wheel """
-        x = self.canvas.canvasx(event.x)  # get event coords
-        y = self.canvas.canvasy(event.y)
-        if event.num == 4 or event.delta == +120:
-            zoom_in(x, y)
-        if event.num == 5 or event.delta == -120:
-            zoom_out(x, y)
-
-    def buttons_init(self):
-
-        backgroundColour = "white"
-        buttonWidth = 6
-        buttonHeight = 1
-        self.toolbar = tk.Frame(self)
-
-        for i, b in enumerate(buttons_dict()):
-            button = tk.Button(self.toolbar, text=b[0],
-                               background=backgroundColour, width=buttonWidth,
-                               height=buttonHeight, command=b[1])
-            button.grid(row=i, column=0)
-
-        self.toolbar.pack(side=tk.LEFT)
-
-    def menu_init(self):
-
+    def _gui_menu_init(self):
+        if CFG["hide_toolbar"]:
+            return
         self.menubar = tk.Menu(self)
         tkmenu = {}
         for submenu, items in commands_dict().items():
@@ -750,13 +573,43 @@ class mainWin(tk.Toplevel):
             self.menubar.add_cascade(label=submenu, menu=tkmenu[submenu])
             self.config(menu=self.menubar)
 
-    def canvas_init(self):
+    def _gui_buttons_init(self):
+
+        backgroundColour = "white"
+        buttonWidth = 6
+        buttonHeight = 1
+        self.toolbar = tk.Frame(self)
+
+        for i, b in enumerate(buttons_dict()):
+            button = tk.Button(self.toolbar, text=b[0], font=('Arial Narrow', '10'),
+                               background=backgroundColour, width=buttonWidth,
+                               height=buttonHeight, command=b[1])
+            button.grid(row=i, column=0)
+
+        self.zoom_entry = tk.Entry(self.toolbar, width=buttonWidth, textvariable = self.zoom)
+        self.zoom_entry.grid(row=i+1, column=0)
+
+        self.toolbar.pack(side=tk.LEFT)
+
+    def _gui_bind_keys(self):
+
+        self.protocol("WM_DELETE_WINDOW", self._quit)
+
+        self.bind("<Key>", lambda event: keyPressed(event))
+        self.bind("<Escape>", lambda event: select_all())
+        self.bind("<MouseWheel>", self._mouse_wheel)  # windows
+        self.bind("<Button-4>", self._mouse_wheel)  # linux
+        self.bind("<Button-5>", self._mouse_wheel)  # linux
+        self.bind("<Button-1>", self._mouse_left)
+        self.bind("<Button-3>", self._mouse_right)
+
+    def _gui_canvas_init(self):
         width = 800
         height = 800
         self.canvas = tk.Canvas(self, width=width,
                                 height=height, background="gray")
         self.canvas.pack(fill=tk.BOTH, expand=tk.YES)
-        self.zoom = max(1, min(img.width // 2**9, img.height // 2**9))
+        self.zoom = max(1, min(self.img.width // 2**9, self.img.height // 2**9))
         self.ofset = [0, 0]  # position of image NW corner relative to canvas
 
     @timeit
@@ -781,7 +634,7 @@ class mainWin(tk.Toplevel):
                                               anchor="nw", image=self.view)
 
     def reset(self):
-        self.zoom = max(1, img.width//800,  img.height//800)
+        self.zoom = max(1, self.img.width//800,  self.img.height//800)
         self.ofset = [0, 0]
         # print(f"initial zoom set: {self.zoom}")
         self.update()
@@ -790,21 +643,34 @@ class mainWin(tk.Toplevel):
     def update(self):
         ''' update image '''
         self.draw()
-        self.title(img.properties())
-        histwin.update()
-        statswin.update()
+        self.title(self.img.properties())
+#        self.histwin.update()
+#        self.statswin.update()
 
-    def on_draw(self, event):
-        ''' track current selection coordinates '''
-        self.xlim = self.ax.get_xlim()
-        self.ylim = self.ax.get_ylim()
-        # print(self.xlim,self.ylim)
+    def _mouse_draw(self, event):
+        ''' not implemented '''
 
-    def _on_mouse_left(self, event):
-        select.set_left()
 
-    def _on_mouse_right(self, event):
-        select.set_right()
+    def _mouse_left(self, event):
+        x,y = get_mouse()
+        if x < 0 or y < 0:
+            return
+        self.selection.set_left()
+
+    def _mouse_right(self, event):
+        x,y = get_mouse()
+        if x < 0 or y < 0:
+            return
+        self.selection.set_right()
+
+    def _mouse_wheel(self, event):
+        """ Zoom with mouse wheel """
+        x = self.canvas.canvasx(event.x)  # get event coords
+        y = self.canvas.canvasy(event.y)
+        if event.num == 4 or event.delta == +120:
+            zoom_in(x, y)
+        if event.num == 5 or event.delta == -120:
+            zoom_out(x, y)
 
     @property
     def ofset(self):
@@ -814,10 +680,10 @@ class mainWin(tk.Toplevel):
     def ofset(self, coords):
         ofset = coords
         if hasattr(self, "canvas"):
-            view_wid = img.width / self.zoom
+#            view_wid = self.img.width / self.zoom
             # print('view_wid', view_wid)
-            max_offset = [-img.width / self.zoom + self.canvas.winfo_width(),
-                          -img.height / self.zoom + self.canvas.winfo_height()]
+            max_offset = [-self.img.width / self.zoom + self.canvas.winfo_width(),
+                          -self.img.height / self.zoom + self.canvas.winfo_height()]
             # print('max_offset', max_offset)
             # will whole canvas
             ofset = [max(max_offset[i], c) for i, c in enumerate(ofset)]
@@ -833,16 +699,23 @@ class mainWin(tk.Toplevel):
     def zoom(self, value):
         if value > 0:
             self.__dict__['zoom'] = int(value)
+
+
+    def _quit(self):
+
+        logging.info("quit")
+        self.destroy()
+
 #  ------------------------------------------
 #  Selection
 #  ------------------------------------------
 
 
 class Selection:
-    
+
     @timeit
-    def __init__(self, parent):
-        self.parent = parent
+    def __init__(self, master):
+        self.master = master
         self.geometry = [0, 0, 0, 0]
         self.rect = None
         self.mask = None
@@ -850,9 +723,9 @@ class Selection:
 
     def slice(self):
         ''' recalculate selection by zoom '''
-        x0, y0, x1, y1 = [mainwin.zoom * c for c in self.geometry]
+        x0, y0, x1, y1 = [app.zoom * c for c in self.geometry]
         slice = np.s_[y0:y1, x0:x1, ...]
-        img.slice = slice
+        app.img.slice = slice
 
         return slice
 
@@ -863,19 +736,19 @@ class Selection:
     def set_right(self):
         self.geometry[2:] = list(get_mouse())
         self.draw()
-    
+
     @timeit
     def draw(self):
         self._valid_selection()
 #        print(self.geometry)
-        mainwin.canvas.delete(self.rect)
-        self.rect = mainwin.canvas.create_rectangle(self.geometry)
+        app.canvas.delete(self.rect)
+        self.rect = app.canvas.create_rectangle(self.geometry)
 #        print(self.rect)
         self.slice()
         if self.cirk_mode:
             self.make_cirk_mask()
-        histwin.update()
-    
+#        app.histwin.update()
+
     @timeit
     def _valid_selection(self):
         ''' avoid right corner being before left '''
@@ -889,14 +762,14 @@ class Selection:
         self.draw()
 
     def select_all(self):
-        self.geometry = [0, 0, img.width * mainwin.zoom,
-                         img.height * mainwin.zoom]
+        self.geometry = [0, 0, app.img.width * app.zoom,
+                         app.img.height * app.zoom]
 
 
     def make_cirk_mask(self):
         x0, y0, x1, y1 = self.geometry
         b, a = (x1+x0)/2, (y1+y0)/2
-        nx, ny = img.arr.shape[:2]
+        nx, ny = app.img.arr.shape[:2]
 
         y, x = np.ogrid[-a:nx-a, -b:ny-b]
         # print(y, x)
@@ -916,7 +789,7 @@ class Selection:
 if __name__ == '__main__':
 
     logging.basicConfig(level=10, format='%(relativeCreated)d !%(levelno)s [%(module)10s%(lineno)4d]\t%(message)s')
-    
+
     # get filename from command line argument or sample
     if len(sys.argv) > 1:
         Fp = Path(sys.argv[1].strip("'").strip('"'))
@@ -928,24 +801,8 @@ if __name__ == '__main__':
     root.title("Npyshop")
     root.withdraw()  # root win is hidden
 
-    history = History(max_length=SETTINGS["history_steps"])
-
-    # load image into numpy array
-    img = npImage(Fp)
-    history.add(img.arr, "orig")
-    history.original = img.arr.copy()
-
-    logging.info("image loaded")
-
-    select = Selection(root)
-    logging.info(select)
-
-    histwin = histWin(root)
-
-    statswin = statsWin(root)
-
-    mainwin = mainWin(root, curr_img=img)
-    mainwin.focus_set()
+    app = App(root, img_path=Fp)
+    app.focus_set()
 
     logging.info(f"mainloop in {time.time()-time0}")
 

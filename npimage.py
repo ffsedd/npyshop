@@ -16,9 +16,9 @@ FILETYPES = ['jpeg', 'bmp', 'png', 'tiff']
 
 class npImage():
 
-    def __init__(self, fpath=None, arr=None):
-        self.fpath = fpath
-        self.arr = arr
+    def __init__(self, img_path=None, img_arr=None):
+        self.fpath = img_path
+        self.arr = img_arr
         self.bitdepth = None
         self.original = None
         self.slice = np.s_[:, :, ...]
@@ -26,21 +26,21 @@ class npImage():
         self.filesize = 0
 
 
-        if fpath:
-            self.load(fpath)
-            
+        if img_path:
+            self.load(img_path)
+
 
         logging.info(f"bitdepth {self.bitdepth}")
-#        self.info()           
+#        self.info()
 
-    
+
     @timeit
     def properties(self):
         return f"{self.fpath}      |  {self.bitdepth}bit {self.filetype}  |  {self.filesize/2**20:.2f} MB  |  {self.width} x {self.height} x {self.channels}  | color:{self.color_model}"
 
     def __repr__(self):
         return self.properties()
-    
+
     @timeit
     def check_filetype(self):
         filetype = imghdr.what(self.fpath)
@@ -50,7 +50,7 @@ class npImage():
     @property
     def channels(self):
         return 1 if self.arr.ndim == 2 else self.arr.shape[2]
-        
+
     @property
     def color_model(self):
         return self.__dict__['color_model']
@@ -67,13 +67,13 @@ class npImage():
             self.arr = rgb_to_hsv(self.arr)
             # print("v max",self.arr[:,:,2].max())
         elif model == 'gray':  # RGB/HSV -> GRAY
-            self.color_model = 'hsv'  # convert to hsv 
+            self.color_model = 'hsv'  # convert to hsv
             self.arr = self.arr[:,:,2] # use value only
-        elif model == 'rgb' and self.color_model == 'gray':  # GRAY -> RGB 
+        elif model == 'rgb' and self.color_model == 'gray':  # GRAY -> RGB
             self.arr = np.stack((self.arr)*3, axis=-1)
-        elif model == 'hsv' and self.color_model == 'gray':  # GRAY -> HSV 
+        elif model == 'hsv' and self.color_model == 'gray':  # GRAY -> HSV
             self.arr = np.stack((np.zeros_like(self.arr))*2, self.arr, axis=-1)
-            
+
         self.__dict__['color_model'] = model  # conversion done, update mode
 
     @timeit
@@ -85,7 +85,7 @@ class npImage():
             return
 
         logging.info(f"open file {fpath}")
-        
+
         Fpath = Path(fpath)
 
 
@@ -99,17 +99,17 @@ class npImage():
 
         self.arr = nputils.load_image(Fpath)
         self.bitdepth = nputils.get_bitdepth(self.arr)
-        self.__dict__['color_model'] = 'rgb' if self.channels == 3 else 'gray' 
-        
+        self.__dict__['color_model'] = 'rgb' if self.channels == 3 else 'gray'
+
         self.arr = nputils.int_to_float(self.arr)  # convert to float
         # self.original = self.arr.copy()
-        
+
     def get_selection(self):
         return self.arr[self.slice]
-        
+
     def set_selection(self,  y):
         self.arr[self.slice] = y
-        
+
     @timeit
     def rgb2gray(self):
         if self.arr.ndim > 2:
@@ -159,7 +159,7 @@ class npImage():
         '''
         # self.arr = ndimage.rotate(self.arr, angle=-90, reshape=True)
         self.arr = np.rot90(self.arr, -k, axes=(0, 1))
-    
+
     @timeit
     def free_rotate(self, angle):
         ''' rotate array
