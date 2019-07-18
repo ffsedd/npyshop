@@ -5,7 +5,6 @@ import logging
 from pathlib import Path
 from send2trash import send2trash
 from tkinter import filedialog
-#from matplotlib.colors import rgb_to_hsv, hsv_to_rgb  # normalizes
 from matplotlib.colors import rgb_to_hsv, hsv_to_rgb
 import nputils
 
@@ -16,7 +15,7 @@ FILETYPES = ['jpeg', 'bmp', 'png', 'tiff']
 
 class npImage():
 
-    def __init__(self, img_path=None, img_arr=None):
+    def __init__(self, img_path=None, img_arr=None, fft=None):
         self.fpath = img_path
         self.arr = img_arr
         self.bitdepth = None
@@ -24,7 +23,8 @@ class npImage():
         self.slice = np.s_[:, :, ...]
         self.filetype = None
         self.filesize = 0
-
+        self.color_model = 'gray'
+        self.fft = None
 
         if img_path:
             self.load(img_path)
@@ -51,13 +51,8 @@ class npImage():
     def channels(self):
         return 1 if self.arr.ndim == 2 else self.arr.shape[2]
 
-    @property
-    def color_model(self):
-        return self.__dict__['color_model']
 
-    @color_model.setter
-    def color_model(self, model):
-
+    def color_model_change(self, model):
         if model == self.color_model:  # do not change anything
             return
         elif model == 'rgb' and self.color_model == 'hsv':  # HSV -> RGB
@@ -74,7 +69,7 @@ class npImage():
         elif model == 'hsv' and self.color_model == 'gray':  # GRAY -> HSV
             self.arr = np.stack((np.zeros_like(self.arr))*2, self.arr, axis=-1)
 
-        self.__dict__['color_model'] = model  # conversion done, update mode
+        self.color_model = model  # conversion done, update mode
 
     @timeit
     def load(self, fpath=None):
@@ -99,7 +94,7 @@ class npImage():
 
         self.arr = nputils.load_image(Fpath)
         self.bitdepth = nputils.get_bitdepth(self.arr)
-        self.__dict__['color_model'] = 'rgb' if self.channels == 3 else 'gray'
+        self.color_model = 'rgb' if self.channels == 3 else 'gray'
 
         self.arr = nputils.int_to_float(self.arr)  # convert to float
         # self.original = self.arr.copy()
@@ -183,33 +178,6 @@ class npImage():
         self.arr = self.arr[self.slice]
 #        self.info() # slow
 
-    def fft(self):
-        from scipy import fftpack
-        # Take the fourier transform of the image.
-        y = self.arr * 255
-        nputils.info(y)
-        F1 = fftpack.fft2(y)
-        nputils.info(F1)
-        # Now shift the quadrants around so that low spatial frequencies are in
-        # the center of the 2D fourier transformed image.
-        F2 = np.fft.fftshift(F1).real
-        nputils.info(F2)
-        ftimage = np.abs(F2)
-        ftimage = np.log(ftimage)
-        nputils.info(ftimage)
-        return ftimage
-
-    def ifft(self):
-        nputils.info(self.arr)
-        F2 = np.exp(self.arr)
-        nputils.info(F2)
-        F1 = np.fft.ifftshift(F2)
-        img = np.fft.ifft2(F1).real
-        nputils.info(img)
-        img = img / 255
-        nputils.info(img)
-
-        return img
 
 
     def info(self):
@@ -244,3 +212,42 @@ class npImage():
             "mean": round(self.arr[self.slice].mean(), 2),
             "std_dev": round(self.arr[self.slice].std(), 2),
         }
+
+    def make_fft(self):
+        from scipy import fftpack
+        # Take the fourier transform of the image.
+        y = 255 * self.arr
+    #    nputils.info(y, "orig")
+        F1 = fftpack.fft2(y)
+    #    nputils.info(F1, "F1")
+        # Now shift the quadrants around so that low spatial frequencies are in
+        # the center of the 2D fourier transformed image.
+        F2 = fftpack.fftshift(F1)
+
+    #    nputils.info(F2, "F2")
+        y = 20 * np.log10(np.abs(F2.real) + .1)
+    #    nputils.info(y, "FFT")
+        y /= 255
+        self.fft = F2
+        self.arr = y
+        logging.info("fft created")
+
+
+    def make_ifft(self):
+        if self.fft is None:
+            logging.info("no fft image")
+            return
+
+        from scipy import fftpack
+        F2 = self.fft
+        F1 = fftpack.ifftshift(F2)
+        y = fftpack.ifft2(F1).real
+        y = nputils.normalize(y)
+        self.arr = y
+        self.fft = None
+
+    def fft_toggle(self):
+        if self.fft is None:
+            self.make_fft()
+        else:
+            self.make_ifft()

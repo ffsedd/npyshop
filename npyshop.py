@@ -7,6 +7,8 @@ import os
 import tkinter as tk
 import numpy as np
 from pathlib import Path
+from functools import wraps
+#import inspect
 
 from PIL import Image, ImageTk
 
@@ -15,7 +17,6 @@ from skimage import img_as_ubyte
 
 import npimage
 import nphistory
-import nputils
 import npfilters
 import nphistwin
 import npstatswin
@@ -27,28 +28,27 @@ print("imports done")
 
 '''
 RESOURCES:
-image operations:
-    https://homepages.inf.ed.ac.uk/rbf/HIPR2/wksheets.htm
-    https://web.cs.wpi.edu/~emmanuel/courses/cs545/S14/slides/lecture02.pdf
-
+ * Image operations:
+      https://homepages.inf.ed.ac.uk/rbf/HIPR2/wksheets.htm
+      https://web.cs.wpi.edu/~emmanuel/courses/cs545/S14/slides/lecture02.pdf
+ * Fourier transform
+      https://www.cs.unm.edu/~brayer/vision/fourier.html
+      http://www.imagemagick.org/Usage/fourier/
 
 BUGS:
 
 
 TODO:
 
-    repeat command
-    
-    command parameters to history
-    
-    command history to text file or iptc?
-    
-    circular selection
-    
-    view area - crop before showing?
-    editable FFT - new app
 
-    apply clipping only when necessary
+    command parameters to history
+
+    command history to text file or iptc?
+
+    repeat command
+
+    circular selection
+
 
 '''
 
@@ -89,6 +89,7 @@ def commands_dict():
                 ("Rotate_180", "u", rotate_180),
                 ("Free Rotate", "f", free_rotate),
                 ("rgb2gray", "b", rgb2gray),
+                ("FFT toggle", "F", fft_toggle),
             ],
         "Selection":
             [
@@ -112,8 +113,6 @@ def commands_dict():
                 ("Clip dark", "d", clip_low),
                 ("Tres light", "L", tres_high),
                 ("Tres dark", "D", tres_low),
-                ("FFT", "F", fft),
-                ("iFFT", "Control-F", ifft),
                 ("delete", "Delete", delete),
                 ("fill", "Insert", fill),
             ],
@@ -205,6 +204,8 @@ def undo():
     if prev:
         app.img.arr = prev['arr'].copy()
         app.update()
+        app.histwin.update()
+        app.statswin.update()
 
 
 def redo():
@@ -213,6 +214,8 @@ def redo():
     if nex:
         app.img.arr = nex['arr'].copy()
         app.update()
+        app.histwin.update()
+        app.statswin.update()
 
 #  ------------------------------------------
 #  IMAGE
@@ -221,12 +224,14 @@ def redo():
 
 def edit_image(func):
     ''' decorator :
-   ly changes, update gui and history '''
+       apply changes, update gui and history '''
+    @wraps(func)
     def wrapper(*args, **kwargs):
         logging.info(func.__name__)
         func(*args, **kwargs)
+        logging.debug(f"edit_image {func.__name__} {args} {kwargs}")
+        app.history.add(app.img.arr,  func.__name__, *args, **kwargs)
         app.update()
-        app.history.add(app.img.arr,  func.__name__)
         app.selection.reset()
     return wrapper
 
@@ -257,6 +262,11 @@ def rgb2gray():
     app.img.rgb2gray()
 
 
+@edit_image
+def fft_toggle():
+    app.img.fft_toggle()
+
+
 #  ------------------------------------------
 #  SELECTION
 #  ------------------------------------------
@@ -267,12 +277,13 @@ def select_all():
 
 def edit_selected(func):
     ''' decorator :
-   load selection, ly changes, save to image, update gui and history '''
+    load selection, ly changes, save to image, update gui and history '''
+    @wraps(func)
     def wrapper(*args, **kwargs):
-        print("edit_selected: ", func.__name__)
         y = app.img.get_selection()
         try:
             y = func(y, *args, **kwargs)
+            app.history.add(app.img.arr,  func.__name__)
         except Exception as e:
             print(e) # ignore error (eg. dialog cancel)
             return
@@ -280,7 +291,7 @@ def edit_selected(func):
         app.update()
         app.histwin.update()
         app.statswin.update()
-        app.history.add(app.img.arr,  func.__name__)
+#        app.history.add(app.img.arr,  func.__name__)
         logging.info("added to history")
     return wrapper
 
@@ -337,29 +348,16 @@ def equalize(y):
 
 @edit_selected
 def fill(y):
-    f = askfloat("Fill with:", initialvalue=0)
+    f = askfloat("Fill with:", initialvalue=1)
     return npfilters.fill(y, f)
 
 
 @edit_selected
 def delete(y):
-    return npfilters.fill(y, 1)
-
-
-@edit_selected
-def fft():
-    fft_arr = app.img.fft()
-    fft_img = npimage.npImage(arr=fft_arr)
-    fft_img.arr = nputils.normalize(fft_img.arr)
-    app(master=root,  img_arr=fft_img)
-
-
-@edit_selected
-def ifft():
-    ifft_arr = app.img.ifft()
-    ifft_img = npimage.npImage(arr=ifft_arr)
-    ifft_img.arr = nputils.normalize(ifft_img.arr)
-    app(master=root,  img_arr=ifft_img)
+    if app.img.fft is not None:
+        print(app.selection.slice())
+        app.img.fft[app.selection.slice()] = 0
+    return npfilters.fill(y, 0)
 
 
 @edit_selected
@@ -530,13 +528,13 @@ def toggle_win(win):
 
 class App(tk.Toplevel):
 
-    def __init__(self, master=None,  img_path=None, img_arr=None):
+    def __init__(self, master=None,  img_path=None, img_arr=None, fft=None):
         super().__init__(master)
 
         self.master = master
         self.geometry("900x810")
 
-        self.img = npimage.npImage(img_path=img_path, img_arr=img_arr)
+        self.img = npimage.npImage(img_path=img_path, img_arr=img_arr, fft=fft)
         self.zoom_var = tk.StringVar()
         self.zoom = 1
         self.ofset = [0, 0]
@@ -613,13 +611,14 @@ class App(tk.Toplevel):
         self.ofset = [0, 0]  # position of image NW corner relative to canvas
 
     @timeit
-    def make_image_view(self):
+    def _make_image_view(self):
 
         logging.info(self.img.arr.shape)
         logging.info(self.zoom)
 
         view = self.img.arr[::self.zoom, ::self.zoom, ...]
         self.view_shape = view.shape[:2]
+        view = np.clip(view,0,1)
 
         view = img_as_ubyte(view)
         view = Image.fromarray(view)
@@ -628,7 +627,7 @@ class App(tk.Toplevel):
     @timeit
     def draw(self):
         ''' draw new image '''
-        self.make_image_view()
+        self._make_image_view()
         print("ofset ", self.ofset)
         self.image = self.canvas.create_image(self.ofset[0], self.ofset[1],
                                               anchor="nw", image=self.view)

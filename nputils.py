@@ -93,8 +93,8 @@ def plti(im, name="", plot_axis=False, vmin=0, vmax=1, **kwargs):
     plt.show()
 
 
-def info(y):
-    logging.info(f"{y.dtype}\t{str(y.shape)}\t<{y.min():.3f} \
+def info(y, title=''):
+    logging.info(f"npinfo: {title}\t {y.dtype}\t{str(y.shape)}\t<{y.min():.3f} \
             {y.mean():.3f} {y.max():.3f}> ({y.std():.3f})\t{type(y)} ")
 
 

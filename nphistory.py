@@ -1,9 +1,13 @@
 #!/usr/bin/env python3
 from collections import deque
 import logging
-#import inspect
+
+
 
 class History():
+
+
+
 
     def __init__(self, max_length=10):
         self.max_length = max_length
@@ -14,18 +18,20 @@ class History():
 #        self.log = []
 
     def __repr__(self):
-        undo = [i['func_name'] for i in self.undo_queue]
+        undo = [(i['func_name']) for i in self.undo_queue]
         redo = [i['func_name'] for i in self.redo_queue]
         return "undo:" + str(undo) + "\nredo:" +  str(redo)
 
 
-    def add(self, arr,  func_name):
+    def add(self, arr, func_name):
         ''' add array to history, discard redo '''
         if self.max_length == 0:
             logging.debug("history disabled")
             return
 
-        self.undo_queue.append({'func_name' : func_name, 'arr' : arr.copy() })
+        self.undo_queue.append({'func_name' : func_name,
+                                'arr' : arr.copy(),
+                                })
         self.redo_queue.clear()  # discard redo queue
         logging.debug(f"added to history: {func_name}, len:{len(self.undo_queue)}")
         logging.info(self)
