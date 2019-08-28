@@ -2,6 +2,7 @@
 # -*- coding: utf-8 -*-
 
 import logging
+import re
 
 import numpy as np
 
@@ -16,6 +17,8 @@ from matplotlib.colors import rgb_to_hsv, hsv_to_rgb
 
 from testing.timeit import timeit
 
+from PIL import Image
+Image.MAX_IMAGE_PIXELS = 933120000
 
 def rgb2gray(rgb):
     return np.dot(rgb[..., :3], [0.2989, 0.5870, 0.1140])
@@ -114,6 +117,14 @@ def create_circular_mask(h, w, center=None, radius=None):
 
 
 
+def natural_sort_key(s, _nsre=re.compile('([0-9]+)')):
+    ''' key for sorted function to get natural sort, eg 2.jpg, 11.jpg, ...
+    use: files = sorted(files, key=natural_sort_key)
+    str(s) added to support pathlib Path
+    '''
+    
+    return [int(text) if text.isdigit() else text.lower()
+            for text in _nsre.split(str(s))] 
 
 
 # MAKE FILTERS WORK WITH RGB

@@ -8,12 +8,10 @@ import tkinter as tk
 import numpy as np
 from pathlib import Path
 from functools import wraps
-#import inspect
 
 from PIL import Image, ImageTk
 
 from skimage import img_as_ubyte
-# from skimage import exposure  # histogram plotting, equalizing
 
 import npimage
 import nphistory
@@ -21,6 +19,8 @@ import npfilters
 import nphistwin
 import npstatswin
 from npgui import askfloat
+from tkinter import filedialog
+from npfilelist import FileList
 from testing.timeit import timeit
 
 time0 = time.time()
@@ -41,6 +41,23 @@ BUGS:
 TODO:
 
 
+Menu items have an accelerator attribute specifically for this purpose:
+
+accelerator Specifies a string to display at the right side of the menu entry. Normally describes an accelerator keystroke sequence that may be typed to invoke the same function as the menu entry. This option is not available for separator or tear-off entries.
+
+self.file_menu.add_command(..., accelerator="Ctrl+S")
+
+
+
+move command functions inside app class? is it possible to decorate them?
+
+
+
+
+    load menu items from csv?
+    
+    underline _File _View ...
+
     command parameters to history
 
     command history to text file or iptc?
@@ -59,6 +76,7 @@ CFG = {
     "hide_stats": True,
     "histogram_bins": 256,
     "history_steps": 10,     # memory !!!
+    "image_extensions" : [".jpg", ".jpeg", ".png", ".tif", ".tiff", ".gif"],
 
 }
 
@@ -72,6 +90,10 @@ def commands_dict():
                 ("Save", "S", save),
                 ("Save as", "s", save_as),
                 ("Save as png", "P", save_as_png),
+                ("Previous", "Left", load_previous),
+                ("Next", "Right", load_next),
+                ("Next", "Up", load_first),
+                ("Next", "Down", load_last),
 
             ],
         "History":
@@ -93,8 +115,7 @@ def commands_dict():
             ],
         "Selection":
             [
-                ("Select left corner", "comma", selection_set_left),
-                ("Select right corner", "period", selection_set_right),
+                ("Select all", "Control-a", select_all),
                 ("Flip", ")", flip),
                 ("Mirror", "(", mirror),
                 ("Gamma", "g", gamma),
@@ -144,19 +165,43 @@ def buttons_dict():
     ]
 
 
+
+
 #  ------------------------------------------
 #  FILE
 #  ------------------------------------------
 
 def load(fp=None):
     logging.info("open")
+
+    if not fp:
+        logging.info("fpath input dialog")
+        fp = filedialog.askopenfilename()
+    if not fp:
+        return
+
     app.img.load(fp)
+    app.filelist = FileList(fp, extensions=CFG["image_extensions"])
     os.chdir(app.img.fpath.parent)
+    app.history = nphistory.History(max_length=CFG["history_steps"]) # reset history
     app.history.original = app.img.arr.copy()
     app.history.add(app.img.arr, "load")
     app.title(app.img.fpath)
     app.reset()
     app.histwin.update()
+
+
+def load_next():
+    load(app.filelist.next)
+
+def load_previous():
+    load(app.filelist.previous)
+
+def load_first():
+    load(app.filelist.first)
+
+def load_last():
+    load(app.filelist.last)
 
 
 def save():
@@ -285,7 +330,7 @@ def edit_selected(func):
             y = func(y, *args, **kwargs)
             app.history.add(app.img.arr,  func.__name__)
         except Exception as e:
-            print(e) # ignore error (eg. dialog cancel)
+            logging.info(e) # ignore error (eg. dialog cancel)
             return
         app.img.set_selection(y)
         app.update()
@@ -355,7 +400,7 @@ def fill(y):
 @edit_selected
 def delete(y):
     if app.img.fft is not None:
-        print(app.selection.slice())
+        logging.info(app.selection.slice())
         app.img.fft[app.selection.slice()] = 0
     return npfilters.fill(y, 0)
 
@@ -438,7 +483,7 @@ def zoom_out(x=0, y=0):
         old_zoom = app.zoom
         app.zoom += zoom_step()  #
         view_wid = app.img.width / app.zoom
-        print('view_wid', view_wid)
+        logging.info(f'view_wid {view_wid}')
         app.ofset = [c * app.zoom / old_zoom for c in app.ofset]
 
 #        app.ofset = [x, y]
@@ -472,14 +517,6 @@ def zoom_in(x=0, y=0):
 
 def zoom_step():
     return int(app.zoom**1.5/10+1)
-
-
-def selection_set_left():
-    app.selection.set_left()
-
-
-def selection_set_right():
-    app.selection.set_right()
 
 
 def get_mouse():
@@ -533,8 +570,8 @@ class App(tk.Toplevel):
 
         self.master = master
         self.geometry("900x810")
-
         self.img = npimage.npImage(img_path=img_path, img_arr=img_arr, fft=fft)
+        self.filelist = FileList(img_path, extensions=CFG["image_extensions"])
         self.zoom_var = tk.StringVar()
         self.zoom = 1
         self.ofset = [0, 0]
@@ -549,7 +586,8 @@ class App(tk.Toplevel):
         self.history.add(self.img.arr, "orig")
         self.history.original = self.img.arr.copy()
 
-        self._gui_buttons_init()
+        self._gui_toolbar_init()
+        
         self._gui_menu_init()
         self._gui_canvas_init()
         self._gui_bind_keys()
@@ -569,24 +607,33 @@ class App(tk.Toplevel):
             self.menubar.add_cascade(label=submenu, menu=tkmenu[submenu])
             self.config(menu=self.menubar)
 
-    def _gui_buttons_init(self):
+        
+        
+    def _gui_toolbar_init(self):
 
         backgroundColour = "white"
         buttonWidth = 6
         buttonHeight = 1
+        
         self.toolbar = tk.Frame(self)
-
+        tk.Label(self.toolbar, width=buttonWidth, text="gamma").pack(side="top")
+        self.gamma_view_value = tk.DoubleVar(value=1)
+        
+        self.gamma_view = tk.Spinbox(self.toolbar, textvariable=self.gamma_view_value, from_= 0, to = 10, format="%.2f", increment=0.1, width = 5)
+        self.gamma_view.pack(side="top")
+        
         self.zoom_label = tk.Label(
             self.toolbar, width=buttonWidth, textvariable=self.zoom_var)
-        self.zoom_label.grid(row=0, column=0)
+        self.zoom_label.pack(side="top")
 
         for i, b in enumerate(buttons_dict()):
             button = tk.Button(self.toolbar, text=b[0], font=('Arial Narrow', '10'),
                                background=backgroundColour, width=buttonWidth,
                                height=buttonHeight, command=b[1])
-            button.grid(row=i+1, column=0)
+            button.pack(side="top")
 
-        self.toolbar.pack(side=tk.LEFT)
+        self.toolbar.pack(side="left")        
+        
 
     def _gui_bind_keys(self):
 
@@ -597,8 +644,12 @@ class App(tk.Toplevel):
         self.bind("<MouseWheel>", self._mouse_wheel)  # windows
         self.bind("<Button-4>", self._mouse_wheel)  # linux
         self.bind("<Button-5>", self._mouse_wheel)  # linux
-        self.bind("<Button-1>", self._mouse_left)
-        self.bind("<Button-3>", self._mouse_right)
+        self.bind("<Control-Button-1>", lambda event: self.selection.set_border(b="NW"))
+        self.bind("<Control-Button-3>", lambda event: self.selection.set_border(b="SE"))
+        self.bind("<Control-Left>", lambda event: self.selection.set_border(b="W"))
+        self.bind("<Control-Right>", lambda event: self.selection.set_border(b="E"))
+        self.bind("<Control-Up>", lambda event: self.selection.set_border(b="N"))
+        self.bind("<Control-Down>", lambda event: self.selection.set_border(b="S"))
 
     def _gui_canvas_init(self):
         width = 800
@@ -618,24 +669,35 @@ class App(tk.Toplevel):
 
         view = self.img.arr[::self.zoom, ::self.zoom, ...]
         self.view_shape = view.shape[:2]
-        view = np.clip(view,0,1)
-
-        view = img_as_ubyte(view)
-        view = Image.fromarray(view)
+        
+        view = self._apply_view_filters(view)
+        view = Image.fromarray(img_as_ubyte(np.clip(view,0,1)))
+        
         self.view = ImageTk.PhotoImage(view, master=self)
 
+    @timeit
+    def _apply_view_filters(self, view):
+        
+        # gamma
+        g = self.gamma_view_value.get()
+        if g != 1:
+            view = npfilters.gamma(view, g)
+            
+        return view
+    
+    
     @timeit
     def draw(self):
         ''' draw new image '''
         self._make_image_view()
-        print("ofset ", self.ofset)
+        logging.info(f"ofset {self.ofset}")
         self.image = self.canvas.create_image(self.ofset[0], self.ofset[1],
                                               anchor="nw", image=self.view)
 
     def reset(self):
         self.zoom = max(1, self.img.width//800,  self.img.height//800)
         self.ofset = [0, 0]
-        # print(f"initial zoom set: {self.zoom}")
+        # logging.info(f"initial zoom set: {self.zoom}")
         self.update()
 
     @timeit
@@ -649,17 +711,17 @@ class App(tk.Toplevel):
     def _mouse_draw(self, event):
         ''' not implemented '''
 
-    def _mouse_left(self, event):
-        x, y = get_mouse()
-        if x < 0 or y < 0:
-            return
-        self.selection.set_left()
+    # def _mouse_select_left(self, event):
+        # x, y = get_mouse()
+        # if x < 0 or y < 0:
+            # return
+        # self.selection.set_topleft()
 
-    def _mouse_right(self, event):
-        x, y = get_mouse()
-        if x < 0 or y < 0:
-            return
-        self.selection.set_right()
+    # def _mouse_select_right(self, event):
+        # x, y = get_mouse()
+        # if x < 0 or y < 0:
+            # return
+        # self.selection.set_bottomright()
 
     def _mouse_wheel(self, event):
         """ Zoom with mouse wheel """
@@ -679,10 +741,9 @@ class App(tk.Toplevel):
         ofset = coords
         if hasattr(self, "canvas"):
             #            view_wid = self.img.width / self.zoom
-            # print('view_wid', view_wid)
             max_offset = [-self.img.width / self.zoom + self.canvas.winfo_width(),
                           -self.img.height / self.zoom + self.canvas.winfo_height()]
-            # print('max_offset', max_offset)
+
             # will whole canvas
             ofset = [max(max_offset[i], c) for i, c in enumerate(ofset)]
         ofset = [min(0, c) for c in ofset]  # only allow negative ofset
@@ -711,7 +772,6 @@ class App(tk.Toplevel):
 
 class Selection:
 
-    @timeit
     def __init__(self, master):
         self.master = master
         self.geometry = [0, 0, 0, 0]
@@ -726,34 +786,43 @@ class Selection:
         app.img.slice = slice
 
         return slice
-
-    def set_left(self):
-        self.geometry[:2] = list(get_mouse())
+       
+    def set_border(self, b="", *args, **kwargs):
+        if "N" in b:
+            self.geometry[1] = list(get_mouse())[1]   
+        if "E" in b:
+            self.geometry[2] = list(get_mouse())[0]   
+        if "S" in b:
+            self.geometry[3] = list(get_mouse())[1]   
+        if "W" in b:
+            self.geometry[0] = list(get_mouse())[0]   
         self.draw()
-
-    def set_right(self):
-        self.geometry[2:] = list(get_mouse())
-        self.draw()
-
-    @timeit
+        
     def draw(self):
-        self._valid_selection()
-#        print(self.geometry)
+        self._validate_selection()
         app.canvas.delete(self.rect)
         self.rect = app.canvas.create_rectangle(self.geometry, outline='red')
-#        print(self.rect)
         self.slice()
         if self.cirk_mode:
             self.make_cirk_mask()
 
-    @timeit
-    def _valid_selection(self):
-        ''' avoid right corner being before left '''
-#        if len(self.geometry) == 4:
+    def _validate_selection(self):
+        
+        # avoid right corner being before left
         geomx = sorted(self.geometry[0::2])
         geomy = sorted(self.geometry[1::2])
-        self.geometry = [geomx[0], geomy[0], geomx[1], geomy[1]]
-
+        
+        # keep selection in image
+        x0, y0, x1, y1 = geomx[0], geomy[0], geomx[1], geomy[1]
+        x0 = max(x0, 0) 
+        y0 = max(y0, 0) 
+        xmax, ymax = app.img.width * app.zoom, app.img.height * app.zoom
+        x1 = min(x1, xmax)
+        y1 = min(y1, ymax)
+        self.geometry = [x0, y0, x1, y1]
+        self.area = (x1 - x0) * (y1 - y0)
+        print(f"selection area {self.area} pixels")
+        
     def reset(self):
         self.select_all()
         self.draw()
@@ -768,9 +837,7 @@ class Selection:
         nx, ny = app.img.arr.shape[:2]
 
         y, x = np.ogrid[-a:nx-a, -b:ny-b]
-        # print(y, x)
         radius = x0 - b
-        # print(radius)
         mask = x*x + y*y <= radius*radius
 
         return mask
@@ -784,8 +851,9 @@ class Selection:
 
 if __name__ == '__main__':
 
-    logging.basicConfig(
-        level=10, format='%(relativeCreated)d !%(levelno)s [%(module)10s%(lineno)4d]\t%(message)s')
+    logging.basicConfig(filename='npyshop.log', filemode='w', 
+        level=20, 
+        format='%(relativeCreated)d !%(levelno)s [%(module)10s%(lineno)4d]\t%(message)s')
 
     # get filename from command line argument or sample
     if len(sys.argv) > 1:

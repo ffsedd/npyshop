@@ -20,7 +20,7 @@ class History():
     def __repr__(self):
         undo = [(i['func_name']) for i in self.undo_queue]
         redo = [i['func_name'] for i in self.redo_queue]
-        return "undo:" + str(undo) + "\nredo:" +  str(redo)
+        return "undo: " + str(undo) + " redo: " +  str(redo)
 
 
     def add(self, arr, func_name):
