@@ -1,6 +1,5 @@
 #!/usr/bin/env python3
 import numpy as np
-import nputils
 
 def clip_result(func):
     ''' decorator to ensure result in limits 0..1 '''
@@ -101,15 +100,17 @@ def clip_low(y, f):
     return y
 
 
-def sigma(y, sigma=2):
-    """ s shaped curve """
-    y = np.tanh((y - .5) * sigma) / 2 + .5
+def sigmoid(y, gain=1, center=0.5):
+    """ s shaped curve - increase contrast """
+    y = (1 + np.exp(-gain * (y - center)))**(-1)
+    #y = np.tanh((y - .5) * sigma) / 2 + .5
     return y
 
 
-
-
-
+def logit(y, gain=1, center=0.5):
+    """ n shaped curve - decrease contrast"""
+    y = - np.log((y - center)**(-1) - 1) / gain
+    return y
 
 
 def high_pass(y, sigma):

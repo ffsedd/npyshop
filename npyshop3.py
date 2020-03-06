@@ -127,7 +127,7 @@ def commands_dict():
                 ("Contrast", "c", contrast),
                 ("Add", "a", add),
                 ("Invert", "i", invert),
-                ("Sigmoid", "I", sigmoid),
+                ("Sigma", "I", sigma),
                 ("Unsharp mask", "M", unsharp_mask),
                 ("Blur", "B", blur),
                 ("Highpass", "H", highpass),
@@ -142,16 +142,16 @@ def commands_dict():
             [
                 ("Histogram", "h", hist_toggle),
                 ("Stats", "t", stats_toggle),
-#                ("Zoom in", "KP_Add", app.zoom_in),
-#                ("Zoom out", "KP_Subtract", app.zoom_out),
+                ("Zoom in", "KP_Add", zoom_in),
+                ("Zoom out", "KP_Subtract", zoom_out),
             ],
     }
 
 
 def buttons_dict():
     return [
-#        ("+", app.zoom_in),
-#        ("-", app.zoom_out),
+        ("+", zoom_in),
+        ("-", zoom_out),
         ("Open", load),
         ("Save as", save_as),
         ("Undo", undo),
@@ -426,9 +426,9 @@ def highpass(y):
 
 
 @edit_selected
-def sigmoid(y):
-    f = askfloat("Increase contrast with S-shape curve: (5-10)", initialvalue=5)
-    return npfilters.sigmoid(y, gain=f)
+def sigma(y):
+    f = askfloat("S-shape curve:", initialvalue=3)
+    return npfilters.sigma(y, f)
 
 
 @edit_selected
@@ -477,6 +477,47 @@ def circular_mask():
 #  GUI FUNCTIONS
 #  ------------------------------------------
 
+
+def zoom_out(x=0, y=0):
+    logging.info("zoom out")
+    if app.zoom < 50:
+        old_zoom = app.zoom
+        app.zoom += zoom_step()  #
+        view_wid = app.img.width / app.zoom
+        logging.info(f'view_wid {view_wid}')
+        app.ofset = [c * app.zoom / old_zoom for c in app.ofset]
+
+#        app.ofset = [x, y]
+        app.update()
+        app.selection.reset()
+
+
+def zoom_in(x=0, y=0):
+    ''' zoom in in allowed steps,
+    put pixel with mouse pointer to canvas center'''
+    logging.info("zoom in")
+    if app.zoom > 1:
+        # get canvas center
+        zs = zoom_step()  #
+        app.zoom -= zs
+        ccy, ccx = [app.canvas.winfo_width() / 2,
+                    app.canvas.winfo_height() / 2]
+        magnif_change = 1 + zs / app.zoom
+        # calculate ofset so that center of image is in center of canvas
+        ofset = [ccx - x * magnif_change,
+                 ccy - y * magnif_change]
+        app.ofset = [ofset[0]+app.ofset[0],
+                     ofset[1]+app.ofset[1]]
+        logging.info(f"xy {x} {y} canvas c {ccx} {ccy} ofset {ofset} \
+        mofset {app.ofset} zoom {app.zoom} \
+        zoom step {zoom_step()} magnif_change {magnif_change}")
+
+        app.update()
+        app.selection.reset()
+
+
+def zoom_step():
+    return int(app.zoom**1.5/10+1)
 
 
 def get_mouse():
@@ -577,9 +618,9 @@ class App(tk.Toplevel):
 
         self.toolbar = tk.Frame(self)
         tk.Label(self.toolbar, width=buttonWidth, text="gamma").pack(side="top")
-        self.gamma_view_value = tk.DoubleVar(value=1.)
+        self.gamma_view_value = tk.DoubleVar(value=1)
 
-        self.gamma_view = tk.Entry(self.toolbar, width=buttonWidth, textvariable=self.gamma_view_value)
+        self.gamma_view = tk.Spinbox(self.toolbar, textvariable=self.gamma_view_value, from_= 0, to = 10, format="%.2f", increment=0.1, width = 5)
         self.gamma_view.pack(side="top")
 
         self.zoom_label = tk.Label(
@@ -621,7 +662,7 @@ class App(tk.Toplevel):
                                9, self.img.height // 2**9))
         self.ofset = [0, 0]  # position of image NW corner relative to canvas
 
-#    @timeit
+    @timeit
     def _make_image_view(self):
 
         logging.info(self.img.arr.shape)
@@ -635,10 +676,10 @@ class App(tk.Toplevel):
 
         self.view = ImageTk.PhotoImage(view, master=self)
 
-#    @timeit
+    @timeit
     def _apply_view_filters(self, view):
 
-        gamma
+        # gamma
         g = self.gamma_view_value.get()
         if g != 1:
             view = npfilters.gamma(view, g)
@@ -688,9 +729,9 @@ class App(tk.Toplevel):
         x = self.canvas.canvasx(event.x)  # get event coords
         y = self.canvas.canvasy(event.y)
         if event.num == 4 or event.delta == +120:
-            self.zoom_in(x, y)
+            zoom_in(x, y)
         if event.num == 5 or event.delta == -120:
-            self.zoom_out(x, y)
+            zoom_out(x, y)
 
     @property
     def ofset(self):
@@ -720,54 +761,10 @@ class App(tk.Toplevel):
             self.__dict__['zoom'] = int(value)
             self.zoom_var.set(f"{100/value:.0f} %")
 
-
-
-    def zoom_out(self, x=0, y=0):
-        logging.info("zoom out")
-        if self.zoom < 50:
-            old_zoom = app.zoom
-            self.zoom += self.zoom_step()  #
-            view_wid = app.img.width / app.zoom
-            logging.info(f'view_wid {view_wid}')
-            self.ofset = [c * self.zoom / old_zoom for c in self.ofset]
-
-    #        app.ofset = [x, y]
-            self.update()
-            self.selection.reset()
-
-
-    def zoom_in(self, x=0, y=0):
-        ''' zoom in in allowed steps,
-        put pixel with mouse pointer to canvas center'''
-        logging.info("zoom in")
-        if self.zoom > 1:
-            # get canvas center
-            zs = self.zoom_step()  #
-            self.zoom -= zs
-            ccy, ccx = [self.canvas.winfo_width() / 2,
-                        self.canvas.winfo_height() / 2]
-            magnif_change = 1 + zs / self.zoom
-            # calculate ofset so that center of image is in center of canvas
-            ofset = [ccx - x * magnif_change,
-                     ccy - y * magnif_change]
-            self.ofset = [ofset[0] + self.ofset[0],
-                         ofset[1] + self.ofset[1]]
-            logging.info(f"xy {x} {y} canvas c {ccx} {ccy} ofset {self.ofset} \
-            mofset {self.ofset} zoom {self.zoom} \
-            zoom step {self.zoom_step()} magnif_change {magnif_change}")
-
-            self.update()
-            self.selection.reset()
-
-
-    def zoom_step(self):
-        return int(self.zoom ** 1.5 / 10+1)
-
     def _quit(self):
-        print("close window")
-        # self.destroy()  # keep mainloop running
-        self.quit()  # exit mainloop
-        # sys.exit()
+
+        logging.info("quit")
+        self.destroy()
 
 #  ------------------------------------------
 #  Selection
@@ -876,6 +873,3 @@ if __name__ == '__main__':
     logging.info(f"mainloop in {time.time()-time0}")
 
     root.mainloop()
-    
-    print("quit npyshop")
-

@@ -6,9 +6,8 @@ from pathlib import Path
 from send2trash import send2trash
 from tkinter import filedialog
 from matplotlib.colors import rgb_to_hsv, hsv_to_rgb
-import nputils
-
-from testing.timeit import timeit
+from skimage import img_as_float, img_as_ubyte, img_as_uint
+from imageio import imread, imwrite
 
 FILETYPES = ['jpeg', 'bmp', 'png', 'tiff']
 
@@ -34,14 +33,14 @@ class npImage():
 #        self.info()
 
 
-    @timeit
+
     def properties(self):
         return f"{self.fpath}      |  {self.bitdepth}bit {self.filetype}  |  {self.filesize/2**20:.2f} MB  |  {self.width} x {self.height} x {self.channels}  | color:{self.color_model}"
 
     def __repr__(self):
         return self.properties()
 
-    @timeit
+
     def check_filetype(self):
         filetype = imghdr.what(self.fpath)
         assert filetype in FILETYPES, f"Error, not supported filetype: {filetype} - {self.fpath}"
@@ -71,7 +70,7 @@ class npImage():
 
         self.color_model = model  # conversion done, update mode
 
-    @timeit
+
     def load(self, fpath=None):
         if not fpath:
             logging.info("fpath input dialog")
@@ -92,12 +91,24 @@ class npImage():
         self.fpath = Fpath
         self.filetype = self.check_filetype()
 
-        self.arr = nputils.load_image(Fpath)
-        self.bitdepth = nputils.get_bitdepth(self.arr)
+        self.arr = imread(Fpath)
+        self.bitdepth = self._get_bitdepth(self.arr) # orig bitdepth before conversion to float
         self.color_model = 'rgb' if self.channels == 3 else 'gray'
 
-        self.arr = nputils.int_to_float(self.arr)  # convert to float
+        self.arr = img_as_float(self.arr)  # convert to float
         # self.original = self.arr.copy()
+
+
+
+    def _get_bitdepth(self, arr):
+        ''' read bitdepth before conversion to float '''
+        if arr.dtype == np.uint8:
+            return 8
+        elif arr.dtype == np.uint16:
+            return 16
+        else:
+            raise Exception(f"unsupported array type: {arr.dtype}")
+
 
     def get_selection(self):
         return self.arr[self.slice]
@@ -105,10 +116,10 @@ class npImage():
     def set_selection(self,  y):
         self.arr[self.slice] = y
 
-    @timeit
+
     def rgb2gray(self):
         if self.arr.ndim > 2:
-            self.arr = nputils.rgb2gray(self.arr)
+            self.arr = np.dot(self.arr[..., :3], [0.2989, 0.5870, 0.1140])
 
     def reset(self):
         self.arr = self.original.copy()
@@ -130,23 +141,49 @@ class npImage():
     def ratio(self):
         return self.arr.shape[0] / self.arr.shape[1]
 
-    @timeit
+
     def save(self, fpath=None):
 
         fpath = fpath or self.fpath
         Fp = Path(fpath)
         logging.info(f"save to {Fp} bitdepth:{self.bitdepth} filetype:{self.filetype}")
-#        print(f"{self.info()}")
+        print(f"save image {fpath}: {self.info()}")
 
         if Fp.is_file():
             send2trash(str(Fp))
 
-        nputils.save_image(self.arr, fpath, bitdepth=self.bitdepth)
+        self._save_image(self.arr, fpath=fpath, bitdepth=self.bitdepth)
         self.fpath = fpath
+
+    def _save_image(self, float_arr, fpath, bitdepth=8):
+        ''' '''
+
+        assert isinstance(float_arr, (np.ndarray, np.generic))
+    
+        Fp = Path(fpath)
+        Fp.parent.mkdir(exist_ok=True)
+
+        float_arr = np.clip(float_arr, a_min=0, a_max=1)
+    
+        arr = self._float_to_int(float_arr, bitdepth)
+    
+        imwrite(Fp, arr)
+    
+        logging.debug(f"image saved")
+
+    def _float_to_int(self, arr, bitdepth=8):
+        ''' '''
+        if bitdepth == 8:
+            return img_as_ubyte(arr)
+        elif bitdepth == 16:
+            return img_as_uint(arr)
+        else:
+            raise Exception("unsupported bitdepth")
+
 
     def save_as(self, fpath=None):
         fpath = fpath or filedialog.asksaveasfilename(defaultextension=".jpg")
-        nputils.save_image(self.arr, fpath, bitdepth=self.bitdepth)
+        self._save_image(self.arr, fpath, bitdepth=self.bitdepth)
 
     def rotate(self, k=1):
         ''' rotate array by 90 degrees
@@ -155,7 +192,7 @@ class npImage():
         # self.arr = ndimage.rotate(self.arr, angle=-90, reshape=True)
         self.arr = np.rot90(self.arr, -k, axes=(0, 1))
 
-    @timeit
+
     def free_rotate(self, angle):
         ''' rotate array
         '''
@@ -213,20 +250,18 @@ class npImage():
             "std_dev": round(self.arr[self.slice].std(), 2),
         }
 
+
+
     def make_fft(self):
         from scipy import fftpack
         # Take the fourier transform of the image.
         y = 255 * self.arr
-    #    nputils.info(y, "orig")
         F1 = fftpack.fft2(y)
-    #    nputils.info(F1, "F1")
         # Now shift the quadrants around so that low spatial frequencies are in
         # the center of the 2D fourier transformed image.
         F2 = fftpack.fftshift(F1)
 
-    #    nputils.info(F2, "F2")
         y = 20 * np.log10(np.abs(F2.real) + .1)
-    #    nputils.info(y, "FFT")
         y /= 255
         self.fft = F2
         self.arr = y
@@ -242,7 +277,7 @@ class npImage():
         F2 = self.fft
         F1 = fftpack.ifftshift(F2)
         y = fftpack.ifft2(F1).real
-        y = nputils.normalize(y)
+        y = normalize(y)
         self.arr = y
         self.fft = None
 
@@ -251,3 +286,61 @@ class npImage():
             self.make_fft()
         else:
             self.make_ifft()
+
+
+
+
+# NUMPY TOOLS ====================================================
+
+
+def info(y, name="", print_output=True):
+    ''' print info about numpy array'''
+    if isinstance(y, (np.ndarray, np.generic)):
+#        pd.set_option("display.precision", 2)
+#        df = pd.DataFrame([[str(name), y.dtype, str(y.shape), y.min(), y.max(), y.mean(), y.std(), type(y) ]],
+#                    columns=['name', 'dtype', 'shape', 'min', 'max', 'mean', 'std', 'type' ])
+#        print(df.to_string(index=False))
+        out = f"{str(name)}\t{y.dtype}\t{str(y.shape)}\t<{y.min():.3f} {y.mean():.3f} {y.max():.3f}> ({y.std():.3f})\t{type(y)} "
+        # print(np.info(y))
+    else:
+        out = f"{name}\t// {type(y)}"
+    if print_output:
+        print(out)
+    return out
+
+
+def normalize(y, inrange=None, outrange=(0, 1)):
+    ''' Normalize numpy array --> values 0...1 '''
+
+    imin, imax = inrange if inrange else ( np.min(y), np.max(y) )
+    omin, omax = outrange
+    logging.debug(f"normalize array, limits - in: {imin},{imax} out: {omin},{omax}")
+
+    return np.clip( omin + omax * (y - imin) / (imax - imin), a_min=omin, a_max=omax )
+
+
+def np_to_pil(im):
+    from PIL import Image
+    ''' np float image (0..1) -> 8bit PIL image '''
+    return Image.fromarray(img_as_ubyte(im))
+
+
+def pil_to_np(im):
+    ''' PIL image -> np float image (0..1) '''
+    return img_as_float(im)
+
+
+
+def blur(y, radius):
+    from scipy.ndimage import gaussian_filter
+    return gaussian_filter(y, radius) 
+
+def gray(y):
+    if y.ndim == 2:
+        return y
+    elif y.ndim >= 3:
+        return np.dot(y[..., :3], [0.2989, 0.5870, 0.1140])
+    else:
+        raise Exception(f"gray conversion not supported, array ndim {y.ndim}")
+            
+       
