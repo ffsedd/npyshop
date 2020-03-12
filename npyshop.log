@@ -1,8 +1,41 @@
-649 !20 [   npimage  81]	open file /home/m/Dropbox/alma_scripts/pyalma/npyshop/sample.jpg
-683 !20 [   npimage  32]	bitdepth 8
-683 !20 [npfilelist  16]	load filelist /home/m/Dropbox/alma_scripts/pyalma/npyshop/sample.jpg
-952 !20 [ nphistory  37]	undo: ['orig'] redo: []
-984 !20 [   npyshop 627]	(639, 960, 3)
-984 !20 [   npyshop 628]	1
-1025 !20 [   npyshop 653]	ofset [0, 0]
-1031 !20 [   npyshop 876]	mainloop in 0.4696004390716553
+408 !20 [   npimage  81]	open file /home/m/Dropbox/alma_scripts/pyalma/npyshop/sample.jpg
+429 !20 [   npimage  32]	bitdepth 8
+429 !20 [npfilelist  16]	load filelist /home/m/Dropbox/alma_scripts/pyalma/npyshop/sample.jpg
+564 !20 [ nphistory  37]	undo: ['orig'] redo: []
+589 !20 [   npyshop 627]	(639, 960, 3)
+589 !20 [   npyshop 628]	1
+610 !20 [   npyshop 653]	ofset [0, 0]
+614 !20 [   npyshop 876]	mainloop in 0.26290154457092285
+1966 !20 [   npyshop 176]	open
+1966 !20 [   npyshop 179]	fpath input dialog
+4582 !20 [   npimage  81]	open file /home/m/Y/APOLLO/2020/J2020/raw/a129_J2020_right_TF.png
+5441 !20 [npfilelist  16]	load filelist /home/m/Y/APOLLO/2020/J2020/raw/a129_J2020_right_TF.png
+5534 !20 [ nphistory  37]	undo: ['load'] redo: []
+5534 !20 [   npyshop 627]	(5176, 5176)
+5534 !20 [   npyshop 628]	6
+5546 !20 [   npyshop 653]	ofset [0, 0]
+7277 !20 [   npyshop 176]	open
+7277 !20 [   npimage  81]	open file /home/m/Y/APOLLO/2020/J2020/raw/a128_J2020_left_TF.png
+7951 !20 [npfilelist  16]	load filelist /home/m/Y/APOLLO/2020/J2020/raw/a128_J2020_left_TF.png
+8043 !20 [ nphistory  37]	undo: ['load'] redo: []
+8044 !20 [   npyshop 627]	(5176, 5176)
+8044 !20 [   npyshop 628]	6
+8059 !20 [   npyshop 653]	ofset [0, 0]
+9949 !20 [   npyshop 276]	rotate_90
+10043 !20 [ nphistory  37]	undo: ['load', 'rotate_90'] redo: []
+10043 !20 [   npyshop 627]	(5176, 5176)
+10043 !20 [   npyshop 628]	6
+10057 !20 [   npyshop 653]	ofset [0, 0]
+14893 !20 [ nphistory  37]	undo: ['load', 'rotate_90', 'clip_high'] redo: []
+14893 !20 [   npyshop 627]	(5176, 5176)
+14894 !20 [   npyshop 628]	6
+14908 !20 [   npyshop 653]	ofset [0, 0]
+14913 !20 [   npyshop 341]	added to history
+16251 !20 [ nphistory  37]	undo: ['load', 'rotate_90', 'clip_high', 'normalize'] redo: []
+16280 !20 [   npyshop 627]	(5176, 5176)
+16280 !20 [   npyshop 628]	6
+16295 !20 [   npyshop 653]	ofset [0, 0]
+16300 !20 [   npyshop 341]	added to history
+22781 !20 [   npyshop 209]	save
+22781 !20 [   npimage 149]	save to /home/m/Y/APOLLO/2020/J2020/raw/a128_J2020_left_TF.png bitdepth:16 filetype:png
+22955 !20 [   npimage 156]	send2trash failed /home/m/Y/APOLLO/2020/J2020/raw/a128_J2020_left_TF.png

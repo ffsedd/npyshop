@@ -150,8 +150,12 @@ class npImage():
         print(f"save image {fpath}: {self.info()}")
 
         if Fp.is_file():
-            send2trash(str(Fp))
-
+            try:
+                send2trash(str(Fp))
+            except Exception as e:
+                logging.info(f"send2trash failed {Fp}")
+                Fp.unlink()
+                
         self._save_image(self.arr, fpath=fpath, bitdepth=self.bitdepth)
         self.fpath = fpath
 

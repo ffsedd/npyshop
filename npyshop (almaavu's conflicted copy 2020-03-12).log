@@ -1,0 +1,922 @@
+3708 !20 [   npimage  81]	open file C:\Dropbox\alma_scripts\pyalma\npyshop\sample.jpg
+3746 !20 [   npimage  32]	bitdepth 8
+3746 !20 [npfilelist  16]	load filelist C:\Dropbox\alma_scripts\pyalma\npyshop\sample.jpg
+3915 !20 [ nphistory  37]	undo: ['orig'] redo: []
+3942 !20 [   npyshop 627]	(639, 960, 3)
+3942 !20 [   npyshop 628]	1
+4061 !20 [   npyshop 653]	ofset [0, 0]
+4067 !20 [   npyshop 876]	mainloop in 0.6432788372039795
+15124 !20 [   npyshop 176]	open
+15125 !20 [   npyshop 179]	fpath input dialog
+20856 !20 [   npimage  81]	open file W:/JETSTREAM_NEW_2020/j171/Video 1_Ag-KA.png
+21008 !20 [npfilelist  16]	load filelist W:/JETSTREAM_NEW_2020/j171/Video 1_Ag-KA.png
+21093 !20 [ nphistory  37]	undo: ['load'] redo: []
+21094 !20 [   npyshop 627]	(2643, 1714, 3)
+21094 !20 [   npyshop 628]	3
+21159 !20 [   npyshop 653]	ofset [0, 0]
+30402 !20 [   npyshop 176]	open
+30402 !20 [   npimage  81]	open file W:\JETSTREAM_NEW_2020\j171\Video 1_Al-K.png
+30572 !20 [npfilelist  16]	load filelist W:\JETSTREAM_NEW_2020\j171\Video 1_Al-K.png
+30677 !20 [ nphistory  37]	undo: ['load'] redo: []
+30677 !20 [   npyshop 627]	(2643, 1714, 3)
+30677 !20 [   npyshop 628]	3
+30755 !20 [   npyshop 653]	ofset [0, 0]
+30931 !20 [   npyshop 176]	open
+30931 !20 [   npimage  81]	open file W:\JETSTREAM_NEW_2020\j171\Video 1_As-KA.png
+31697 !20 [npfilelist  16]	load filelist W:\JETSTREAM_NEW_2020\j171\Video 1_As-KA.png
+31811 !20 [ nphistory  37]	undo: ['load'] redo: []
+31811 !20 [   npyshop 627]	(2643, 1714, 3)
+31812 !20 [   npyshop 628]	3
+31965 !20 [   npyshop 653]	ofset [0, 0]
+31971 !20 [   npyshop 176]	open
+31971 !20 [   npimage  81]	open file W:\JETSTREAM_NEW_2020\j171\Video 1_Al-K.png
+32149 !20 [npfilelist  16]	load filelist W:\JETSTREAM_NEW_2020\j171\Video 1_Al-K.png
+32252 !20 [ nphistory  37]	undo: ['load'] redo: []
+32252 !20 [   npyshop 627]	(2643, 1714, 3)
+32252 !20 [   npyshop 628]	3
+32329 !20 [   npyshop 653]	ofset [0, 0]
+33027 !20 [   npyshop 176]	open
+33027 !20 [   npimage  81]	open file W:\JETSTREAM_NEW_2020\j171\Video 1_Ag-KA.png
+33191 !20 [npfilelist  16]	load filelist W:\JETSTREAM_NEW_2020\j171\Video 1_Ag-KA.png
+33295 !20 [ nphistory  37]	undo: ['load'] redo: []
+33296 !20 [   npyshop 627]	(2643, 1714, 3)
+33296 !20 [   npyshop 628]	3
+33376 !20 [   npyshop 653]	ofset [0, 0]
+37075 !20 [   npyshop 742]	zoom in
+37076 !20 [   npyshop 757]	xy 785.0 320.0 canvas c 563.5 931.0 ofset [0, 0]             mofset [0, 0] zoom 2             zoom step 1 magnif_change 1.5
+37076 !20 [   npyshop 627]	(2643, 1714, 3)
+37076 !20 [   npyshop 628]	2
+37259 !20 [   npyshop 653]	ofset [0, 0]
+38626 !20 [   npyshop 176]	open
+38627 !20 [   npimage  81]	open file W:\JETSTREAM_NEW_2020\j171\Video 1_Al-K.png
+38800 !20 [npfilelist  16]	load filelist W:\JETSTREAM_NEW_2020\j171\Video 1_Al-K.png
+38907 !20 [ nphistory  37]	undo: ['load'] redo: []
+38908 !20 [   npyshop 627]	(2643, 1714, 3)
+38908 !20 [   npyshop 628]	3
+38985 !20 [   npyshop 653]	ofset [0, 0]
+40035 !20 [   npyshop 176]	open
+40035 !20 [   npimage  81]	open file W:\JETSTREAM_NEW_2020\j171\Video 1_Ag-KA.png
+40209 !20 [npfilelist  16]	load filelist W:\JETSTREAM_NEW_2020\j171\Video 1_Ag-KA.png
+40326 !20 [ nphistory  37]	undo: ['load'] redo: []
+40327 !20 [   npyshop 627]	(2643, 1714, 3)
+40327 !20 [   npyshop 628]	3
+40409 !20 [   npyshop 653]	ofset [0, 0]
+43044 !20 [   npyshop 176]	open
+43044 !20 [   npimage  81]	open file W:\JETSTREAM_NEW_2020\j171\Video 1_Al-K.png
+43217 !20 [npfilelist  16]	load filelist W:\JETSTREAM_NEW_2020\j171\Video 1_Al-K.png
+43339 !20 [ nphistory  37]	undo: ['load'] redo: []
+43339 !20 [   npyshop 627]	(2643, 1714, 3)
+43339 !20 [   npyshop 628]	3
+43425 !20 [   npyshop 653]	ofset [0, 0]
+44675 !20 [   npyshop 176]	open
+44675 !20 [   npimage  81]	open file W:\JETSTREAM_NEW_2020\j171\Video 1_As-KA.png
+45436 !20 [npfilelist  16]	load filelist W:\JETSTREAM_NEW_2020\j171\Video 1_As-KA.png
+45543 !20 [ nphistory  37]	undo: ['load'] redo: []
+45543 !20 [   npyshop 627]	(2643, 1714, 3)
+45544 !20 [   npyshop 628]	3
+45716 !20 [   npyshop 653]	ofset [0, 0]
+82595 !20 [   npyshop 176]	open
+82595 !20 [   npimage  81]	open file W:\JETSTREAM_NEW_2020\j171\Video 1_As-LB.png
+82960 !20 [npfilelist  16]	load filelist W:\JETSTREAM_NEW_2020\j171\Video 1_As-LB.png
+83062 !20 [ nphistory  37]	undo: ['load'] redo: []
+83063 !20 [   npyshop 627]	(2643, 1714, 3)
+83063 !20 [   npyshop 628]	3
+83215 !20 [   npyshop 653]	ofset [0, 0]
+92850 !20 [   npyshop 176]	open
+92851 !20 [   npimage  81]	open file W:\JETSTREAM_NEW_2020\j171\Video 1_Au-LA.png
+93015 !20 [npfilelist  16]	load filelist W:\JETSTREAM_NEW_2020\j171\Video 1_Au-LA.png
+93117 !20 [ nphistory  37]	undo: ['load'] redo: []
+93117 !20 [   npyshop 627]	(2643, 1714, 3)
+93117 !20 [   npyshop 628]	3
+93194 !20 [   npyshop 653]	ofset [0, 0]
+94995 !20 [   npyshop 176]	open
+94996 !20 [   npimage  81]	open file W:\JETSTREAM_NEW_2020\j171\Video 1_Au-LB1.png
+95311 !20 [npfilelist  16]	load filelist W:\JETSTREAM_NEW_2020\j171\Video 1_Au-LB1.png
+95417 !20 [ nphistory  37]	undo: ['load'] redo: []
+95417 !20 [   npyshop 627]	(2643, 1714, 3)
+95417 !20 [   npyshop 628]	3
+95545 !20 [   npyshop 653]	ofset [0, 0]
+96899 !20 [   npyshop 176]	open
+96899 !20 [   npimage  81]	open file W:\JETSTREAM_NEW_2020\j171\Video 1_Ba-LA.png
+97032 !20 [npfilelist  16]	load filelist W:\JETSTREAM_NEW_2020\j171\Video 1_Ba-LA.png
+97135 !20 [ nphistory  37]	undo: ['load'] redo: []
+97136 !20 [   npyshop 627]	(2643, 1714, 3)
+97136 !20 [   npyshop 628]	3
+97213 !20 [   npyshop 653]	ofset [0, 0]
+97667 !20 [   npyshop 176]	open
+97667 !20 [   npimage  81]	open file W:\JETSTREAM_NEW_2020\j171\Video 1_Au-LB1.png
+97983 !20 [npfilelist  16]	load filelist W:\JETSTREAM_NEW_2020\j171\Video 1_Au-LB1.png
+98087 !20 [ nphistory  37]	undo: ['load'] redo: []
+98088 !20 [   npyshop 627]	(2643, 1714, 3)
+98088 !20 [   npyshop 628]	3
+98214 !20 [   npyshop 653]	ofset [0, 0]
+98930 !20 [   npyshop 176]	open
+98931 !20 [   npimage  81]	open file W:\JETSTREAM_NEW_2020\j171\Video 1_Au-LA.png
+99093 !20 [npfilelist  16]	load filelist W:\JETSTREAM_NEW_2020\j171\Video 1_Au-LA.png
+99195 !20 [ nphistory  37]	undo: ['load'] redo: []
+99196 !20 [   npyshop 627]	(2643, 1714, 3)
+99196 !20 [   npyshop 628]	3
+99272 !20 [   npyshop 653]	ofset [0, 0]
+111235 !20 [   npyshop 176]	open
+111235 !20 [   npimage  81]	open file W:\JETSTREAM_NEW_2020\j171\Video 1_Au-LB1.png
+111552 !20 [npfilelist  16]	load filelist W:\JETSTREAM_NEW_2020\j171\Video 1_Au-LB1.png
+111654 !20 [ nphistory  37]	undo: ['load'] redo: []
+111655 !20 [   npyshop 627]	(2643, 1714, 3)
+111655 !20 [   npyshop 628]	3
+111780 !20 [   npyshop 653]	ofset [0, 0]
+113058 !20 [   npyshop 176]	open
+113059 !20 [   npimage  81]	open file W:\JETSTREAM_NEW_2020\j171\Video 1_Ba-LA.png
+113191 !20 [npfilelist  16]	load filelist W:\JETSTREAM_NEW_2020\j171\Video 1_Ba-LA.png
+113293 !20 [ nphistory  37]	undo: ['load'] redo: []
+113294 !20 [   npyshop 627]	(2643, 1714, 3)
+113294 !20 [   npyshop 628]	3
+113368 !20 [   npyshop 653]	ofset [0, 0]
+113971 !20 [   npyshop 176]	open
+113971 !20 [   npimage  81]	open file W:\JETSTREAM_NEW_2020\j171\Video 1_Ba-LB2.png
+114121 !20 [npfilelist  16]	load filelist W:\JETSTREAM_NEW_2020\j171\Video 1_Ba-LB2.png
+114225 !20 [ nphistory  37]	undo: ['load'] redo: []
+114226 !20 [   npyshop 627]	(2643, 1714, 3)
+114226 !20 [   npyshop 628]	3
+114302 !20 [   npyshop 653]	ofset [0, 0]
+115298 !20 [   npyshop 176]	open
+115298 !20 [   npimage  81]	open file W:\JETSTREAM_NEW_2020\j171\Video 1_Bi-LA.png
+115567 !20 [npfilelist  16]	load filelist W:\JETSTREAM_NEW_2020\j171\Video 1_Bi-LA.png
+115672 !20 [ nphistory  37]	undo: ['load'] redo: []
+115673 !20 [   npyshop 627]	(2643, 1714, 3)
+115673 !20 [   npyshop 628]	3
+115765 !20 [   npyshop 653]	ofset [0, 0]
+116530 !20 [   npyshop 176]	open
+116530 !20 [   npimage  81]	open file W:\JETSTREAM_NEW_2020\j171\Video 1_Br-KA.png
+116889 !20 [npfilelist  16]	load filelist W:\JETSTREAM_NEW_2020\j171\Video 1_Br-KA.png
+116994 !20 [ nphistory  37]	undo: ['load'] redo: []
+116995 !20 [   npyshop 627]	(2643, 1714, 3)
+116995 !20 [   npyshop 628]	3
+117097 !20 [   npyshop 653]	ofset [0, 0]
+117794 !20 [   npyshop 176]	open
+117795 !20 [   npimage  81]	open file W:\JETSTREAM_NEW_2020\j171\Video 1_Ca-KA.png
+118334 !20 [npfilelist  16]	load filelist W:\JETSTREAM_NEW_2020\j171\Video 1_Ca-KA.png
+118440 !20 [ nphistory  37]	undo: ['load'] redo: []
+118440 !20 [   npyshop 627]	(2643, 1714, 3)
+118440 !20 [   npyshop 628]	3
+118589 !20 [   npyshop 653]	ofset [0, 0]
+119219 !20 [   npyshop 176]	open
+119219 !20 [   npimage  81]	open file W:\JETSTREAM_NEW_2020\j171\Video 1_Br-KA.png
+119587 !20 [npfilelist  16]	load filelist W:\JETSTREAM_NEW_2020\j171\Video 1_Br-KA.png
+119691 !20 [ nphistory  37]	undo: ['load'] redo: []
+119692 !20 [   npyshop 627]	(2643, 1714, 3)
+119692 !20 [   npyshop 628]	3
+119794 !20 [   npyshop 653]	ofset [0, 0]
+126530 !20 [   npyshop 176]	open
+126531 !20 [   npimage  81]	open file W:\JETSTREAM_NEW_2020\j171\Video 1_Ca-KA.png
+127074 !20 [npfilelist  16]	load filelist W:\JETSTREAM_NEW_2020\j171\Video 1_Ca-KA.png
+127178 !20 [ nphistory  37]	undo: ['load'] redo: []
+127179 !20 [   npyshop 627]	(2643, 1714, 3)
+127179 !20 [   npyshop 628]	3
+127328 !20 [   npyshop 653]	ofset [0, 0]
+133826 !20 [   npyshop 176]	open
+133826 !20 [   npimage  81]	open file W:\JETSTREAM_NEW_2020\j171\Video 1_Cd-KA.png
+134059 !20 [npfilelist  16]	load filelist W:\JETSTREAM_NEW_2020\j171\Video 1_Cd-KA.png
+134164 !20 [ nphistory  37]	undo: ['load'] redo: []
+134165 !20 [   npyshop 627]	(2643, 1714, 3)
+134165 !20 [   npyshop 628]	3
+134252 !20 [   npyshop 653]	ofset [0, 0]
+140947 !20 [   npyshop 176]	open
+140947 !20 [   npimage  81]	open file W:\JETSTREAM_NEW_2020\j171\Video 1_Cl-KA.png
+141103 !20 [npfilelist  16]	load filelist W:\JETSTREAM_NEW_2020\j171\Video 1_Cl-KA.png
+141205 !20 [ nphistory  37]	undo: ['load'] redo: []
+141206 !20 [   npyshop 627]	(2643, 1714, 3)
+141206 !20 [   npyshop 628]	3
+141282 !20 [   npyshop 653]	ofset [0, 0]
+141858 !20 [   npyshop 176]	open
+141858 !20 [   npimage  81]	open file W:\JETSTREAM_NEW_2020\j171\Video 1_Co-KA.png
+142126 !20 [npfilelist  16]	load filelist W:\JETSTREAM_NEW_2020\j171\Video 1_Co-KA.png
+142231 !20 [ nphistory  37]	undo: ['load'] redo: []
+142232 !20 [   npyshop 627]	(2643, 1714, 3)
+142232 !20 [   npyshop 628]	3
+142327 !20 [   npyshop 653]	ofset [0, 0]
+145282 !20 [   npyshop 176]	open
+145282 !20 [   npimage  81]	open file W:\JETSTREAM_NEW_2020\j171\Video 1_Cr-KA.png
+145436 !20 [npfilelist  16]	load filelist W:\JETSTREAM_NEW_2020\j171\Video 1_Cr-KA.png
+145547 !20 [ nphistory  37]	undo: ['load'] redo: []
+145547 !20 [   npyshop 627]	(2643, 1714, 3)
+145547 !20 [   npyshop 628]	3
+145624 !20 [   npyshop 653]	ofset [0, 0]
+176002 !20 [   npyshop 176]	open
+176002 !20 [   npimage  81]	open file W:\JETSTREAM_NEW_2020\j171\Video 1_Cu-KA.png
+176423 !20 [npfilelist  16]	load filelist W:\JETSTREAM_NEW_2020\j171\Video 1_Cu-KA.png
+176529 !20 [ nphistory  37]	undo: ['load'] redo: []
+176530 !20 [   npyshop 627]	(2643, 1714, 3)
+176530 !20 [   npyshop 628]	3
+176627 !20 [   npyshop 653]	ofset [0, 0]
+232707 !20 [   npyshop 176]	open
+232708 !20 [   npimage  81]	open file W:\JETSTREAM_NEW_2020\j171\Video 1_Fe-KA.png
+233103 !20 [npfilelist  16]	load filelist W:\JETSTREAM_NEW_2020\j171\Video 1_Fe-KA.png
+233205 !20 [ nphistory  37]	undo: ['load'] redo: []
+233205 !20 [   npyshop 627]	(2643, 1714, 3)
+233205 !20 [   npyshop 628]	3
+233308 !20 [   npyshop 653]	ofset [0, 0]
+235570 !20 [   npyshop 176]	open
+235570 !20 [   npimage  81]	open file W:\JETSTREAM_NEW_2020\j171\Video 1_Hf-LA.png
+235784 !20 [npfilelist  16]	load filelist W:\JETSTREAM_NEW_2020\j171\Video 1_Hf-LA.png
+235887 !20 [ nphistory  37]	undo: ['load'] redo: []
+235888 !20 [   npyshop 627]	(2643, 1714, 3)
+235888 !20 [   npyshop 628]	3
+235980 !20 [   npyshop 653]	ofset [0, 0]
+237410 !20 [   npyshop 176]	open
+237410 !20 [   npimage  81]	open file W:\JETSTREAM_NEW_2020\j171\Video 1_Hg-LA.png
+237650 !20 [npfilelist  16]	load filelist W:\JETSTREAM_NEW_2020\j171\Video 1_Hg-LA.png
+237753 !20 [ nphistory  37]	undo: ['load'] redo: []
+237754 !20 [   npyshop 627]	(2643, 1714, 3)
+237754 !20 [   npyshop 628]	3
+237847 !20 [   npyshop 653]	ofset [0, 0]
+241765 !20 [   npyshop 176]	open
+241765 !20 [   npimage  81]	open file W:\JETSTREAM_NEW_2020\j171\Video 1_K-KA.png
+242029 !20 [npfilelist  16]	load filelist W:\JETSTREAM_NEW_2020\j171\Video 1_K-KA.png
+242130 !20 [ nphistory  37]	undo: ['load'] redo: []
+242130 !20 [   npyshop 627]	(2643, 1714, 3)
+242131 !20 [   npyshop 628]	3
+242218 !20 [   npyshop 653]	ofset [0, 0]
+247522 !20 [   npyshop 176]	open
+247522 !20 [   npimage  81]	open file W:\JETSTREAM_NEW_2020\j171\Video 1_Mg-K.png
+247704 !20 [npfilelist  16]	load filelist W:\JETSTREAM_NEW_2020\j171\Video 1_Mg-K.png
+247808 !20 [ nphistory  37]	undo: ['load'] redo: []
+247808 !20 [   npyshop 627]	(2643, 1714, 3)
+247808 !20 [   npyshop 628]	3
+247882 !20 [   npyshop 653]	ofset [0, 0]
+248995 !20 [   npyshop 176]	open
+248995 !20 [   npimage  81]	open file W:\JETSTREAM_NEW_2020\j171\Video 1_Mn-KA.png
+249174 !20 [npfilelist  16]	load filelist W:\JETSTREAM_NEW_2020\j171\Video 1_Mn-KA.png
+249277 !20 [ nphistory  37]	undo: ['load'] redo: []
+249278 !20 [   npyshop 627]	(2643, 1714, 3)
+249278 !20 [   npyshop 628]	3
+249358 !20 [   npyshop 653]	ofset [0, 0]
+249954 !20 [   npyshop 176]	open
+249954 !20 [   npimage  81]	open file W:\JETSTREAM_NEW_2020\j171\Video 1_Ni-KA.png
+250076 !20 [npfilelist  16]	load filelist W:\JETSTREAM_NEW_2020\j171\Video 1_Ni-KA.png
+250180 !20 [ nphistory  37]	undo: ['load'] redo: []
+250181 !20 [   npyshop 627]	(2643, 1714, 3)
+250181 !20 [   npyshop 628]	3
+250255 !20 [   npyshop 653]	ofset [0, 0]
+250802 !20 [   npyshop 176]	open
+250803 !20 [   npimage  81]	open file W:\JETSTREAM_NEW_2020\j171\Video 1_P-KA.png
+250930 !20 [npfilelist  16]	load filelist W:\JETSTREAM_NEW_2020\j171\Video 1_P-KA.png
+251033 !20 [ nphistory  37]	undo: ['load'] redo: []
+251033 !20 [   npyshop 627]	(2643, 1714, 3)
+251033 !20 [   npyshop 628]	3
+251106 !20 [   npyshop 653]	ofset [0, 0]
+251699 !20 [   npyshop 176]	open
+251699 !20 [   npimage  81]	open file W:\JETSTREAM_NEW_2020\j171\Video 1_Pb-LA.png
+252330 !20 [npfilelist  16]	load filelist W:\JETSTREAM_NEW_2020\j171\Video 1_Pb-LA.png
+252432 !20 [ nphistory  37]	undo: ['load'] redo: []
+252433 !20 [   npyshop 627]	(2643, 1714, 3)
+252433 !20 [   npyshop 628]	3
+252562 !20 [   npyshop 653]	ofset [0, 0]
+324835 !20 [   npyshop 176]	open
+324835 !20 [   npimage  81]	open file W:\JETSTREAM_NEW_2020\j171\Video 1_P-KA.png
+324964 !20 [npfilelist  16]	load filelist W:\JETSTREAM_NEW_2020\j171\Video 1_P-KA.png
+325070 !20 [ nphistory  37]	undo: ['load'] redo: []
+325070 !20 [   npyshop 627]	(2643, 1714, 3)
+325070 !20 [   npyshop 628]	3
+325144 !20 [   npyshop 653]	ofset [0, 0]
+330754 !20 [   npyshop 176]	open
+330754 !20 [   npimage  81]	open file W:\JETSTREAM_NEW_2020\j171\Video 1_Pb-LA.png
+331390 !20 [npfilelist  16]	load filelist W:\JETSTREAM_NEW_2020\j171\Video 1_Pb-LA.png
+331496 !20 [ nphistory  37]	undo: ['load'] redo: []
+331497 !20 [   npyshop 627]	(2643, 1714, 3)
+331497 !20 [   npyshop 628]	3
+331637 !20 [   npyshop 653]	ofset [0, 0]
+331645 !20 [   npyshop 176]	open
+331645 !20 [   npimage  81]	open file W:\JETSTREAM_NEW_2020\j171\Video 1_Pb-LB.png
+332159 !20 [npfilelist  16]	load filelist W:\JETSTREAM_NEW_2020\j171\Video 1_Pb-LB.png
+332261 !20 [ nphistory  37]	undo: ['load'] redo: []
+332262 !20 [   npyshop 627]	(2643, 1714, 3)
+332262 !20 [   npyshop 628]	3
+332391 !20 [   npyshop 653]	ofset [0, 0]
+332398 !20 [   npyshop 176]	open
+332398 !20 [   npimage  81]	open file W:\JETSTREAM_NEW_2020\j171\Video 1_Rh-KA.png
+332720 !20 [npfilelist  16]	load filelist W:\JETSTREAM_NEW_2020\j171\Video 1_Rh-KA.png
+332822 !20 [ nphistory  37]	undo: ['load'] redo: []
+332823 !20 [   npyshop 627]	(2643, 1714, 3)
+332823 !20 [   npyshop 628]	3
+332951 !20 [   npyshop 653]	ofset [0, 0]
+333747 !20 [   npyshop 176]	open
+333747 !20 [   npimage  81]	open file W:\JETSTREAM_NEW_2020\j171\Video 1_S-KA.png
+334016 !20 [npfilelist  16]	load filelist W:\JETSTREAM_NEW_2020\j171\Video 1_S-KA.png
+334123 !20 [ nphistory  37]	undo: ['load'] redo: []
+334123 !20 [   npyshop 627]	(2643, 1714, 3)
+334123 !20 [   npyshop 628]	3
+334228 !20 [   npyshop 653]	ofset [0, 0]
+340371 !20 [   npyshop 176]	open
+340371 !20 [   npimage  81]	open file W:\JETSTREAM_NEW_2020\j171\Video 1_Sb-KA.png
+340510 !20 [npfilelist  16]	load filelist W:\JETSTREAM_NEW_2020\j171\Video 1_Sb-KA.png
+340614 !20 [ nphistory  37]	undo: ['load'] redo: []
+340614 !20 [   npyshop 627]	(2643, 1714, 3)
+340614 !20 [   npyshop 628]	3
+340690 !20 [   npyshop 653]	ofset [0, 0]
+341267 !20 [   npyshop 176]	open
+341267 !20 [   npimage  81]	open file W:\JETSTREAM_NEW_2020\j171\Video 1_Se-KA.png
+341473 !20 [npfilelist  16]	load filelist W:\JETSTREAM_NEW_2020\j171\Video 1_Se-KA.png
+341593 !20 [ nphistory  37]	undo: ['load'] redo: []
+341593 !20 [   npyshop 627]	(2643, 1714, 3)
+341593 !20 [   npyshop 628]	3
+341678 !20 [   npyshop 653]	ofset [0, 0]
+342259 !20 [   npyshop 176]	open
+342259 !20 [   npimage  81]	open file W:\JETSTREAM_NEW_2020\j171\Video 1_Si-K.png
+342386 !20 [npfilelist  16]	load filelist W:\JETSTREAM_NEW_2020\j171\Video 1_Si-K.png
+342488 !20 [ nphistory  37]	undo: ['load'] redo: []
+342488 !20 [   npyshop 627]	(2643, 1714, 3)
+342489 !20 [   npyshop 628]	3
+342561 !20 [   npyshop 653]	ofset [0, 0]
+343314 !20 [   npyshop 176]	open
+343315 !20 [   npimage  81]	open file W:\JETSTREAM_NEW_2020\j171\Video 1_Sn-KA.png
+343499 !20 [npfilelist  16]	load filelist W:\JETSTREAM_NEW_2020\j171\Video 1_Sn-KA.png
+343611 !20 [ nphistory  37]	undo: ['load'] redo: []
+343612 !20 [   npyshop 627]	(2643, 1714, 3)
+343612 !20 [   npyshop 628]	3
+343692 !20 [   npyshop 653]	ofset [0, 0]
+346962 !20 [   npyshop 176]	open
+346962 !20 [   npimage  81]	open file W:\JETSTREAM_NEW_2020\j171\Video 1_Sr-KA.png
+347112 !20 [npfilelist  16]	load filelist W:\JETSTREAM_NEW_2020\j171\Video 1_Sr-KA.png
+347214 !20 [ nphistory  37]	undo: ['load'] redo: []
+347215 !20 [   npyshop 627]	(2643, 1714, 3)
+347215 !20 [   npyshop 628]	3
+347289 !20 [   npyshop 653]	ofset [0, 0]
+350419 !20 [   npyshop 176]	open
+350419 !20 [   npimage  81]	open file W:\JETSTREAM_NEW_2020\j171\Video 1_Ti-KA.png
+350574 !20 [npfilelist  16]	load filelist W:\JETSTREAM_NEW_2020\j171\Video 1_Ti-KA.png
+350677 !20 [ nphistory  37]	undo: ['load'] redo: []
+350678 !20 [   npyshop 627]	(2643, 1714, 3)
+350678 !20 [   npyshop 628]	3
+350755 !20 [   npyshop 653]	ofset [0, 0]
+352083 !20 [   npyshop 176]	open
+352083 !20 [   npimage  81]	open file W:\JETSTREAM_NEW_2020\j171\Video 1_Video 1.png
+352700 !20 [npfilelist  16]	load filelist W:\JETSTREAM_NEW_2020\j171\Video 1_Video 1.png
+352803 !20 [ nphistory  37]	undo: ['load'] redo: []
+352804 !20 [   npyshop 627]	(2643, 1714, 3)
+352804 !20 [   npyshop 628]	3
+352964 !20 [   npyshop 653]	ofset [0, 0]
+357235 !20 [   npyshop 176]	open
+357235 !20 [   npimage  81]	open file W:\JETSTREAM_NEW_2020\j171\Video 1_Zn-KA.png
+357524 !20 [npfilelist  16]	load filelist W:\JETSTREAM_NEW_2020\j171\Video 1_Zn-KA.png
+357632 !20 [ nphistory  37]	undo: ['load'] redo: []
+357632 !20 [   npyshop 627]	(2643, 1714, 3)
+357633 !20 [   npyshop 628]	3
+357725 !20 [   npyshop 653]	ofset [0, 0]
+358290 !20 [   npyshop 176]	open
+358290 !20 [   npimage  81]	open file W:\JETSTREAM_NEW_2020\j171\Video 1_Zr-KA.png
+358551 !20 [npfilelist  16]	load filelist W:\JETSTREAM_NEW_2020\j171\Video 1_Zr-KA.png
+358654 !20 [ nphistory  37]	undo: ['load'] redo: []
+358655 !20 [   npyshop 627]	(2643, 1714, 3)
+358656 !20 [   npyshop 628]	3
+358772 !20 [   npyshop 653]	ofset [0, 0]
+358779 !20 [   npyshop 176]	open
+358779 !20 [   npimage  81]	open file W:\JETSTREAM_NEW_2020\j171\Video Mosaic.png
+363234 !20 [npfilelist  16]	load filelist W:\JETSTREAM_NEW_2020\j171\Video Mosaic.png
+363676 !20 [ nphistory  37]	undo: ['load'] redo: []
+363677 !20 [   npyshop 627]	(5733, 4073, 3)
+363677 !20 [   npyshop 628]	7
+363831 !20 [   npyshop 653]	ofset [0, 0]
+363838 !20 [   npyshop 176]	open
+363838 !20 [   npimage  81]	open file W:\JETSTREAM_NEW_2020\j171\Video 1_Ag-KA.png
+364041 !20 [npfilelist  16]	load filelist W:\JETSTREAM_NEW_2020\j171\Video 1_Ag-KA.png
+364221 !20 [ nphistory  37]	undo: ['load'] redo: []
+364222 !20 [   npyshop 627]	(2643, 1714, 3)
+364222 !20 [   npyshop 628]	3
+364304 !20 [   npyshop 653]	ofset [0, 0]
+364312 !20 [   npyshop 176]	open
+364312 !20 [   npimage  81]	open file W:\JETSTREAM_NEW_2020\j171\Video 1_Al-K.png
+364483 !20 [npfilelist  16]	load filelist W:\JETSTREAM_NEW_2020\j171\Video 1_Al-K.png
+364585 !20 [ nphistory  37]	undo: ['load'] redo: []
+364585 !20 [   npyshop 627]	(2643, 1714, 3)
+364585 !20 [   npyshop 628]	3
+364661 !20 [   npyshop 653]	ofset [0, 0]
+364669 !20 [   npyshop 176]	open
+364669 !20 [   npimage  81]	open file W:\JETSTREAM_NEW_2020\j171\Video 1_As-KA.png
+365415 !20 [npfilelist  16]	load filelist W:\JETSTREAM_NEW_2020\j171\Video 1_As-KA.png
+365519 !20 [ nphistory  37]	undo: ['load'] redo: []
+365519 !20 [   npyshop 627]	(2643, 1714, 3)
+365519 !20 [   npyshop 628]	3
+365677 !20 [   npyshop 653]	ofset [0, 0]
+365685 !20 [   npyshop 176]	open
+365685 !20 [   npimage  81]	open file W:\JETSTREAM_NEW_2020\j171\Video 1_As-LB.png
+366052 !20 [npfilelist  16]	load filelist W:\JETSTREAM_NEW_2020\j171\Video 1_As-LB.png
+366155 !20 [ nphistory  37]	undo: ['load'] redo: []
+366155 !20 [   npyshop 627]	(2643, 1714, 3)
+366155 !20 [   npyshop 628]	3
+366307 !20 [   npyshop 653]	ofset [0, 0]
+366964 !20 [   npyshop 176]	open
+366964 !20 [   npimage  81]	open file W:\JETSTREAM_NEW_2020\j171\Video 1_Au-LA.png
+367123 !20 [npfilelist  16]	load filelist W:\JETSTREAM_NEW_2020\j171\Video 1_Au-LA.png
+367226 !20 [ nphistory  37]	undo: ['load'] redo: []
+367226 !20 [   npyshop 627]	(2643, 1714, 3)
+367226 !20 [   npyshop 628]	3
+367306 !20 [   npyshop 653]	ofset [0, 0]
+367955 !20 [   npyshop 176]	open
+367955 !20 [   npimage  81]	open file W:\JETSTREAM_NEW_2020\j171\Video 1_Au-LB1.png
+368272 !20 [npfilelist  16]	load filelist W:\JETSTREAM_NEW_2020\j171\Video 1_Au-LB1.png
+368373 !20 [ nphistory  37]	undo: ['load'] redo: []
+368374 !20 [   npyshop 627]	(2643, 1714, 3)
+368374 !20 [   npyshop 628]	3
+368502 !20 [   npyshop 653]	ofset [0, 0]
+368850 !20 [   npyshop 176]	open
+368850 !20 [   npimage  81]	open file W:\JETSTREAM_NEW_2020\j171\Video 1_Ba-LA.png
+368982 !20 [npfilelist  16]	load filelist W:\JETSTREAM_NEW_2020\j171\Video 1_Ba-LA.png
+369085 !20 [ nphistory  37]	undo: ['load'] redo: []
+369086 !20 [   npyshop 627]	(2643, 1714, 3)
+369086 !20 [   npyshop 628]	3
+369160 !20 [   npyshop 653]	ofset [0, 0]
+369650 !20 [   npyshop 176]	open
+369650 !20 [   npimage  81]	open file W:\JETSTREAM_NEW_2020\j171\Video 1_Ba-LB2.png
+369795 !20 [npfilelist  16]	load filelist W:\JETSTREAM_NEW_2020\j171\Video 1_Ba-LB2.png
+369897 !20 [ nphistory  37]	undo: ['load'] redo: []
+369898 !20 [   npyshop 627]	(2643, 1714, 3)
+369898 !20 [   npyshop 628]	3
+369975 !20 [   npyshop 653]	ofset [0, 0]
+370371 !20 [   npyshop 176]	open
+370371 !20 [   npimage  81]	open file W:\JETSTREAM_NEW_2020\j171\Video 1_Bi-LA.png
+370634 !20 [npfilelist  16]	load filelist W:\JETSTREAM_NEW_2020\j171\Video 1_Bi-LA.png
+370736 !20 [ nphistory  37]	undo: ['load'] redo: []
+370737 !20 [   npyshop 627]	(2643, 1714, 3)
+370737 !20 [   npyshop 628]	3
+370829 !20 [   npyshop 653]	ofset [0, 0]
+371363 !20 [   npyshop 176]	open
+371363 !20 [   npimage  81]	open file W:\JETSTREAM_NEW_2020\j171\Video 1_Br-KA.png
+371732 !20 [npfilelist  16]	load filelist W:\JETSTREAM_NEW_2020\j171\Video 1_Br-KA.png
+371834 !20 [ nphistory  37]	undo: ['load'] redo: []
+371834 !20 [   npyshop 627]	(2643, 1714, 3)
+371834 !20 [   npyshop 628]	3
+371937 !20 [   npyshop 653]	ofset [0, 0]
+372146 !20 [   npyshop 176]	open
+372147 !20 [   npimage  81]	open file W:\JETSTREAM_NEW_2020\j171\Video 1_Ca-KA.png
+372687 !20 [npfilelist  16]	load filelist W:\JETSTREAM_NEW_2020\j171\Video 1_Ca-KA.png
+372788 !20 [ nphistory  37]	undo: ['load'] redo: []
+372789 !20 [   npyshop 627]	(2643, 1714, 3)
+372789 !20 [   npyshop 628]	3
+372937 !20 [   npyshop 653]	ofset [0, 0]
+373154 !20 [   npyshop 176]	open
+373155 !20 [   npimage  81]	open file W:\JETSTREAM_NEW_2020\j171\Video 1_Br-KA.png
+373533 !20 [npfilelist  16]	load filelist W:\JETSTREAM_NEW_2020\j171\Video 1_Br-KA.png
+373641 !20 [ nphistory  37]	undo: ['load'] redo: []
+373642 !20 [   npyshop 627]	(2643, 1714, 3)
+373642 !20 [   npyshop 628]	3
+373745 !20 [   npyshop 653]	ofset [0, 0]
+373754 !20 [   npyshop 176]	open
+373754 !20 [   npimage  81]	open file W:\JETSTREAM_NEW_2020\j171\Video 1_Bi-LA.png
+374016 !20 [npfilelist  16]	load filelist W:\JETSTREAM_NEW_2020\j171\Video 1_Bi-LA.png
+374122 !20 [ nphistory  37]	undo: ['load'] redo: []
+374123 !20 [   npyshop 627]	(2643, 1714, 3)
+374123 !20 [   npyshop 628]	3
+374214 !20 [   npyshop 653]	ofset [0, 0]
+374578 !20 [   npyshop 176]	open
+374578 !20 [   npimage  81]	open file W:\JETSTREAM_NEW_2020\j171\Video 1_Ba-LB2.png
+374723 !20 [npfilelist  16]	load filelist W:\JETSTREAM_NEW_2020\j171\Video 1_Ba-LB2.png
+374826 !20 [ nphistory  37]	undo: ['load'] redo: []
+374828 !20 [   npyshop 627]	(2643, 1714, 3)
+374828 !20 [   npyshop 628]	3
+374904 !20 [   npyshop 653]	ofset [0, 0]
+375810 !20 [   npyshop 176]	open
+375811 !20 [   npimage  81]	open file W:\JETSTREAM_NEW_2020\j171\Video 1_Bi-LA.png
+376077 !20 [npfilelist  16]	load filelist W:\JETSTREAM_NEW_2020\j171\Video 1_Bi-LA.png
+376181 !20 [ nphistory  37]	undo: ['load'] redo: []
+376182 !20 [   npyshop 627]	(2643, 1714, 3)
+376182 !20 [   npyshop 628]	3
+376275 !20 [   npyshop 653]	ofset [0, 0]
+377443 !20 [   npyshop 176]	open
+377443 !20 [   npimage  81]	open file W:\JETSTREAM_NEW_2020\j171\Video 1_Ba-LB2.png
+377591 !20 [npfilelist  16]	load filelist W:\JETSTREAM_NEW_2020\j171\Video 1_Ba-LB2.png
+377693 !20 [ nphistory  37]	undo: ['load'] redo: []
+377693 !20 [   npyshop 627]	(2643, 1714, 3)
+377693 !20 [   npyshop 628]	3
+377769 !20 [   npyshop 653]	ofset [0, 0]
+378418 !20 [   npyshop 176]	open
+378419 !20 [   npimage  81]	open file W:\JETSTREAM_NEW_2020\j171\Video 1_Ba-LA.png
+378550 !20 [npfilelist  16]	load filelist W:\JETSTREAM_NEW_2020\j171\Video 1_Ba-LA.png
+378653 !20 [ nphistory  37]	undo: ['load'] redo: []
+378654 !20 [   npyshop 627]	(2643, 1714, 3)
+378654 !20 [   npyshop 628]	3
+378728 !20 [   npyshop 653]	ofset [0, 0]
+379187 !20 [   npyshop 176]	open
+379187 !20 [   npimage  81]	open file W:\JETSTREAM_NEW_2020\j171\Video 1_Au-LB1.png
+379503 !20 [npfilelist  16]	load filelist W:\JETSTREAM_NEW_2020\j171\Video 1_Au-LB1.png
+379622 !20 [ nphistory  37]	undo: ['load'] redo: []
+379623 !20 [   npyshop 627]	(2643, 1714, 3)
+379623 !20 [   npyshop 628]	3
+379748 !20 [   npyshop 653]	ofset [0, 0]
+381522 !20 [   npyshop 176]	open
+381522 !20 [   npimage  81]	open file W:\JETSTREAM_NEW_2020\j171\Video 1_Ba-LA.png
+381654 !20 [npfilelist  16]	load filelist W:\JETSTREAM_NEW_2020\j171\Video 1_Ba-LA.png
+381754 !20 [ nphistory  37]	undo: ['load'] redo: []
+381755 !20 [   npyshop 627]	(2643, 1714, 3)
+381755 !20 [   npyshop 628]	3
+381830 !20 [   npyshop 653]	ofset [0, 0]
+382259 !20 [   npyshop 176]	open
+382259 !20 [   npimage  81]	open file W:\JETSTREAM_NEW_2020\j171\Video 1_Ba-LB2.png
+382406 !20 [npfilelist  16]	load filelist W:\JETSTREAM_NEW_2020\j171\Video 1_Ba-LB2.png
+382511 !20 [ nphistory  37]	undo: ['load'] redo: []
+382511 !20 [   npyshop 627]	(2643, 1714, 3)
+382511 !20 [   npyshop 628]	3
+382587 !20 [   npyshop 653]	ofset [0, 0]
+382595 !20 [   npyshop 176]	open
+382595 !20 [   npimage  81]	open file W:\JETSTREAM_NEW_2020\j171\Video 1_Bi-LA.png
+382862 !20 [npfilelist  16]	load filelist W:\JETSTREAM_NEW_2020\j171\Video 1_Bi-LA.png
+382964 !20 [ nphistory  37]	undo: ['load'] redo: []
+382965 !20 [   npyshop 627]	(2643, 1714, 3)
+382965 !20 [   npyshop 628]	3
+383058 !20 [   npyshop 653]	ofset [0, 0]
+383066 !20 [   npyshop 176]	open
+383066 !20 [   npimage  81]	open file W:\JETSTREAM_NEW_2020\j171\Video 1_Br-KA.png
+383425 !20 [npfilelist  16]	load filelist W:\JETSTREAM_NEW_2020\j171\Video 1_Br-KA.png
+383533 !20 [ nphistory  37]	undo: ['load'] redo: []
+383534 !20 [   npyshop 627]	(2643, 1714, 3)
+383534 !20 [   npyshop 628]	3
+383637 !20 [   npyshop 653]	ofset [0, 0]
+383645 !20 [   npyshop 176]	open
+383645 !20 [   npimage  81]	open file W:\JETSTREAM_NEW_2020\j171\Video 1_Ca-KA.png
+384183 !20 [npfilelist  16]	load filelist W:\JETSTREAM_NEW_2020\j171\Video 1_Ca-KA.png
+384287 !20 [ nphistory  37]	undo: ['load'] redo: []
+384287 !20 [   npyshop 627]	(2643, 1714, 3)
+384287 !20 [   npyshop 628]	3
+384438 !20 [   npyshop 653]	ofset [0, 0]
+384446 !20 [   npyshop 176]	open
+384446 !20 [   npimage  81]	open file W:\JETSTREAM_NEW_2020\j171\Video 1_Cd-KA.png
+384677 !20 [npfilelist  16]	load filelist W:\JETSTREAM_NEW_2020\j171\Video 1_Cd-KA.png
+384782 !20 [ nphistory  37]	undo: ['load'] redo: []
+384783 !20 [   npyshop 627]	(2643, 1714, 3)
+384783 !20 [   npyshop 628]	3
+384868 !20 [   npyshop 653]	ofset [0, 0]
+384876 !20 [   npyshop 176]	open
+384877 !20 [   npimage  81]	open file W:\JETSTREAM_NEW_2020\j171\Video 1_Cl-KA.png
+385022 !20 [npfilelist  16]	load filelist W:\JETSTREAM_NEW_2020\j171\Video 1_Cl-KA.png
+385126 !20 [ nphistory  37]	undo: ['load'] redo: []
+385127 !20 [   npyshop 627]	(2643, 1714, 3)
+385127 !20 [   npyshop 628]	3
+385204 !20 [   npyshop 653]	ofset [0, 0]
+385212 !20 [   npyshop 176]	open
+385212 !20 [   npimage  81]	open file W:\JETSTREAM_NEW_2020\j171\Video 1_Co-KA.png
+385476 !20 [npfilelist  16]	load filelist W:\JETSTREAM_NEW_2020\j171\Video 1_Co-KA.png
+385583 !20 [ nphistory  37]	undo: ['load'] redo: []
+385584 !20 [   npyshop 627]	(2643, 1714, 3)
+385584 !20 [   npyshop 628]	3
+385675 !20 [   npyshop 653]	ofset [0, 0]
+385683 !20 [   npyshop 176]	open
+385683 !20 [   npimage  81]	open file W:\JETSTREAM_NEW_2020\j171\Video 1_Cr-KA.png
+385831 !20 [npfilelist  16]	load filelist W:\JETSTREAM_NEW_2020\j171\Video 1_Cr-KA.png
+385933 !20 [ nphistory  37]	undo: ['load'] redo: []
+385933 !20 [   npyshop 627]	(2643, 1714, 3)
+385933 !20 [   npyshop 628]	3
+386009 !20 [   npyshop 653]	ofset [0, 0]
+390595 !20 [   npyshop 176]	open
+390595 !20 [   npimage  81]	open file W:\JETSTREAM_NEW_2020\j171\Video 1_Co-KA.png
+390867 !20 [npfilelist  16]	load filelist W:\JETSTREAM_NEW_2020\j171\Video 1_Co-KA.png
+390971 !20 [ nphistory  37]	undo: ['load'] redo: []
+390972 !20 [   npyshop 627]	(2643, 1714, 3)
+390972 !20 [   npyshop 628]	3
+391063 !20 [   npyshop 653]	ofset [0, 0]
+391070 !20 [   npyshop 176]	open
+391070 !20 [   npimage  81]	open file W:\JETSTREAM_NEW_2020\j171\Video 1_Cl-KA.png
+391214 !20 [npfilelist  16]	load filelist W:\JETSTREAM_NEW_2020\j171\Video 1_Cl-KA.png
+391316 !20 [ nphistory  37]	undo: ['load'] redo: []
+391317 !20 [   npyshop 627]	(2643, 1714, 3)
+391317 !20 [   npyshop 628]	3
+391391 !20 [   npyshop 653]	ofset [0, 0]
+391398 !20 [   npyshop 176]	open
+391398 !20 [   npimage  81]	open file W:\JETSTREAM_NEW_2020\j171\Video 1_Cd-KA.png
+391639 !20 [npfilelist  16]	load filelist W:\JETSTREAM_NEW_2020\j171\Video 1_Cd-KA.png
+391743 !20 [ nphistory  37]	undo: ['load'] redo: []
+391743 !20 [   npyshop 627]	(2643, 1714, 3)
+391743 !20 [   npyshop 628]	3
+391830 !20 [   npyshop 653]	ofset [0, 0]
+391838 !20 [   npyshop 176]	open
+391838 !20 [   npimage  81]	open file W:\JETSTREAM_NEW_2020\j171\Video 1_Ca-KA.png
+392377 !20 [npfilelist  16]	load filelist W:\JETSTREAM_NEW_2020\j171\Video 1_Ca-KA.png
+392483 !20 [ nphistory  37]	undo: ['load'] redo: []
+392483 !20 [   npyshop 627]	(2643, 1714, 3)
+392483 !20 [   npyshop 628]	3
+392631 !20 [   npyshop 653]	ofset [0, 0]
+392638 !20 [   npyshop 176]	open
+392638 !20 [   npimage  81]	open file W:\JETSTREAM_NEW_2020\j171\Video 1_Br-KA.png
+392999 !20 [npfilelist  16]	load filelist W:\JETSTREAM_NEW_2020\j171\Video 1_Br-KA.png
+393107 !20 [ nphistory  37]	undo: ['load'] redo: []
+393107 !20 [   npyshop 627]	(2643, 1714, 3)
+393107 !20 [   npyshop 628]	3
+393208 !20 [   npyshop 653]	ofset [0, 0]
+393216 !20 [   npyshop 176]	open
+393216 !20 [   npimage  81]	open file W:\JETSTREAM_NEW_2020\j171\Video 1_Bi-LA.png
+393482 !20 [npfilelist  16]	load filelist W:\JETSTREAM_NEW_2020\j171\Video 1_Bi-LA.png
+393586 !20 [ nphistory  37]	undo: ['load'] redo: []
+393587 !20 [   npyshop 627]	(2643, 1714, 3)
+393587 !20 [   npyshop 628]	3
+393678 !20 [   npyshop 653]	ofset [0, 0]
+393686 !20 [   npyshop 176]	open
+393686 !20 [   npimage  81]	open file W:\JETSTREAM_NEW_2020\j171\Video 1_Ba-LB2.png
+393831 !20 [npfilelist  16]	load filelist W:\JETSTREAM_NEW_2020\j171\Video 1_Ba-LB2.png
+393933 !20 [ nphistory  37]	undo: ['load'] redo: []
+393933 !20 [   npyshop 627]	(2643, 1714, 3)
+393933 !20 [   npyshop 628]	3
+394008 !20 [   npyshop 653]	ofset [0, 0]
+394015 !20 [   npyshop 176]	open
+394015 !20 [   npimage  81]	open file W:\JETSTREAM_NEW_2020\j171\Video 1_Ba-LA.png
+394148 !20 [npfilelist  16]	load filelist W:\JETSTREAM_NEW_2020\j171\Video 1_Ba-LA.png
+394252 !20 [ nphistory  37]	undo: ['load'] redo: []
+394253 !20 [   npyshop 627]	(2643, 1714, 3)
+394253 !20 [   npyshop 628]	3
+394326 !20 [   npyshop 653]	ofset [0, 0]
+395075 !20 [   npyshop 176]	open
+395075 !20 [   npimage  81]	open file W:\JETSTREAM_NEW_2020\j171\Video 1_Au-LB1.png
+395392 !20 [npfilelist  16]	load filelist W:\JETSTREAM_NEW_2020\j171\Video 1_Au-LB1.png
+395495 !20 [ nphistory  37]	undo: ['load'] redo: []
+395496 !20 [   npyshop 627]	(2643, 1714, 3)
+395496 !20 [   npyshop 628]	3
+395636 !20 [   npyshop 653]	ofset [0, 0]
+398003 !20 [   npyshop 176]	open
+398003 !20 [   npimage  81]	open file W:\JETSTREAM_NEW_2020\j171\Video 1_Au-LA.png
+398164 !20 [npfilelist  16]	load filelist W:\JETSTREAM_NEW_2020\j171\Video 1_Au-LA.png
+398271 !20 [ nphistory  37]	undo: ['load'] redo: []
+398272 !20 [   npyshop 627]	(2643, 1714, 3)
+398272 !20 [   npyshop 628]	3
+398349 !20 [   npyshop 653]	ofset [0, 0]
+399538 !20 [   npyshop 176]	open
+399538 !20 [   npimage  81]	open file W:\JETSTREAM_NEW_2020\j171\Video 1_Au-LB1.png
+399857 !20 [npfilelist  16]	load filelist W:\JETSTREAM_NEW_2020\j171\Video 1_Au-LB1.png
+399962 !20 [ nphistory  37]	undo: ['load'] redo: []
+399963 !20 [   npyshop 627]	(2643, 1714, 3)
+399963 !20 [   npyshop 628]	3
+400087 !20 [   npyshop 653]	ofset [0, 0]
+400419 !20 [   npyshop 176]	open
+400419 !20 [   npimage  81]	open file W:\JETSTREAM_NEW_2020\j171\Video 1_Au-LA.png
+400584 !20 [npfilelist  16]	load filelist W:\JETSTREAM_NEW_2020\j171\Video 1_Au-LA.png
+400692 !20 [ nphistory  37]	undo: ['load'] redo: []
+400693 !20 [   npyshop 627]	(2643, 1714, 3)
+400693 !20 [   npyshop 628]	3
+400771 !20 [   npyshop 653]	ofset [0, 0]
+401682 !20 [   npyshop 176]	open
+401682 !20 [   npimage  81]	open file W:\JETSTREAM_NEW_2020\j171\Video 1_Au-LB1.png
+401999 !20 [npfilelist  16]	load filelist W:\JETSTREAM_NEW_2020\j171\Video 1_Au-LB1.png
+402101 !20 [ nphistory  37]	undo: ['load'] redo: []
+402101 !20 [   npyshop 627]	(2643, 1714, 3)
+402101 !20 [   npyshop 628]	3
+402226 !20 [   npyshop 653]	ofset [0, 0]
+409090 !20 [   npyshop 176]	open
+409091 !20 [   npimage  81]	open file W:\JETSTREAM_NEW_2020\j171\Video 1_Ba-LA.png
+409226 !20 [npfilelist  16]	load filelist W:\JETSTREAM_NEW_2020\j171\Video 1_Ba-LA.png
+409333 !20 [ nphistory  37]	undo: ['load'] redo: []
+409333 !20 [   npyshop 627]	(2643, 1714, 3)
+409333 !20 [   npyshop 628]	3
+409407 !20 [   npyshop 653]	ofset [0, 0]
+409778 !20 [   npyshop 176]	open
+409778 !20 [   npimage  81]	open file W:\JETSTREAM_NEW_2020\j171\Video 1_Ba-LB2.png
+409923 !20 [npfilelist  16]	load filelist W:\JETSTREAM_NEW_2020\j171\Video 1_Ba-LB2.png
+410025 !20 [ nphistory  37]	undo: ['load'] redo: []
+410026 !20 [   npyshop 627]	(2643, 1714, 3)
+410026 !20 [   npyshop 628]	3
+410102 !20 [   npyshop 653]	ofset [0, 0]
+410109 !20 [   npyshop 176]	open
+410109 !20 [   npimage  81]	open file W:\JETSTREAM_NEW_2020\j171\Video 1_Bi-LA.png
+410378 !20 [npfilelist  16]	load filelist W:\JETSTREAM_NEW_2020\j171\Video 1_Bi-LA.png
+410480 !20 [ nphistory  37]	undo: ['load'] redo: []
+410481 !20 [   npyshop 627]	(2643, 1714, 3)
+410481 !20 [   npyshop 628]	3
+410572 !20 [   npyshop 653]	ofset [0, 0]
+410580 !20 [   npyshop 176]	open
+410580 !20 [   npimage  81]	open file W:\JETSTREAM_NEW_2020\j171\Video 1_Br-KA.png
+410932 !20 [npfilelist  16]	load filelist W:\JETSTREAM_NEW_2020\j171\Video 1_Br-KA.png
+411035 !20 [ nphistory  37]	undo: ['load'] redo: []
+411035 !20 [   npyshop 627]	(2643, 1714, 3)
+411036 !20 [   npyshop 628]	3
+411137 !20 [   npyshop 653]	ofset [0, 0]
+411144 !20 [   npyshop 176]	open
+411144 !20 [   npimage  81]	open file W:\JETSTREAM_NEW_2020\j171\Video 1_Ca-KA.png
+411686 !20 [npfilelist  16]	load filelist W:\JETSTREAM_NEW_2020\j171\Video 1_Ca-KA.png
+411790 !20 [ nphistory  37]	undo: ['load'] redo: []
+411791 !20 [   npyshop 627]	(2643, 1714, 3)
+411791 !20 [   npyshop 628]	3
+411940 !20 [   npyshop 653]	ofset [0, 0]
+411949 !20 [   npyshop 176]	open
+411949 !20 [   npimage  81]	open file W:\JETSTREAM_NEW_2020\j171\Video 1_Cd-KA.png
+412185 !20 [npfilelist  16]	load filelist W:\JETSTREAM_NEW_2020\j171\Video 1_Cd-KA.png
+412292 !20 [ nphistory  37]	undo: ['load'] redo: []
+412293 !20 [   npyshop 627]	(2643, 1714, 3)
+412293 !20 [   npyshop 628]	3
+412378 !20 [   npyshop 653]	ofset [0, 0]
+412386 !20 [   npyshop 176]	open
+412386 !20 [   npimage  81]	open file W:\JETSTREAM_NEW_2020\j171\Video 1_Cl-KA.png
+412529 !20 [npfilelist  16]	load filelist W:\JETSTREAM_NEW_2020\j171\Video 1_Cl-KA.png
+412631 !20 [ nphistory  37]	undo: ['load'] redo: []
+412632 !20 [   npyshop 627]	(2643, 1714, 3)
+412632 !20 [   npyshop 628]	3
+412705 !20 [   npyshop 653]	ofset [0, 0]
+412712 !20 [   npyshop 176]	open
+412712 !20 [   npimage  81]	open file W:\JETSTREAM_NEW_2020\j171\Video 1_Co-KA.png
+412974 !20 [npfilelist  16]	load filelist W:\JETSTREAM_NEW_2020\j171\Video 1_Co-KA.png
+413076 !20 [ nphistory  37]	undo: ['load'] redo: []
+413077 !20 [   npyshop 627]	(2643, 1714, 3)
+413077 !20 [   npyshop 628]	3
+413175 !20 [   npyshop 653]	ofset [0, 0]
+414355 !20 [   npyshop 176]	open
+414355 !20 [   npimage  81]	open file W:\JETSTREAM_NEW_2020\j171\Video 1_Cr-KA.png
+414508 !20 [npfilelist  16]	load filelist W:\JETSTREAM_NEW_2020\j171\Video 1_Cr-KA.png
+414616 !20 [ nphistory  37]	undo: ['load'] redo: []
+414617 !20 [   npyshop 627]	(2643, 1714, 3)
+414617 !20 [   npyshop 628]	3
+414694 !20 [   npyshop 653]	ofset [0, 0]
+415251 !20 [   npyshop 176]	open
+415251 !20 [   npimage  81]	open file W:\JETSTREAM_NEW_2020\j171\Video 1_Cu-KA.png
+415673 !20 [npfilelist  16]	load filelist W:\JETSTREAM_NEW_2020\j171\Video 1_Cu-KA.png
+415779 !20 [ nphistory  37]	undo: ['load'] redo: []
+415780 !20 [   npyshop 627]	(2643, 1714, 3)
+415780 !20 [   npyshop 628]	3
+415877 !20 [   npyshop 653]	ofset [0, 0]
+415939 !20 [   npyshop 176]	open
+415939 !20 [   npimage  81]	open file W:\JETSTREAM_NEW_2020\j171\Video 1_Fe-KA.png
+416327 !20 [npfilelist  16]	load filelist W:\JETSTREAM_NEW_2020\j171\Video 1_Fe-KA.png
+416430 !20 [ nphistory  37]	undo: ['load'] redo: []
+416430 !20 [   npyshop 627]	(2643, 1714, 3)
+416430 !20 [   npyshop 628]	3
+416534 !20 [   npyshop 653]	ofset [0, 0]
+416787 !20 [   npyshop 176]	open
+416787 !20 [   npimage  81]	open file W:\JETSTREAM_NEW_2020\j171\Video 1_Hf-LA.png
+416999 !20 [npfilelist  16]	load filelist W:\JETSTREAM_NEW_2020\j171\Video 1_Hf-LA.png
+417102 !20 [ nphistory  37]	undo: ['load'] redo: []
+417103 !20 [   npyshop 627]	(2643, 1714, 3)
+417103 !20 [   npyshop 628]	3
+417194 !20 [   npyshop 653]	ofset [0, 0]
+417475 !20 [   npyshop 176]	open
+417475 !20 [   npimage  81]	open file W:\JETSTREAM_NEW_2020\j171\Video 1_Fe-KA.png
+417868 !20 [npfilelist  16]	load filelist W:\JETSTREAM_NEW_2020\j171\Video 1_Fe-KA.png
+417975 !20 [ nphistory  37]	undo: ['load'] redo: []
+417976 !20 [   npyshop 627]	(2643, 1714, 3)
+417976 !20 [   npyshop 628]	3
+418079 !20 [   npyshop 653]	ofset [0, 0]
+455699 !20 [   npyshop 742]	zoom in
+455699 !20 [   npyshop 757]	xy 465.0 906.0 canvas c 559.0 509.5 ofset [0, -203.5]             mofset [0, -203.5] zoom 2             zoom step 1 magnif_change 1.5
+455699 !20 [   npyshop 627]	(2643, 1714, 3)
+455699 !20 [   npyshop 628]	2
+455927 !20 [   npyshop 653]	ofset [0, -203.5]
+2142560 !20 [   npyshop 176]	open
+2142561 !20 [   npimage  81]	open file W:\JETSTREAM_NEW_2020\j171\Video 1_Hf-LA.png
+2142781 !20 [npfilelist  16]	load filelist W:\JETSTREAM_NEW_2020\j171\Video 1_Hf-LA.png
+2142885 !20 [ nphistory  37]	undo: ['load'] redo: []
+2142886 !20 [   npyshop 627]	(2643, 1714, 3)
+2142886 !20 [   npyshop 628]	3
+2142982 !20 [   npyshop 653]	ofset [0, 0]
+2143457 !20 [   npyshop 176]	open
+2143457 !20 [   npimage  81]	open file W:\JETSTREAM_NEW_2020\j171\Video 1_Hg-LA.png
+2143707 !20 [npfilelist  16]	load filelist W:\JETSTREAM_NEW_2020\j171\Video 1_Hg-LA.png
+2143811 !20 [ nphistory  37]	undo: ['load'] redo: []
+2143812 !20 [   npyshop 627]	(2643, 1714, 3)
+2143812 !20 [   npyshop 628]	3
+2143907 !20 [   npyshop 653]	ofset [0, 0]
+2144960 !20 [   npyshop 176]	open
+2144961 !20 [   npimage  81]	open file W:\JETSTREAM_NEW_2020\j171\Video 1_K-KA.png
+2145220 !20 [npfilelist  16]	load filelist W:\JETSTREAM_NEW_2020\j171\Video 1_K-KA.png
+2145329 !20 [ nphistory  37]	undo: ['load'] redo: []
+2145329 !20 [   npyshop 627]	(2643, 1714, 3)
+2145329 !20 [   npyshop 628]	3
+2145416 !20 [   npyshop 653]	ofset [0, 0]
+2145808 !20 [   npyshop 176]	open
+2145808 !20 [   npimage  81]	open file W:\JETSTREAM_NEW_2020\j171\Video 1_Mg-K.png
+2145936 !20 [npfilelist  16]	load filelist W:\JETSTREAM_NEW_2020\j171\Video 1_Mg-K.png
+2146044 !20 [ nphistory  37]	undo: ['load'] redo: []
+2146045 !20 [   npyshop 627]	(2643, 1714, 3)
+2146045 !20 [   npyshop 628]	3
+2146120 !20 [   npyshop 653]	ofset [0, 0]
+2146576 !20 [   npyshop 176]	open
+2146576 !20 [   npimage  81]	open file W:\JETSTREAM_NEW_2020\j171\Video 1_K-KA.png
+2146842 !20 [npfilelist  16]	load filelist W:\JETSTREAM_NEW_2020\j171\Video 1_K-KA.png
+2146946 !20 [ nphistory  37]	undo: ['load'] redo: []
+2146947 !20 [   npyshop 627]	(2643, 1714, 3)
+2146947 !20 [   npyshop 628]	3
+2147035 !20 [   npyshop 653]	ofset [0, 0]
+2157360 !20 [   npyshop 176]	open
+2157360 !20 [   npimage  81]	open file W:\JETSTREAM_NEW_2020\j171\Video 1_Mg-K.png
+2157497 !20 [npfilelist  16]	load filelist W:\JETSTREAM_NEW_2020\j171\Video 1_Mg-K.png
+2157608 !20 [ nphistory  37]	undo: ['load'] redo: []
+2157608 !20 [   npyshop 627]	(2643, 1714, 3)
+2157608 !20 [   npyshop 628]	3
+2157684 !20 [   npyshop 653]	ofset [0, 0]
+2158080 !20 [   npyshop 176]	open
+2158080 !20 [   npimage  81]	open file W:\JETSTREAM_NEW_2020\j171\Video 1_K-KA.png
+2158346 !20 [npfilelist  16]	load filelist W:\JETSTREAM_NEW_2020\j171\Video 1_K-KA.png
+2158451 !20 [ nphistory  37]	undo: ['load'] redo: []
+2158452 !20 [   npyshop 627]	(2643, 1714, 3)
+2158452 !20 [   npyshop 628]	3
+2158540 !20 [   npyshop 653]	ofset [0, 0]
+2164896 !20 [   npyshop 176]	open
+2164896 !20 [   npimage  81]	open file W:\JETSTREAM_NEW_2020\j171\Video 1_Mg-K.png
+2165031 !20 [npfilelist  16]	load filelist W:\JETSTREAM_NEW_2020\j171\Video 1_Mg-K.png
+2165134 !20 [ nphistory  37]	undo: ['load'] redo: []
+2165135 !20 [   npyshop 627]	(2643, 1714, 3)
+2165135 !20 [   npyshop 628]	3
+2165226 !20 [   npyshop 653]	ofset [0, 0]
+2165728 !20 [   npyshop 176]	open
+2165728 !20 [   npimage  81]	open file W:\JETSTREAM_NEW_2020\j171\Video 1_Mn-KA.png
+2165909 !20 [npfilelist  16]	load filelist W:\JETSTREAM_NEW_2020\j171\Video 1_Mn-KA.png
+2166013 !20 [ nphistory  37]	undo: ['load'] redo: []
+2166014 !20 [   npyshop 627]	(2643, 1714, 3)
+2166014 !20 [   npyshop 628]	3
+2166095 !20 [   npyshop 653]	ofset [0, 0]
+2166624 !20 [   npyshop 176]	open
+2166624 !20 [   npimage  81]	open file W:\JETSTREAM_NEW_2020\j171\Video 1_Ni-KA.png
+2166748 !20 [npfilelist  16]	load filelist W:\JETSTREAM_NEW_2020\j171\Video 1_Ni-KA.png
+2166861 !20 [ nphistory  37]	undo: ['load'] redo: []
+2166861 !20 [   npyshop 627]	(2643, 1714, 3)
+2166861 !20 [   npyshop 628]	3
+2166936 !20 [   npyshop 653]	ofset [0, 0]
+2167952 !20 [   npyshop 176]	open
+2167952 !20 [   npimage  81]	open file W:\JETSTREAM_NEW_2020\j171\Video 1_P-KA.png
+2168087 !20 [npfilelist  16]	load filelist W:\JETSTREAM_NEW_2020\j171\Video 1_P-KA.png
+2168193 !20 [ nphistory  37]	undo: ['load'] redo: []
+2168193 !20 [   npyshop 627]	(2643, 1714, 3)
+2168193 !20 [   npyshop 628]	3
+2168282 !20 [   npyshop 653]	ofset [0, 0]
+2168944 !20 [   npyshop 176]	open
+2168944 !20 [   npimage  81]	open file W:\JETSTREAM_NEW_2020\j171\Video 1_Pb-LA.png
+2169608 !20 [npfilelist  16]	load filelist W:\JETSTREAM_NEW_2020\j171\Video 1_Pb-LA.png
+2169717 !20 [ nphistory  37]	undo: ['load'] redo: []
+2169718 !20 [   npyshop 627]	(2643, 1714, 3)
+2169718 !20 [   npyshop 628]	3
+2169850 !20 [   npyshop 653]	ofset [0, 0]
+2169856 !20 [   npyshop 176]	open
+2169857 !20 [   npimage  81]	open file W:\JETSTREAM_NEW_2020\j171\Video 1_Pb-LB.png
+2170380 !20 [npfilelist  16]	load filelist W:\JETSTREAM_NEW_2020\j171\Video 1_Pb-LB.png
+2170494 !20 [ nphistory  37]	undo: ['load'] redo: []
+2170494 !20 [   npyshop 627]	(2643, 1714, 3)
+2170494 !20 [   npyshop 628]	3
+2170656 !20 [   npyshop 653]	ofset [0, 0]
+2170664 !20 [   npyshop 176]	open
+2170664 !20 [   npimage  81]	open file W:\JETSTREAM_NEW_2020\j171\Video 1_Rh-KA.png
+2170997 !20 [npfilelist  16]	load filelist W:\JETSTREAM_NEW_2020\j171\Video 1_Rh-KA.png
+2171106 !20 [ nphistory  37]	undo: ['load'] redo: []
+2171106 !20 [   npyshop 627]	(2643, 1714, 3)
+2171107 !20 [   npyshop 628]	3
+2171236 !20 [   npyshop 653]	ofset [0, 0]
+2171616 !20 [   npyshop 176]	open
+2171616 !20 [   npimage  81]	open file W:\JETSTREAM_NEW_2020\j171\Video 1_S-KA.png
+2171888 !20 [npfilelist  16]	load filelist W:\JETSTREAM_NEW_2020\j171\Video 1_S-KA.png
+2171992 !20 [ nphistory  37]	undo: ['load'] redo: []
+2171993 !20 [   npyshop 627]	(2643, 1714, 3)
+2171993 !20 [   npyshop 628]	3
+2172109 !20 [   npyshop 653]	ofset [0, 0]
+2172592 !20 [   npyshop 176]	open
+2172592 !20 [   npimage  81]	open file W:\JETSTREAM_NEW_2020\j171\Video 1_Sb-KA.png
+2172731 !20 [npfilelist  16]	load filelist W:\JETSTREAM_NEW_2020\j171\Video 1_Sb-KA.png
+2172835 !20 [ nphistory  37]	undo: ['load'] redo: []
+2172835 !20 [   npyshop 627]	(2643, 1714, 3)
+2172835 !20 [   npyshop 628]	3
+2172911 !20 [   npyshop 653]	ofset [0, 0]
+2173360 !20 [   npyshop 176]	open
+2173361 !20 [   npimage  81]	open file W:\JETSTREAM_NEW_2020\j171\Video 1_Se-KA.png
+2173565 !20 [npfilelist  16]	load filelist W:\JETSTREAM_NEW_2020\j171\Video 1_Se-KA.png
+2173676 !20 [ nphistory  37]	undo: ['load'] redo: []
+2173676 !20 [   npyshop 627]	(2643, 1714, 3)
+2173676 !20 [   npyshop 628]	3
+2173762 !20 [   npyshop 653]	ofset [0, 0]
+2174160 !20 [   npyshop 176]	open
+2174160 !20 [   npimage  81]	open file W:\JETSTREAM_NEW_2020\j171\Video 1_Si-K.png
+2174289 !20 [npfilelist  16]	load filelist W:\JETSTREAM_NEW_2020\j171\Video 1_Si-K.png
+2174396 !20 [ nphistory  37]	undo: ['load'] redo: []
+2174396 !20 [   npyshop 627]	(2643, 1714, 3)
+2174396 !20 [   npyshop 628]	3
+2174480 !20 [   npyshop 653]	ofset [0, 0]
+2174880 !20 [   npyshop 176]	open
+2174880 !20 [   npimage  81]	open file W:\JETSTREAM_NEW_2020\j171\Video 1_Sn-KA.png
+2175071 !20 [npfilelist  16]	load filelist W:\JETSTREAM_NEW_2020\j171\Video 1_Sn-KA.png
+2175173 !20 [ nphistory  37]	undo: ['load'] redo: []
+2175174 !20 [   npyshop 627]	(2643, 1714, 3)
+2175174 !20 [   npyshop 628]	3
+2175267 !20 [   npyshop 653]	ofset [0, 0]
+2175855 !20 [   npyshop 176]	open
+2175855 !20 [   npimage  81]	open file W:\JETSTREAM_NEW_2020\j171\Video 1_Sr-KA.png
+2176022 !20 [npfilelist  16]	load filelist W:\JETSTREAM_NEW_2020\j171\Video 1_Sr-KA.png
+2176128 !20 [ nphistory  37]	undo: ['load'] redo: []
+2176128 !20 [   npyshop 627]	(2643, 1714, 3)
+2176129 !20 [   npyshop 628]	3
+2176215 !20 [   npyshop 653]	ofset [0, 0]
+2176816 !20 [   npyshop 176]	open
+2176816 !20 [   npimage  81]	open file W:\JETSTREAM_NEW_2020\j171\Video 1_Ti-KA.png
+2176968 !20 [npfilelist  16]	load filelist W:\JETSTREAM_NEW_2020\j171\Video 1_Ti-KA.png
+2177073 !20 [ nphistory  37]	undo: ['load'] redo: []
+2177073 !20 [   npyshop 627]	(2643, 1714, 3)
+2177073 !20 [   npyshop 628]	3
+2177150 !20 [   npyshop 653]	ofset [0, 0]
+2177680 !20 [   npyshop 176]	open
+2177680 !20 [   npimage  81]	open file W:\JETSTREAM_NEW_2020\j171\Video 1_Video 1.png
+2178306 !20 [npfilelist  16]	load filelist W:\JETSTREAM_NEW_2020\j171\Video 1_Video 1.png
+2178411 !20 [ nphistory  37]	undo: ['load'] redo: []
+2178411 !20 [   npyshop 627]	(2643, 1714, 3)
+2178411 !20 [   npyshop 628]	3
+2178574 !20 [   npyshop 653]	ofset [0, 0]
+2181871 !20 [   npyshop 176]	open
+2181871 !20 [   npimage  81]	open file W:\JETSTREAM_NEW_2020\j171\Video 1_Zn-KA.png
+2182162 !20 [npfilelist  16]	load filelist W:\JETSTREAM_NEW_2020\j171\Video 1_Zn-KA.png
+2182268 !20 [ nphistory  37]	undo: ['load'] redo: []
+2182269 !20 [   npyshop 627]	(2643, 1714, 3)
+2182269 !20 [   npyshop 628]	3
+2182364 !20 [   npyshop 653]	ofset [0, 0]
+2182591 !20 [   npyshop 176]	open
+2182591 !20 [   npimage  81]	open file W:\JETSTREAM_NEW_2020\j171\Video 1_Video 1.png
+2183230 !20 [npfilelist  16]	load filelist W:\JETSTREAM_NEW_2020\j171\Video 1_Video 1.png
+2183333 !20 [ nphistory  37]	undo: ['load'] redo: []
+2183333 !20 [   npyshop 627]	(2643, 1714, 3)
+2183333 !20 [   npyshop 628]	3
+2183519 !20 [   npyshop 653]	ofset [0, 0]
