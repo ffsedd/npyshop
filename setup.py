@@ -13,7 +13,7 @@ setup(
     author='ffsedd',
     author_email='ffsedd@gmail.com',
     description='python image editor',
-    packages=['npyshop'],
+    packages=find_packages(where=''),  # Required
     #scripts=['qq'],
     install_requires=['send2trash', 'pillow', 'numpy'],
     include_package_data=True,
