@@ -11,7 +11,7 @@ from functools import wraps
 
 from PIL import Image, ImageTk
 
-from skimage import img_as_ubyte
+from skimage_dtype import img_as_ubyte
 
 import npimage
 import nphistory

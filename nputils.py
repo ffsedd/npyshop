@@ -12,7 +12,7 @@ from pathlib import Path
 
 from imageio import imread, imwrite
 
-from skimage import img_as_float, img_as_ubyte, img_as_uint
+from skimage_dtype import img_as_float, img_as_ubyte, img_as_uint
 from matplotlib.colors import rgb_to_hsv, hsv_to_rgb
 
 from testing.timeit import timeit

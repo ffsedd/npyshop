@@ -5,7 +5,7 @@ import tkinter as tk
 from matplotlib import pyplot as plt
 from matplotlib.backends.backend_tkagg import FigureCanvasTkAgg
 
-from skimage import exposure  # histogram plotting, equalizing
+from skimage_exposure import cumulative_distribution  # histogram plotting
 
 from testing.timeit import timeit
 
@@ -83,6 +83,6 @@ class histWin(tk.Toplevel):
         self.ax_cdf.cla()
         self.ax_hist.hist(self.master.img.arr.ravel(), bins=self.bins, range=(0, 1),
                           density=True, histtype='step', color='black')
-        img_cdf, bins = exposure.cumulative_distribution(self.master.img.arr, self.bins)
+        img_cdf, bins = cumulative_distribution(self.master.img.arr, self.bins)
         self.ax_cdf.plot(bins, img_cdf, 'r')
         self.canvas.draw()
