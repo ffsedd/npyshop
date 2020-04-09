@@ -1,8 +1,135 @@
-620 !20 [   npimage  81]	open file /home/m/Dropbox/alma_scripts/pyalma/npyshop/sample.jpg
-694 !20 [   npimage  32]	bitdepth 8
-694 !20 [npfilelist  16]	load filelist /home/m/Dropbox/alma_scripts/pyalma/npyshop/sample.jpg
-970 !20 [ nphistory  37]	undo: ['orig'] redo: []
-1029 !20 [   npyshop 627]	(639, 960, 3)
-1029 !20 [   npyshop 628]	1
-1116 !20 [   npyshop 653]	ofset [0, 0]
-1121 !20 [   npyshop 876]	mainloop in 0.6132948398590088
+576 !20 [   npimage  81]	open file /home/m/Dropbox/alma_scripts/pyalma/npyshop/sample.jpg
+608 !20 [   npimage  32]	bitdepth 8
+608 !20 [npfilelist  16]	load filelist /home/m/Dropbox/alma_scripts/pyalma/npyshop/sample.jpg
+848 !20 [ nphistory  37]	undo: ['orig'] redo: []
+921 !20 [   npyshop 627]	(639, 960, 3)
+922 !20 [   npyshop 628]	1
+994 !20 [   npyshop 653]	ofset [0, 0]
+998 !20 [   npyshop 876]	mainloop in 0.4994819164276123
+2662 !20 [   npyshop 176]	open
+2662 !20 [   npyshop 179]	fpath input dialog
+5659 !20 [   npimage  81]	open file /home/m/DATA/dbox/ZUMI/zakazky/1510_Pozler/pudorys.jpg
+6304 !20 [npfilelist  16]	load filelist /home/m/DATA/dbox/ZUMI/zakazky/1510_Pozler/pudorys.jpg
+7188 !20 [ nphistory  37]	undo: ['load'] redo: []
+7188 !20 [   npyshop 627]	(2755, 4107, 3)
+7188 !20 [   npyshop 628]	5
+7230 !20 [   npyshop 653]	ofset [0, 0]
+11259 !20 [ nphistory  37]	undo: ['load', 'normalize'] redo: []
+11329 !20 [   npyshop 627]	(2755, 4107, 3)
+11329 !20 [   npyshop 628]	5
+11366 !20 [   npyshop 653]	ofset [0, 0]
+11370 !20 [   npyshop 341]	added to history
+23690 !20 [   npyshop 320]	select all
+33577 !20 [   npyshop 276]	rgb2gray
+33981 !20 [ nphistory  37]	undo: ['load', 'normalize', 'rgb2gray'] redo: []
+33981 !20 [   npyshop 627]	(2755, 4107)
+33981 !20 [   npyshop 628]	5
+33996 !20 [   npyshop 653]	ofset [0, 0]
+48239 !20 [ nphistory  37]	undo: ['load', 'normalize', 'rgb2gray', 'clip_high'] redo: []
+48239 !20 [   npyshop 627]	(2755, 4107)
+48239 !20 [   npyshop 628]	5
+48252 !20 [   npyshop 653]	ofset [0, 0]
+48867 !20 [   npyshop 341]	added to history
+53730 !20 [ nphistory  37]	undo: ['load', 'normalize', 'rgb2gray', 'clip_high', 'clip_low'] redo: []
+53730 !20 [   npyshop 627]	(2755, 4107)
+53730 !20 [   npyshop 628]	5
+53743 !20 [   npyshop 653]	ofset [0, 0]
+54444 !20 [   npyshop 341]	added to history
+55758 !20 [ nphistory  37]	undo: ['load', 'normalize', 'rgb2gray', 'clip_high', 'clip_low', 'normalize'] redo: []
+55782 !20 [   npyshop 627]	(2755, 4107)
+55782 !20 [   npyshop 628]	5
+55796 !20 [   npyshop 653]	ofset [0, 0]
+56502 !20 [   npyshop 341]	added to history
+61113 !20 [   npyshop 742]	zoom in
+61113 !20 [   npyshop 757]	xy 724.0 160.0 canvas c 537.5 992.0 ofset [0, 0]             mofset [0, 0] zoom 3             zoom step 1 magnif_change 1.6666666666666665
+61113 !20 [   npyshop 627]	(2755, 4107)
+61114 !20 [   npyshop 628]	3
+61154 !20 [   npyshop 653]	ofset [0, 0]
+61793 !20 [   npyshop 742]	zoom in
+61793 !20 [   npyshop 757]	xy 722.0 160.0 canvas c 537.5 992.0 ofset [-69.5, 0]             mofset [-69.5, 0] zoom 2             zoom step 1 magnif_change 1.5
+61793 !20 [   npyshop 627]	(2755, 4107)
+61793 !20 [   npyshop 628]	2
+61871 !20 [   npyshop 653]	ofset [-69.5, 0]
+62905 !20 [   npyshop 726]	zoom out
+62905 !20 [   npyshop 731]	view_wid 1369.0
+62905 !20 [   npyshop 627]	(2755, 4107)
+62905 !20 [   npyshop 628]	3
+62942 !20 [   npyshop 653]	ofset [0, 0]
+69625 !20 [   npyshop 248]	undo
+69625 !20 [ nphistory  53]	undo: ['load', 'normalize', 'rgb2gray', 'clip_high', 'clip_low'] redo: ['normalize']
+69679 !20 [   npyshop 627]	(2755, 4107)
+69680 !20 [   npyshop 628]	3
+69710 !20 [   npyshop 653]	ofset [0, 0]
+76693 !20 [ nphistory  37]	undo: ['load', 'normalize', 'rgb2gray', 'clip_high', 'clip_low', 'clip_high'] redo: []
+76693 !20 [   npyshop 627]	(2755, 4107)
+76694 !20 [   npyshop 628]	3
+76726 !20 [   npyshop 653]	ofset [0, 0]
+77325 !20 [   npyshop 341]	added to history
+88252 !20 [   npyshop 248]	undo
+88252 !20 [ nphistory  53]	undo: ['load', 'normalize', 'rgb2gray', 'clip_high', 'clip_low'] redo: ['clip_high']
+88306 !20 [   npyshop 627]	(2755, 4107)
+88307 !20 [   npyshop 628]	3
+88337 !20 [   npyshop 653]	ofset [0, 0]
+89412 !20 [   npyshop 248]	undo
+89412 !20 [ nphistory  53]	undo: ['load', 'normalize', 'rgb2gray', 'clip_high'] redo: ['clip_high', 'clip_low']
+89466 !20 [   npyshop 627]	(2755, 4107)
+89467 !20 [   npyshop 628]	3
+89496 !20 [   npyshop 653]	ofset [0, 0]
+94587 !20 [ nphistory  37]	undo: ['load', 'normalize', 'rgb2gray', 'clip_high', 'normalize'] redo: []
+94609 !20 [   npyshop 627]	(2755, 4107)
+94609 !20 [   npyshop 628]	3
+94638 !20 [   npyshop 653]	ofset [0, 0]
+95246 !20 [   npyshop 341]	added to history
+102915 !20 [ nphistory  37]	undo: ['load', 'normalize', 'rgb2gray', 'clip_high', 'normalize', 'gamma'] redo: []
+102938 !20 [   npyshop 627]	(2755, 4107)
+102938 !20 [   npyshop 628]	3
+102968 !20 [   npyshop 653]	ofset [0, 0]
+103592 !20 [   npyshop 341]	added to history
+114284 !20 [ nphistory  37]	undo: ['load', 'normalize', 'rgb2gray', 'clip_high', 'normalize', 'gamma', 'gamma'] redo: []
+114308 !20 [   npyshop 627]	(2755, 4107)
+114308 !20 [   npyshop 628]	3
+114341 !20 [   npyshop 653]	ofset [0, 0]
+115026 !20 [   npyshop 341]	added to history
+117898 !20 [   npyshop 248]	undo
+117898 !20 [ nphistory  53]	undo: ['load', 'normalize', 'rgb2gray', 'clip_high', 'normalize', 'gamma'] redo: ['gamma']
+117955 !20 [   npyshop 627]	(2755, 4107)
+117956 !20 [   npyshop 628]	3
+117989 !20 [   npyshop 653]	ofset [0, 0]
+122872 !20 [ nphistory  37]	undo: ['load', 'normalize', 'rgb2gray', 'clip_high', 'normalize', 'gamma', 'gamma'] redo: []
+122894 !20 [   npyshop 627]	(2755, 4107)
+122895 !20 [   npyshop 628]	3
+122925 !20 [   npyshop 653]	ofset [0, 0]
+123541 !20 [   npyshop 341]	added to history
+131779 !20 [ nphistory  37]	undo: ['load', 'normalize', 'rgb2gray', 'clip_high', 'normalize', 'gamma', 'gamma', 'clip_low'] redo: []
+131779 !20 [   npyshop 627]	(2755, 4107)
+131780 !20 [   npyshop 628]	3
+131809 !20 [   npyshop 653]	ofset [0, 0]
+132419 !20 [   npyshop 341]	added to history
+134356 !20 [ nphistory  37]	undo: ['load', 'normalize', 'rgb2gray', 'clip_high', 'normalize', 'gamma', 'gamma', 'clip_low', 'normalize'] redo: []
+134378 !20 [   npyshop 627]	(2755, 4107)
+134378 !20 [   npyshop 628]	3
+134411 !20 [   npyshop 653]	ofset [0, 0]
+135101 !20 [   npyshop 341]	added to history
+145850 !20 [   npyshop 209]	save
+145850 !20 [   npimage 149]	save to /home/m/DATA/dbox/ZUMI/zakazky/1510_Pozler/pudorys.jpg bitdepth:8 filetype:jpeg
+151129 !20 [   npyshop 276]	fft_toggle
+183001 !20 [   npyshop 726]	zoom out
+183001 !20 [   npyshop 731]	view_wid 1026.75
+183001 !20 [   npyshop 627]	(2755, 4107)
+183002 !20 [   npyshop 628]	4
+183026 !20 [   npyshop 653]	ofset [0, 0]
+198232 !20 [   npyshop 334]	Exception: input empty
+204152 !20 [   npyshop 176]	open
+204153 !20 [   npyshop 179]	fpath input dialog
+208680 !20 [   npyshop 176]	open
+208680 !20 [   npyshop 179]	fpath input dialog
+212880 !20 [   npyshop 176]	open
+212880 !20 [   npyshop 179]	fpath input dialog
+224826 !20 [   npyshop 465]	selection geom: [12, 129, 993, 571] crop
+224826 !20 [   npimage 218]	apply crop: 12 993 129 571
+224826 !20 [   npyshop 627]	(1768, 3924)
+224826 !20 [   npyshop 628]	4
+224843 !20 [   npyshop 653]	ofset [0, 0]
+224870 !20 [ nphistory  37]	undo: ['load', 'normalize', 'rgb2gray', 'clip_high', 'normalize', 'gamma', 'gamma', 'clip_low', 'normalize', 'crop'] redo: []
+226567 !20 [   npyshop 209]	save
+226568 !20 [   npimage 149]	save to /home/m/DATA/dbox/ZUMI/zakazky/1510_Pozler/pudorys.jpg bitdepth:8 filetype:jpeg
